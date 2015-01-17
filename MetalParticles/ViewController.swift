@@ -67,7 +67,14 @@ class ViewController: UIViewController
     {
         for _ in 0 ..< particleCount
         {
-            let particle = Particle(positionX: Float(arc4random() % 640), positionY: Float(arc4random() % 640))
+            let positionX = Float(arc4random() % 640)
+            let positionY = Float(arc4random() % 640)
+            let velocityX = (Float(arc4random() % 10) - 5) / 10.0
+            let velocityY = (Float(arc4random() % 10) - 5) / 10.0
+         
+            let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY)
+            
+            
             
             particles.append(particle)
         }
@@ -76,9 +83,8 @@ class ViewController: UIViewController
     func setUpMetal()
     {
         device = MTLCreateSystemDefaultDevice()
-        
-        println("device = \(device)")
-        
+   
+
         if device == nil
         {
             errorFlag = true
@@ -95,11 +101,32 @@ class ViewController: UIViewController
             threadGroups = MTLSizeMake(Int(imageSide) / threadGroupCount.width, Int(imageSide) / threadGroupCount.height, 1)
             
             setUpTexture()
+            
             run()
         }
     }
     
     func run()
+    {
+        Async.background()
+            {
+                // self.image = self.applyFilter()
+                
+                self.applyShader()
+            }
+            .main
+            {
+                self.imageView.image = self.image
+                
+                self.textureA.replaceRegion(self.region, mipmapLevel: 0, withBytes: self.blankBitmapRawData, bytesPerRow: Int(self.bytesPerRow))
+                
+                self.run();
+        }
+    }
+    
+    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
+    
+    func applyShader()
     {
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
@@ -107,15 +134,19 @@ class ViewController: UIViewController
         commandEncoder.setComputePipelineState(pipelineState)
         
         var particleVectorByteLength = particles.count*sizeofValue(particles[0])
-  
+        
         var buffer: MTLBuffer = device.newBufferWithBytes(&particles, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(buffer, offset: 0, atIndex: 0)
         
         var inVectorBuffer = device.newBufferWithBytes(&particles, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(inVectorBuffer, offset: 0, atIndex: 0)
-
-        commandQueue = device.newCommandQueue()
         
+        
+        
+        var resultdata = [Particle](count:particles.count, repeatedValue: Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0))
+        var outVectorBuffer = device.newBufferWithBytes(&resultdata, length: particleVectorByteLength, options: nil)
+        commandEncoder.setBuffer(outVectorBuffer, offset: 0, atIndex: 1)
+      
         commandEncoder.setTexture(textureA, atIndex: 0)
         
         var threadsPerGroup = MTLSize(width:32,height:1,depth:1)
@@ -126,24 +157,25 @@ class ViewController: UIViewController
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
         
+        
+        var data = NSData(bytesNoCopy: outVectorBuffer.contents(),
+            length: particles.count*sizeof(Particle), freeWhenDone: false)
+        var finalResultArray = [Particle](count: particles.count, repeatedValue: Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0))
+        data.getBytes(&finalResultArray, length:particles.count * sizeof(Particle))
+        
+        particles = finalResultArray
+     
         textureA.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
         
         let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &imageBytes, length: providerLength))
         
         let imageRef = CGImageCreate(UInt(imageSize.width), UInt(imageSize.height), bitsPerComponent, bitsPerPixel, bytesPerRow, rgbColorSpace, bitmapInfo, providerRef, nil, false, renderingIntent)
         
-        let image =  UIImage(CGImage: imageRef)!
-        
-        println("got image \(image.size)")
-        
-        imageView.image = image
+        image =  UIImage(CGImage: imageRef)!
     }
-    
 
     func setUpTexture()
     {
-
-        
         var rawData = [UInt8](count: Int(imageSide * imageSide * 4), repeatedValue: 0)
         
         let context = CGBitmapContextCreate(&rawData, imageSide, imageSide, bitsPerComponent, bytesPerRow, rgbColorSpace, bitmapInfo)
@@ -158,11 +190,7 @@ class ViewController: UIViewController
 
     override func viewDidLayoutSubviews()
     {
-        println("viewDidLayoutSubviews")
-        
         imageView.frame = CGRect(x: 0, y: 0, width: 640, height: 640)
-        
-        run()
     }
     
     override func didReceiveMemoryWarning()
@@ -178,5 +206,7 @@ struct Particle
 {
     var positionX: Float = 0
     var positionY: Float = 0
+    var velocityX: Float = 0
+    var velocityY: Float = 0
 }
 

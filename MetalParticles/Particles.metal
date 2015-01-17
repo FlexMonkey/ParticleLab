@@ -32,7 +32,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float distanceSquared = ((thisParticle.positionX - inGravityWell.positionX) * (thisParticle.positionX - inGravityWell.positionX)) +  ((thisParticle.positionY - inGravityWell.positionY) * (thisParticle.positionY - inGravityWell.positionY));
     const float distance = distanceSquared < 1 ? 1 : sqrt(distanceSquared);
-    const float factor = (1 / distance) * ((id < 100000) ? 0.01 : 0.02);
+    const float factor = (1 / distance) * ((id < 100000) ? 0.01 : 0.015);
     
     float newVelocityX = (thisParticle.velocityX * 0.999) + (inGravityWell.positionX - thisParticle.positionX) * factor;
     float newVelocityY = (thisParticle.velocityY * 0.999) + (inGravityWell.positionY - thisParticle.positionY) * factor;

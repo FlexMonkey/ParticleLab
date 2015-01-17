@@ -70,24 +70,39 @@ class ViewController: UIViewController
         setUpMetal()
     }
     
+    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    {
+        let location = event.allTouches()?.anyObject()?.locationInView(imageView)
+        
+        if let _location = location
+        {
+            positionGravityWell(_location)
+        }
+    }
+    
     override func touchesMoved(touches: NSSet, withEvent event: UIEvent)
     {
-        let touch = event.allTouches()?.anyObject()?.locationInView(imageView)
+        let location = event.allTouches()?.anyObject()?.locationInView(imageView)
         
-        if let _touch = touch
+        if let _location = location
         {
-            if markerWidget.alpha == 0
-            {
-                UIView.animateWithDuration(0.25, animations: {self.markerWidget.alpha = 1})
-            }
-            
-            let imageScale = imageView.frame.width / 640
-            
-            gravityWell.x = _touch.x / imageScale
-            gravityWell.y = _touch.y / imageScale
-            
-            markerWidget.frame = CGRect(x: imageView.frame.origin.x + _touch.x, y: imageView.frame.origin.y + _touch.y, width: 0, height: 0)
+            positionGravityWell(_location)
         }
+    }
+    
+    func positionGravityWell(location: CGPoint)
+    {
+        if markerWidget.alpha == 0
+        {
+            UIView.animateWithDuration(0.25, animations: {self.markerWidget.alpha = 1})
+        }
+        
+        let imageScale = imageView.frame.width / 640
+        
+        gravityWell.x = location.x / imageScale
+        gravityWell.y = location.y / imageScale
+        
+        markerWidget.frame = CGRect(x: imageView.frame.origin.x + location.x, y: imageView.frame.origin.y + location.y, width: 0, height: 0)
     }
     
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent)

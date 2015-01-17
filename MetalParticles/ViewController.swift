@@ -110,8 +110,6 @@ class ViewController: UIViewController
     {
         Async.background()
             {
-                // self.image = self.applyFilter()
-                
                 self.applyShader()
             }
             .main

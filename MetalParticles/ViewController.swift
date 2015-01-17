@@ -179,9 +179,7 @@ class ViewController: UIViewController
             .main
             {
                 self.imageView.image = self.image
-                
-                self.textureA.replaceRegion(self.region, mipmapLevel: 0, withBytes: self.blankBitmapRawData, bytesPerRow: Int(self.bytesPerRow))
-                
+
                 self.run();
         }
     }
@@ -216,6 +214,8 @@ class ViewController: UIViewController
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
+        
+        textureA.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
         
         commandEncoder.setTexture(textureA, atIndex: 0)
         

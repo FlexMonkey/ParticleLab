@@ -36,10 +36,10 @@ class ViewController: UIViewController
     var commandQueue: MTLCommandQueue! = nil
     
     let imageView =  UIImageView(frame: CGRectZero)
+    let markerWidget = MarkerWidget(frame: CGRectZero)
     
     var region: MTLRegion!
     var textureA: MTLTexture!
-    // var textureB: MTLTexture!
     
     var image:UIImage!
     var errorFlag:Bool = false
@@ -47,35 +47,84 @@ class ViewController: UIViewController
     var threadGroupCount:MTLSize!
     var threadGroups: MTLSize!
     
-    let particleCount: Int = 100000
+    let particleCount: Int = 200000
     var particles = [Particle]()
+    
+    var gravityWell = CGPoint(x: 320, y: 320)
 
     override func viewDidLoad()
     {
         super.viewDidLoad()
+        
+        view.backgroundColor = UIColor.blackColor()
 
         imageView.contentMode = UIViewContentMode.ScaleAspectFit
-        
+
+        markerWidget.alpha = 0
+    
         view.addSubview(imageView)
+        view.addSubview(markerWidget)
         
         setUpParticles()
         
         setUpMetal()
     }
     
+    override func touchesMoved(touches: NSSet, withEvent event: UIEvent)
+    {
+        let touch = event.allTouches()?.anyObject()?.locationInView(imageView)
+        
+        if let _touch = touch
+        {
+            if markerWidget.alpha == 0
+            {
+                UIView.animateWithDuration(0.25, animations: {self.markerWidget.alpha = 1})
+            }
+            
+            let imageScale = imageView.frame.width / 640
+            
+            gravityWell.x = _touch.x / imageScale
+            gravityWell.y = _touch.y / imageScale
+            
+            markerWidget.frame = CGRect(x: imageView.frame.origin.x + _touch.x, y: imageView.frame.origin.y + _touch.y, width: 0, height: 0)
+        }
+    }
+    
+    override func touchesEnded(touches: NSSet, withEvent event: UIEvent)
+    {
+        UIView.animateWithDuration(1.0, delay: 2.0, options: nil, animations: {self.markerWidget.alpha = 0}, completion: nil)
+    }
+    
     func setUpParticles()
     {
         for _ in 0 ..< particleCount
         {
-            let positionX = Float(arc4random() % 640)
-            let positionY = Float(arc4random() % 640)
+            var positionX = Float(arc4random() % 640)
+            var positionY = Float(arc4random() % 640)
             let velocityX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityY = (Float(arc4random() % 10) - 5) / 10.0
          
+            let foo = Int(arc4random() % 4)
+            
+            if foo == 0
+            {
+                positionX = 0
+            }
+            else if foo == 1
+            {
+                positionX = 640
+            }
+            else if foo == 2
+            {
+                positionY = 0
+            }
+            else
+            {
+                positionY = 640
+            }
+            
             let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY)
-            
-            
-            
+    
             particles.append(particle)
         }
     }
@@ -145,6 +194,11 @@ class ViewController: UIViewController
         var outVectorBuffer = device.newBufferWithBytes(&resultdata, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(outVectorBuffer, offset: 0, atIndex: 1)
       
+        var xxx = Particle(positionX: Float(gravityWell.x), positionY: Float(gravityWell.y), velocityX: 0, velocityY: 0)
+        
+        var inGravityWell = device.newBufferWithBytes(&xxx, length: sizeofValue(xxx), options: nil)
+        commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
+        
         commandEncoder.setTexture(textureA, atIndex: 0)
         
         var threadsPerGroup = MTLSize(width:32,height:1,depth:1)
@@ -188,7 +242,20 @@ class ViewController: UIViewController
 
     override func viewDidLayoutSubviews()
     {
-        imageView.frame = CGRect(x: 0, y: 0, width: 640, height: 640)
+        if view.frame.height > view.frame.width
+        {
+           let imageSide = view.frame.width
+            
+           imageView.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide)
+        }
+        else
+        {
+            let imageSide = view.frame.height
+            
+            imageView.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide)
+        }
+        
+        
     }
     
     override func didReceiveMemoryWarning()

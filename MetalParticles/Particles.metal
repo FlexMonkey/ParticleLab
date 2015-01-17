@@ -21,20 +21,21 @@ struct Particle
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
                                  const device Particle *inParticle [[ buffer(0) ]],
                                 device Particle *outParticle [[ buffer(1) ]],
+                                   constant Particle &inGravityWell [[ buffer(2) ]],
                                    uint id [[thread_position_in_grid]])
 {
     const uint2 particlePosition(inParticle[id].positionX, inParticle[id].positionY);
     
     const Particle thisParticle = inParticle[id];
     
-    const float4 outColor(0.0, 0.0, 1.0, 1.0);
+    const float4 outColor(1.0, (id < 100000) ? 1.0 : 0.0 , (id < 100000) ? 0.0 : 1.0, 1.0);
     
-    const float distanceSquared = ((thisParticle.positionX - 320) * (thisParticle.positionX - 320)) +  ((thisParticle.positionY - 320) * (thisParticle.positionY - 320));
+    const float distanceSquared = ((thisParticle.positionX - inGravityWell.positionX) * (thisParticle.positionX - inGravityWell.positionX)) +  ((thisParticle.positionY - inGravityWell.positionY) * (thisParticle.positionY - inGravityWell.positionY));
     const float distance = distanceSquared < 1 ? 1 : sqrt(distanceSquared);
-    const float factor = (1 / distance) * 0.01;
+    const float factor = (1 / distance) * ((id < 100000) ? 0.01 : 0.02);
     
-    float newVelocityX = (thisParticle.velocityX * 0.9999) + (320 - thisParticle.positionX) * factor;
-    float newVelocityY = (thisParticle.velocityY * 0.9999) + (320 - thisParticle.positionY) * factor;
+    float newVelocityX = (thisParticle.velocityX * 0.999) + (inGravityWell.positionX - thisParticle.positionX) * factor;
+    float newVelocityY = (thisParticle.velocityY * 0.999) + (inGravityWell.positionY - thisParticle.positionY) * factor;
     
     outParticle[id].positionX = thisParticle.positionX + thisParticle.velocityX;
     outParticle[id].positionY = thisParticle.positionY + thisParticle.velocityY;

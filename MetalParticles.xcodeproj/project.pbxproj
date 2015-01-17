@@ -15,6 +15,7 @@
 		BE75EEA81A6A2CC000B20D49 /* MetalParticlesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */; };
 		BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB21A6A327F00B20D49 /* Particles.metal */; };
 		BE75EEB61A6A459C00B20D49 /* Async.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB51A6A459C00B20D49 /* Async.swift */; };
+		BE75EEB91A6A82C800B20D49 /* MarkerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -40,6 +41,7 @@
 		BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalParticlesTests.swift; sourceTree = "<group>"; };
 		BE75EEB21A6A327F00B20D49 /* Particles.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Particles.metal; sourceTree = "<group>"; };
 		BE75EEB51A6A459C00B20D49 /* Async.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Async.swift; sourceTree = "<group>"; };
+		BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerWidget.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -81,6 +83,7 @@
 		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
 			isa = PBXGroup;
 			children = (
+				BE75EEB71A6A82A400B20D49 /* marker */,
 				BE75EEB41A6A458E00B20D49 /* async */,
 				BE75EEB11A6A326400B20D49 /* shaders */,
 				BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */,
@@ -132,6 +135,14 @@
 				BE75EEB51A6A459C00B20D49 /* Async.swift */,
 			);
 			name = async;
+			sourceTree = "<group>";
+		};
+		BE75EEB71A6A82A400B20D49 /* marker */ = {
+			isa = PBXGroup;
+			children = (
+				BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */,
+			);
+			name = marker;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -237,6 +248,7 @@
 				BE75EEB61A6A459C00B20D49 /* Async.swift in Sources */,
 				BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */,
 				BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */,
+				BE75EEB91A6A82C800B20D49 /* MarkerWidget.swift in Sources */,
 				BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

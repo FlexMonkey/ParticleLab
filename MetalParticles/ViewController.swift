@@ -40,7 +40,6 @@ class ViewController: UIViewController
     
     var region: MTLRegion!
     var textureA: MTLTexture!
-    var textureB: MTLTexture!
     
     var image:UIImage!
     var errorFlag:Bool = false
@@ -253,7 +252,6 @@ class ViewController: UIViewController
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
         
         textureA = device.newTextureWithDescriptor(textureDescriptor)
-        textureB = device.newTextureWithDescriptor(textureDescriptor)
         
        region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
     }
@@ -282,7 +280,6 @@ class ViewController: UIViewController
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-
 
 }
 

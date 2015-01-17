@@ -40,6 +40,7 @@ class ViewController: UIViewController
     
     var region: MTLRegion!
     var textureA: MTLTexture!
+    var textureB: MTLTexture!
     
     var image:UIImage!
     var errorFlag:Bool = false
@@ -47,10 +48,11 @@ class ViewController: UIViewController
     var threadGroupCount:MTLSize!
     var threadGroups: MTLSize!
     
-    let particleCount: Int = 200000
+    let particleCount: Int = 250_000
     var particles = [Particle]()
     
     var gravityWell = CGPoint(x: 320, y: 320)
+    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
 
     override func viewDidLoad()
     {
@@ -97,7 +99,7 @@ class ViewController: UIViewController
             UIView.animateWithDuration(0.25, animations: {self.markerWidget.alpha = 1})
         }
         
-        let imageScale = imageView.frame.width / 640
+        let imageScale = imageView.frame.width / CGFloat(imageSide)
         
         gravityWell.x = location.x / imageScale
         gravityWell.y = location.y / imageScale
@@ -114,28 +116,28 @@ class ViewController: UIViewController
     {
         for _ in 0 ..< particleCount
         {
-            var positionX = Float(arc4random() % 640)
-            var positionY = Float(arc4random() % 640)
+            var positionX = Float(arc4random() % UInt32(imageSide))
+            var positionY = Float(arc4random() % UInt32(imageSide))
             let velocityX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityY = (Float(arc4random() % 10) - 5) / 10.0
          
-            let foo = Int(arc4random() % 4)
+            let positionRule = Int(arc4random() % 4)
             
-            if foo == 0
+            if positionRule == 0
             {
                 positionX = 0
             }
-            else if foo == 1
+            else if positionRule == 1
             {
-                positionX = 640
+                positionX = Float(imageSide)
             }
-            else if foo == 2
+            else if positionRule == 2
             {
                 positionY = 0
             }
             else
             {
-                positionY = 640
+                positionY = Float(imageSide)
             }
             
             let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY)
@@ -147,8 +149,7 @@ class ViewController: UIViewController
     func setUpMetal()
     {
         device = MTLCreateSystemDefaultDevice()
-   
-
+ 
         if device == nil
         {
             errorFlag = true
@@ -186,32 +187,35 @@ class ViewController: UIViewController
         }
     }
     
-    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
+    
     
     func applyShader()
     {
+        commandQueue = device.newCommandQueue()
+        
+        let kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
+        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
+        
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
         
         commandEncoder.setComputePipelineState(pipelineState)
         
-        var particleVectorByteLength = particles.count*sizeofValue(particles[0])
+        let particleVectorByteLength = particles.count*sizeofValue(particles[0])
         
         var buffer: MTLBuffer = device.newBufferWithBytes(&particles, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(buffer, offset: 0, atIndex: 0)
         
         var inVectorBuffer = device.newBufferWithBytes(&particles, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(inVectorBuffer, offset: 0, atIndex: 0)
-        
-        
-        
+ 
         var resultdata = [Particle](count:particles.count, repeatedValue: Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0))
         var outVectorBuffer = device.newBufferWithBytes(&resultdata, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(outVectorBuffer, offset: 0, atIndex: 1)
       
-        var xxx = Particle(positionX: Float(gravityWell.x), positionY: Float(gravityWell.y), velocityX: 0, velocityY: 0)
+        var gravityWellParticle = Particle(positionX: Float(gravityWell.x), positionY: Float(gravityWell.y), velocityX: 0, velocityY: 0)
         
-        var inGravityWell = device.newBufferWithBytes(&xxx, length: sizeofValue(xxx), options: nil)
+        var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
         
         commandEncoder.setTexture(textureA, atIndex: 0)
@@ -223,7 +227,6 @@ class ViewController: UIViewController
         commandEncoder.endEncoding()
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
-        
         
         var data = NSData(bytesNoCopy: outVectorBuffer.contents(),
             length: particles.count*sizeof(Particle), freeWhenDone: false)
@@ -250,8 +253,9 @@ class ViewController: UIViewController
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
         
         textureA = device.newTextureWithDescriptor(textureDescriptor)
+        textureB = device.newTextureWithDescriptor(textureDescriptor)
         
-       region = MTLRegionMake2D(0, 0, Int(640), Int(640))
+       region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
     }
 
 

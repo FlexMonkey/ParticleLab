@@ -1,0 +1,422 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */; };
+		BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE931A6A2CC000B20D49 /* ViewController.swift */; };
+		BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE951A6A2CC000B20D49 /* Main.storyboard */; };
+		BE75EE991A6A2CC000B20D49 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE981A6A2CC000B20D49 /* Images.xcassets */; };
+		BE75EE9C1A6A2CC000B20D49 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE9A1A6A2CC000B20D49 /* LaunchScreen.xib */; };
+		BE75EEA81A6A2CC000B20D49 /* MetalParticlesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		BE75EEA21A6A2CC000B20D49 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = BE75EE841A6A2CC000B20D49 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = BE75EE8B1A6A2CC000B20D49;
+			remoteInfo = MetalParticles;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		BE75EE8C1A6A2CC000B20D49 /* MetalParticles.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalParticles.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE75EE901A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		BE75EE931A6A2CC000B20D49 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		BE75EE961A6A2CC000B20D49 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		BE75EE981A6A2CC000B20D49 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Images.xcassets; sourceTree = "<group>"; };
+		BE75EE9B1A6A2CC000B20D49 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/LaunchScreen.xib; sourceTree = "<group>"; };
+		BE75EEA11A6A2CC000B20D49 /* MetalParticlesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalParticlesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE75EEA61A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalParticlesTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		BE75EE891A6A2CC000B20D49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE75EE9E1A6A2CC000B20D49 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		BE75EE831A6A2CC000B20D49 = {
+			isa = PBXGroup;
+			children = (
+				BE75EE8E1A6A2CC000B20D49 /* MetalParticles */,
+				BE75EEA41A6A2CC000B20D49 /* MetalParticlesTests */,
+				BE75EE8D1A6A2CC000B20D49 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		BE75EE8D1A6A2CC000B20D49 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				BE75EE8C1A6A2CC000B20D49 /* MetalParticles.app */,
+				BE75EEA11A6A2CC000B20D49 /* MetalParticlesTests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
+			isa = PBXGroup;
+			children = (
+				BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */,
+				BE75EE931A6A2CC000B20D49 /* ViewController.swift */,
+				BE75EE951A6A2CC000B20D49 /* Main.storyboard */,
+				BE75EE981A6A2CC000B20D49 /* Images.xcassets */,
+				BE75EE9A1A6A2CC000B20D49 /* LaunchScreen.xib */,
+				BE75EE8F1A6A2CC000B20D49 /* Supporting Files */,
+			);
+			path = MetalParticles;
+			sourceTree = "<group>";
+		};
+		BE75EE8F1A6A2CC000B20D49 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BE75EE901A6A2CC000B20D49 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		BE75EEA41A6A2CC000B20D49 /* MetalParticlesTests */ = {
+			isa = PBXGroup;
+			children = (
+				BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */,
+				BE75EEA51A6A2CC000B20D49 /* Supporting Files */,
+			);
+			path = MetalParticlesTests;
+			sourceTree = "<group>";
+		};
+		BE75EEA51A6A2CC000B20D49 /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				BE75EEA61A6A2CC000B20D49 /* Info.plist */,
+			);
+			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		BE75EE8B1A6A2CC000B20D49 /* MetalParticles */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE75EEAB1A6A2CC000B20D49 /* Build configuration list for PBXNativeTarget "MetalParticles" */;
+			buildPhases = (
+				BE75EE881A6A2CC000B20D49 /* Sources */,
+				BE75EE891A6A2CC000B20D49 /* Frameworks */,
+				BE75EE8A1A6A2CC000B20D49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = MetalParticles;
+			productName = MetalParticles;
+			productReference = BE75EE8C1A6A2CC000B20D49 /* MetalParticles.app */;
+			productType = "com.apple.product-type.application";
+		};
+		BE75EEA01A6A2CC000B20D49 /* MetalParticlesTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = BE75EEAE1A6A2CC000B20D49 /* Build configuration list for PBXNativeTarget "MetalParticlesTests" */;
+			buildPhases = (
+				BE75EE9D1A6A2CC000B20D49 /* Sources */,
+				BE75EE9E1A6A2CC000B20D49 /* Frameworks */,
+				BE75EE9F1A6A2CC000B20D49 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				BE75EEA31A6A2CC000B20D49 /* PBXTargetDependency */,
+			);
+			name = MetalParticlesTests;
+			productName = MetalParticlesTests;
+			productReference = BE75EEA11A6A2CC000B20D49 /* MetalParticlesTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		BE75EE841A6A2CC000B20D49 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0610;
+				ORGANIZATIONNAME = "Simon Gladman";
+				TargetAttributes = {
+					BE75EE8B1A6A2CC000B20D49 = {
+						CreatedOnToolsVersion = 6.1.1;
+					};
+					BE75EEA01A6A2CC000B20D49 = {
+						CreatedOnToolsVersion = 6.1.1;
+						TestTargetID = BE75EE8B1A6A2CC000B20D49;
+					};
+				};
+			};
+			buildConfigurationList = BE75EE871A6A2CC000B20D49 /* Build configuration list for PBXProject "MetalParticles" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = BE75EE831A6A2CC000B20D49;
+			productRefGroup = BE75EE8D1A6A2CC000B20D49 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				BE75EE8B1A6A2CC000B20D49 /* MetalParticles */,
+				BE75EEA01A6A2CC000B20D49 /* MetalParticlesTests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		BE75EE8A1A6A2CC000B20D49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */,
+				BE75EE9C1A6A2CC000B20D49 /* LaunchScreen.xib in Resources */,
+				BE75EE991A6A2CC000B20D49 /* Images.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE75EE9F1A6A2CC000B20D49 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		BE75EE881A6A2CC000B20D49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */,
+				BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		BE75EE9D1A6A2CC000B20D49 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				BE75EEA81A6A2CC000B20D49 /* MetalParticlesTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		BE75EEA31A6A2CC000B20D49 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = BE75EE8B1A6A2CC000B20D49 /* MetalParticles */;
+			targetProxy = BE75EEA21A6A2CC000B20D49 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		BE75EE951A6A2CC000B20D49 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BE75EE961A6A2CC000B20D49 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		BE75EE9A1A6A2CC000B20D49 /* LaunchScreen.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				BE75EE9B1A6A2CC000B20D49 /* Base */,
+			);
+			name = LaunchScreen.xib;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		BE75EEA91A6A2CC000B20D49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		BE75EEAA1A6A2CC000B20D49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				COPY_PHASE_STRIP = YES;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 8.1;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		BE75EEAC1A6A2CC000B20D49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = MetalParticles/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		BE75EEAD1A6A2CC000B20D49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				INFOPLIST_FILE = MetalParticles/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+		BE75EEAF1A6A2CC000B20D49 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = MetalParticlesTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalParticles.app/MetalParticles";
+			};
+			name = Debug;
+		};
+		BE75EEB01A6A2CC000B20D49 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SDKROOT)/Developer/Library/Frameworks",
+					"$(inherited)",
+				);
+				INFOPLIST_FILE = MetalParticlesTests/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalParticles.app/MetalParticles";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		BE75EE871A6A2CC000B20D49 /* Build configuration list for PBXProject "MetalParticles" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE75EEA91A6A2CC000B20D49 /* Debug */,
+				BE75EEAA1A6A2CC000B20D49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		BE75EEAB1A6A2CC000B20D49 /* Build configuration list for PBXNativeTarget "MetalParticles" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE75EEAC1A6A2CC000B20D49 /* Debug */,
+				BE75EEAD1A6A2CC000B20D49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+		BE75EEAE1A6A2CC000B20D49 /* Build configuration list for PBXNativeTarget "MetalParticlesTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				BE75EEAF1A6A2CC000B20D49 /* Debug */,
+				BE75EEB01A6A2CC000B20D49 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = BE75EE841A6A2CC000B20D49 /* Project object */;
+}

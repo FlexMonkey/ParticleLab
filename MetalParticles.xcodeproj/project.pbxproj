@@ -13,6 +13,7 @@
 		BE75EE991A6A2CC000B20D49 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE981A6A2CC000B20D49 /* Images.xcassets */; };
 		BE75EE9C1A6A2CC000B20D49 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE9A1A6A2CC000B20D49 /* LaunchScreen.xib */; };
 		BE75EEA81A6A2CC000B20D49 /* MetalParticlesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */; };
+		BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB21A6A327F00B20D49 /* Particles.metal */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +37,7 @@
 		BE75EEA11A6A2CC000B20D49 /* MetalParticlesTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = MetalParticlesTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE75EEA61A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalParticlesTests.swift; sourceTree = "<group>"; };
+		BE75EEB21A6A327F00B20D49 /* Particles.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Particles.metal; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +79,7 @@
 		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
 			isa = PBXGroup;
 			children = (
+				BE75EEB11A6A326400B20D49 /* shaders */,
 				BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */,
 				BE75EE931A6A2CC000B20D49 /* ViewController.swift */,
 				BE75EE951A6A2CC000B20D49 /* Main.storyboard */,
@@ -110,6 +113,14 @@
 				BE75EEA61A6A2CC000B20D49 /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		BE75EEB11A6A326400B20D49 /* shaders */ = {
+			isa = PBXGroup;
+			children = (
+				BE75EEB21A6A327F00B20D49 /* Particles.metal */,
+			);
+			name = shaders;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -212,6 +223,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */,
 				BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */,
 				BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */,
 			);

@@ -18,6 +18,28 @@ struct Particle
     float velocityY;
 };
 
+kernel void glowShader(texture2d<float, access::read> inTexture [[texture(0)]],
+                            texture2d<float, access::write> outTexture [[texture(1)]],
+                       texture2d<float, access::read> inTextureB [[texture(2)]],
+                            uint2 gid [[thread_position_in_grid]])
+{
+    float4 accumColor(0,0,0,0);
+    
+    for (int j = -2; j <= 2; j++)
+    {
+        for (int i = -2; i <= 2; i++)
+        {
+            uint2 kernelIndex(gid.x + i, gid.y + j);
+            accumColor += inTexture.read(kernelIndex).rgba;
+        }
+    }
+    
+    accumColor.rgb = (accumColor.rgb / 26.0f) + inTextureB.read(gid).rgb;
+    accumColor.a = 1.0f;
+    
+    outTexture.write(accumColor, gid);
+}
+
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
                                    const device Particle *inParticle [[ buffer(0) ]],
                                    device Particle *outParticle [[ buffer(1) ]],

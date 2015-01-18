@@ -41,18 +41,21 @@ class ViewController: UIViewController
     
     var region: MTLRegion!
     var textureA: MTLTexture!
+    var textureB: MTLTexture! //
+    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
     
     var image:UIImage!
     var errorFlag:Bool = false
     
     var threadGroupCount:MTLSize!
     var threadGroups: MTLSize!
+    var glow_threadGroupCount:MTLSize!
+    var glow_threadGroups: MTLSize!
     
     let particleCount: Int = 250_000
     var particles = [Particle]()
     
     var gravityWell = CGPoint(x: 320, y: 320)
-    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
 
     override func viewDidLoad()
     {
@@ -165,6 +168,9 @@ class ViewController: UIViewController
             threadGroupCount = MTLSizeMake(32, 32, 1)
             threadGroups = MTLSizeMake(Int(imageSide) / threadGroupCount.width, Int(imageSide) / threadGroupCount.height, 1)
             
+            glow_threadGroupCount = MTLSizeMake(16, 16, 1)
+            glow_threadGroups = MTLSizeMake(Int(imageSide) / glow_threadGroupCount.width, Int(imageSide) / glow_threadGroupCount.height, 1)
+            
             setUpTexture()
             
             run()
@@ -185,11 +191,38 @@ class ViewController: UIViewController
         }
     }
     
-    
+    final func glowTexture()
+    {
+        commandQueue = device.newCommandQueue()
+        
+        kernelFunction = defaultLibrary.newFunctionWithName("glowShader")
+        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
+        
+        let commandBuffer = commandQueue.commandBuffer()
+        let commandEncoder = commandBuffer.computeCommandEncoder()
+        
+        commandEncoder.setComputePipelineState(pipelineState)
+        
+        commandEncoder.setTexture(textureA, atIndex: 0)
+        commandEncoder.setTexture(textureA, atIndex: 1)
+        commandEncoder.setTexture(textureB, atIndex: 2)
+        
+        commandEncoder.dispatchThreadgroups(glow_threadGroups, threadsPerThreadgroup: glow_threadGroupCount)
+        
+        commandEncoder.endEncoding()
+        commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
+
+    }
     
     final func applyShader()
     {
+        textureB.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+        
         commandQueue = device.newCommandQueue()
+
+        kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
+        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
 
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
@@ -213,9 +246,9 @@ class ViewController: UIViewController
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
         
-        textureA.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+
         
-        commandEncoder.setTexture(textureA, atIndex: 0)
+        commandEncoder.setTexture(textureB, atIndex: 0)
         
         var threadsPerGroup = MTLSize(width:32,height:1,depth:1)
         var numThreadgroups = MTLSize(width:(particles.count+31)/32, height:1, depth:1)
@@ -224,6 +257,8 @@ class ViewController: UIViewController
         commandEncoder.endEncoding()
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
+        
+        glowTexture()
         
         var data = NSData(bytesNoCopy: outVectorBuffer.contents(),
             length: particles.count*sizeof(Particle), freeWhenDone: false)
@@ -241,13 +276,10 @@ class ViewController: UIViewController
 
     func setUpTexture()
     {
-        var rawData = [UInt8](count: Int(imageSide * imageSide * 4), repeatedValue: 0)
-        
-        let context = CGBitmapContextCreate(&rawData, imageSide, imageSide, bitsPerComponent, bytesPerRow, rgbColorSpace, bitmapInfo)
-        
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
         
         textureA = device.newTextureWithDescriptor(textureDescriptor)
+        textureB = device.newTextureWithDescriptor(textureDescriptor)
         
        region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
     }

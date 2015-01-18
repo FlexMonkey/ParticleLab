@@ -30,6 +30,7 @@ class ViewController: UIViewController
     let providerLength = Int(640 * 640 * 4) * sizeof(UInt8)
     var imageBytes = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
     
+    var kernelFunction: MTLFunction!
     var pipelineState: MTLComputePipelineState!
     var defaultLibrary: MTLLibrary! = nil
     var device: MTLDevice! = nil
@@ -158,7 +159,7 @@ class ViewController: UIViewController
             defaultLibrary = device.newDefaultLibrary()
             commandQueue = device.newCommandQueue()
             
-            let kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
+            kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
             pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
             
             threadGroupCount = MTLSizeMake(32, 32, 1)
@@ -170,7 +171,7 @@ class ViewController: UIViewController
         }
     }
     
-    func run()
+    final func run()
     {
         Async.background()
             {
@@ -186,13 +187,10 @@ class ViewController: UIViewController
     
     
     
-    func applyShader()
+    final func applyShader()
     {
         commandQueue = device.newCommandQueue()
-        
-        let kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
-        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
-        
+
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
         
@@ -206,7 +204,7 @@ class ViewController: UIViewController
         var inVectorBuffer = device.newBufferWithBytes(&particles, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(inVectorBuffer, offset: 0, atIndex: 0)
  
-        var resultdata = [Particle](count:particles.count, repeatedValue: Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0))
+        var resultdata =  [Particle](count:particles.count, repeatedValue: Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0))
         var outVectorBuffer = device.newBufferWithBytes(&resultdata, length: particleVectorByteLength, options: nil)
         commandEncoder.setBuffer(outVectorBuffer, offset: 0, atIndex: 1)
       

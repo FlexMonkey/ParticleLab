@@ -19,9 +19,9 @@ struct Particle
 };
 
 kernel void glowShader(texture2d<float, access::read> inTexture [[texture(0)]],
-                            texture2d<float, access::write> outTexture [[texture(1)]],
+                       texture2d<float, access::write> outTexture [[texture(1)]],
                        texture2d<float, access::read> inTextureB [[texture(2)]],
-                            uint2 gid [[thread_position_in_grid]])
+                       uint2 gid [[thread_position_in_grid]])
 {
     float4 accumColor(0,0,0,0);
     
@@ -34,7 +34,7 @@ kernel void glowShader(texture2d<float, access::read> inTexture [[texture(0)]],
         }
     }
     
-    accumColor.rgb = (accumColor.rgb / 26.0f) + inTextureB.read(gid).rgb;
+    accumColor.rgb = (accumColor.rgb / 27.0f) + inTextureB.read(gid).rgb;
     accumColor.a = 1.0f;
     
     outTexture.write(accumColor, gid);
@@ -57,7 +57,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float distanceSquared = ((thisParticle.positionX - inGravityWell.positionX) * (thisParticle.positionX - inGravityWell.positionX)) +  ((thisParticle.positionY - inGravityWell.positionY) * (thisParticle.positionY - inGravityWell.positionY));
     const float distance = distanceSquared < 1 ? 1 : sqrt(distanceSquared);
     
-    const float factor = (1 / distance) * (type == 0 ? 0.01 : (type == 1 ? 0.0125 : 0.015));
+    const float factor = (1 / distance) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
     
     float newVelocityX = (thisParticle.velocityX * 0.999) + (inGravityWell.positionX - thisParticle.positionX) * factor;
     float newVelocityY = (thisParticle.velocityY * 0.999) + (inGravityWell.positionY - thisParticle.positionY) * factor;

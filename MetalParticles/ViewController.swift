@@ -52,6 +52,9 @@ class ViewController: UIViewController
     var glow_threadGroupCount:MTLSize!
     var glow_threadGroups: MTLSize!
     
+    let threadsPerGroup = MTLSize(width:32,height:1,depth:1)
+    let numThreadgroups = MTLSize(width:(250_000+31)/32, height:1, depth:1)
+    
     let particleCount: Int = 250_000
     var particles = [Particle]()
     
@@ -245,13 +248,9 @@ class ViewController: UIViewController
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
-        
-
-        
+  
         commandEncoder.setTexture(textureB, atIndex: 0)
         
-        var threadsPerGroup = MTLSize(width:32,height:1,depth:1)
-        var numThreadgroups = MTLSize(width:(particles.count+31)/32, height:1, depth:1)
         commandEncoder.dispatchThreadgroups(numThreadgroups, threadsPerThreadgroup: threadsPerGroup)
         
         commandEncoder.endEncoding()
@@ -291,13 +290,13 @@ class ViewController: UIViewController
         {
            let imageSide = view.frame.width
             
-           imageView.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide)
+           imageView.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: 01)
         }
         else
         {
             let imageSide = view.frame.height
             
-            imageView.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide)
+            imageView.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
         }
         
         

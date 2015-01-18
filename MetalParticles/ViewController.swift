@@ -229,11 +229,9 @@ class ViewController: UIViewController
         
         var data = NSData(bytesNoCopy: outVectorBuffer.contents(),
             length: particles.count*sizeof(Particle), freeWhenDone: false)
-        var finalResultArray = [Particle](count: particles.count, repeatedValue: Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0))
-        data.getBytes(&finalResultArray, length:particles.count * sizeof(Particle))
-        
-        particles = finalResultArray
-     
+
+        data.getBytes(&particles, length:particles.count * sizeof(Particle))
+    
         textureA.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
         
         let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &imageBytes, length: providerLength))

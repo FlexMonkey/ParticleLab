@@ -50,13 +50,14 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const Particle thisParticle = inParticle[id];
     
-    const bool isEven = id % 2 == 0;
+    const int type = id % 3;
     
-    const float4 outColor(1.0, isEven ? 1.0 : 0.0 , isEven ? 0.0 : 1.0, 1.0);
+    const float4 outColor(type == 0 ? 1.0 : 0.0 , type == 1 ? 1.0 : 0.0  , type == 2 ? 1.0 : 0.0 , 1.0);
     
     const float distanceSquared = ((thisParticle.positionX - inGravityWell.positionX) * (thisParticle.positionX - inGravityWell.positionX)) +  ((thisParticle.positionY - inGravityWell.positionY) * (thisParticle.positionY - inGravityWell.positionY));
     const float distance = distanceSquared < 1 ? 1 : sqrt(distanceSquared);
-    const float factor = (1 / distance) * (isEven ? 0.01 : 0.015);
+    
+    const float factor = (1 / distance) * (type == 0 ? 0.01 : (type == 1 ? 0.0125 : 0.015));
     
     float newVelocityX = (thisParticle.velocityX * 0.999) + (inGravityWell.positionX - thisParticle.positionX) * factor;
     float newVelocityY = (thisParticle.velocityY * 0.999) + (inGravityWell.positionY - thisParticle.positionY) * factor;

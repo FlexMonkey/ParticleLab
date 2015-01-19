@@ -47,13 +47,11 @@ class ViewController: UIViewController
     var image:UIImage!
     var errorFlag:Bool = false
     
-    var threadGroupCount:MTLSize!
-    var threadGroups: MTLSize!
     var glow_threadGroupCount:MTLSize!
     var glow_threadGroups: MTLSize!
     
-    let threadsPerGroup = MTLSize(width:32,height:1,depth:1)
-    let numThreadgroups = MTLSize(width:(250_000+31)/32, height:1, depth:1)
+    var particle_threadGroupCount:MTLSize!
+    var particle_threadGroups:MTLSize!
     
     let particleCount: Int = 250_000
     var particles = [Particle]()
@@ -164,12 +162,9 @@ class ViewController: UIViewController
         {
             defaultLibrary = device.newDefaultLibrary()
             commandQueue = device.newCommandQueue()
-            
-            kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
-            pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
-            
-            threadGroupCount = MTLSizeMake(32, 32, 1)
-            threadGroups = MTLSizeMake(Int(imageSide) / threadGroupCount.width, Int(imageSide) / threadGroupCount.height, 1)
+   
+            particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
+            particle_threadGroups = MTLSize(width:(particles.count + 31) / 32, height:1, depth:1)
             
             glow_threadGroupCount = MTLSizeMake(16, 16, 1)
             glow_threadGroups = MTLSizeMake(Int(imageSide) / glow_threadGroupCount.width, Int(imageSide) / glow_threadGroupCount.height, 1)
@@ -221,8 +216,6 @@ class ViewController: UIViewController
     final func applyShader()
     {
         textureB.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
-        
-        commandQueue = device.newCommandQueue()
 
         kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
         pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
@@ -251,7 +244,7 @@ class ViewController: UIViewController
   
         commandEncoder.setTexture(textureB, atIndex: 0)
         
-        commandEncoder.dispatchThreadgroups(numThreadgroups, threadsPerThreadgroup: threadsPerGroup)
+        commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
         commandEncoder.endEncoding()
         commandBuffer.commit()

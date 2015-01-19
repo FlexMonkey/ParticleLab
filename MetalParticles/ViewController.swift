@@ -5,6 +5,7 @@
 //  Created by Simon Gladman on 17/01/2015.
 //  Copyright (c) 2015 Simon Gladman. All rights reserved.
 //
+//  Reengineered based on technique from http://memkite.com/blog/2014/12/30/example-of-sharing-memory-between-gpu-and-cpu-with-swift-and-metal-for-ios8/
 
 import UIKit
 import Metal
@@ -53,8 +54,14 @@ class ViewController: UIViewController
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 250_000
-    var particles = [Particle]()
+    let particleCount: Int = 1048576
+    
+    var particlesMemory:UnsafeMutablePointer<Void> = nil
+    let alignment:UInt = 0x4000
+    let xvectorByteSize:UInt = UInt(1048576) * UInt(sizeof(Particle))
+    var particlesVoidPtr: COpaquePointer!
+    var particlesParticlePtr: UnsafeMutablePointer<Particle>!
+    var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
     
     var gravityWell = CGPoint(x: 640, y: 640)
     
@@ -118,15 +125,23 @@ class ViewController: UIViewController
         UIView.animateWithDuration(1.0, delay: 2.0, options: nil, animations: {self.markerWidget.alpha = 0}, completion: nil)
     }
     
+
+    
     func setUpParticles()
     {
-        for _ in 0 ..< particleCount
+        posix_memalign(&particlesMemory, alignment, xvectorByteSize)
+        
+        particlesVoidPtr = COpaquePointer(particlesMemory)
+        particlesParticlePtr = UnsafeMutablePointer<Particle>(particlesVoidPtr)
+        particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
+ 
+        for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex
         {
             var positionX = Float(arc4random() % UInt32(imageSide))
             var positionY = Float(arc4random() % UInt32(imageSide))
             let velocityX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityY = (Float(arc4random() % 10) - 5) / 10.0
-         
+      
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -148,7 +163,7 @@ class ViewController: UIViewController
             
             let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY)
     
-            particles.append(particle)
+            particlesParticleBufferPtr[index] = particle
         }
     }
     
@@ -166,7 +181,7 @@ class ViewController: UIViewController
             commandQueue = device.newCommandQueue()
    
             particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
-            particle_threadGroups = MTLSize(width:(particles.count + 31) / 32, height:1, depth:1)
+            particle_threadGroups = MTLSize(width:(particleCount + 31) / 32, height:1, depth:1)
             
             glow_threadGroupCount = MTLSizeMake(16, 16, 1)
             glow_threadGroups = MTLSizeMake(Int(imageSide) / glow_threadGroupCount.width, Int(imageSide) / glow_threadGroupCount.height, 1)
@@ -229,19 +244,13 @@ class ViewController: UIViewController
         let commandEncoder = commandBuffer.computeCommandEncoder()
         
         commandEncoder.setComputePipelineState(pipelineState)
+
+        let particlesBufferNoCopy = device.newBufferWithBytesNoCopy(particlesMemory, length: Int(xvectorByteSize),
+            options: nil, deallocator: nil)
         
-        let particleVectorByteLength = particles.count*sizeofValue(particles[0])
-        
-        var buffer: MTLBuffer = device.newBufferWithBytes(&particles, length: particleVectorByteLength, options: nil)
-        commandEncoder.setBuffer(buffer, offset: 0, atIndex: 0)
-        
-        var inVectorBuffer = device.newBufferWithBytes(&particles, length: particleVectorByteLength, options: nil)
-        commandEncoder.setBuffer(inVectorBuffer, offset: 0, atIndex: 0)
- 
-        var resultdata =  [Particle](count:particles.count, repeatedValue: Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0))
-        var outVectorBuffer = device.newBufferWithBytes(&resultdata, length: particleVectorByteLength, options: nil)
-        commandEncoder.setBuffer(outVectorBuffer, offset: 0, atIndex: 1)
-      
+        commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
+        commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
+
         var gravityWellParticle = Particle(positionX: Float(gravityWell.x), positionY: Float(gravityWell.y), velocityX: 0, velocityY: 0)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
@@ -257,11 +266,10 @@ class ViewController: UIViewController
         
         glowTexture()
         
-        var data = NSData(bytesNoCopy: outVectorBuffer.contents(),
-            length: particles.count*sizeof(Particle), freeWhenDone: false)
-
-        data.getBytes(&particles, length:particles.count * sizeof(Particle))
-    
+        particlesVoidPtr = COpaquePointer(particlesMemory)
+        particlesParticlePtr = UnsafeMutablePointer(particlesVoidPtr)
+        particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
+   
         textureA.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
         
         let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &imageBytes, length: providerLength))

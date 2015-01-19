@@ -17,18 +17,18 @@ class ViewController: UIViewController
     let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.PremultipliedLast.rawValue)
     let renderingIntent = kCGRenderingIntentDefault
     
-    let imageSide: UInt = 640
-    let imageSize = CGSize(width: Int(640), height: Int(640))
-    let imageByteCount = Int(640 * 640 * 4)
+    let imageSide: UInt = 1280
+    let imageSize = CGSize(width: Int(1280), height: Int(1280))
+    let imageByteCount = Int(1280 * 1280 * 4)
     
     let bytesPerPixel = UInt(4)
     let bitsPerComponent = UInt(8)
     let bitsPerPixel:UInt = 32
     let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     
-    let bytesPerRow = UInt(4 * 640)
-    let providerLength = Int(640 * 640 * 4) * sizeof(UInt8)
-    var imageBytes = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
+    let bytesPerRow = UInt(4 * 1280)
+    let providerLength = Int(1280 * 1280 * 4) * sizeof(UInt8)
+    var imageBytes = [UInt8](count: Int(1280 * 1280 * 4), repeatedValue: 0)
     
     var kernelFunction: MTLFunction!
     var pipelineState: MTLComputePipelineState!
@@ -42,7 +42,7 @@ class ViewController: UIViewController
     var region: MTLRegion!
     var textureA: MTLTexture!
     var textureB: MTLTexture! //
-    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
+    let blankBitmapRawData = [UInt8](count: Int(1280 * 1280 * 4), repeatedValue: 0)
     
     var image:UIImage!
     var errorFlag:Bool = false
@@ -56,7 +56,9 @@ class ViewController: UIViewController
     let particleCount: Int = 250_000
     var particles = [Particle]()
     
-    var gravityWell = CGPoint(x: 320, y: 320)
+    var gravityWell = CGPoint(x: 640, y: 640)
+    
+    var frameStartTime = CFAbsoluteTimeGetCurrent()
 
     override func viewDidLoad()
     {
@@ -174,18 +176,21 @@ class ViewController: UIViewController
             run()
         }
     }
-    
+
     final func run()
     {
+        println("frametime:" + NSString(format: "%.6f", CFAbsoluteTimeGetCurrent() - frameStartTime))
+        frameStartTime = CFAbsoluteTimeGetCurrent()
+        
         Async.background()
-            {
-                self.applyShader()
-            }
-            .main
-            {
-                self.imageView.image = self.image
+        {
+            self.applyShader()
+        }
+        .main
+        {
+            self.imageView.image = self.image
 
-                self.run();
+            self.run();
         }
     }
     

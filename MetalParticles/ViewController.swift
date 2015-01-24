@@ -18,18 +18,18 @@ class ViewController: UIViewController
     let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.PremultipliedLast.rawValue)
     let renderingIntent = kCGRenderingIntentDefault
     
-    let imageSide: UInt = 1280
-    let imageSize = CGSize(width: Int(1280), height: Int(1280))
-    let imageByteCount = Int(1280 * 1280 * 4)
+    let imageSide: UInt = 1024
+    let imageSize = CGSize(width: Int(1024), height: Int(1024))
+    let imageByteCount = Int(1024 * 1024 * 4)
     
     let bytesPerPixel = UInt(4)
     let bitsPerComponent = UInt(8)
     let bitsPerPixel:UInt = 32
     let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     
-    let bytesPerRow = UInt(4 * 1280)
-    let providerLength = Int(1280 * 1280 * 4) * sizeof(UInt8)
-    var imageBytes = [UInt8](count: Int(1280 * 1280 * 4), repeatedValue: 0)
+    let bytesPerRow = UInt(4 * 1024)
+    let providerLength = Int(1024 * 1024 * 4) * sizeof(UInt8)
+    var imageBytes = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
     var kernelFunction: MTLFunction!
     var pipelineState: MTLComputePipelineState!
@@ -37,33 +37,30 @@ class ViewController: UIViewController
     var device: MTLDevice! = nil
     var commandQueue: MTLCommandQueue! = nil
     
+    var imageRef: CGImage?
     let imageView =  UIImageView(frame: CGRectZero)
     let markerWidget = MarkerWidget(frame: CGRectZero)
     
     var region: MTLRegion!
     var textureA: MTLTexture!
     var textureB: MTLTexture! //
-    let blankBitmapRawData = [UInt8](count: Int(1280 * 1280 * 4), repeatedValue: 0)
+    let blankBitmapRawData = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
-    var image:UIImage!
     var errorFlag:Bool = false
-    
-    var glow_threadGroupCount:MTLSize!
-    var glow_threadGroups: MTLSize!
-    
+ 
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
     let particleCount: Int = 1048576
-    
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let xvectorByteSize:UInt = UInt(1048576) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(1048576) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
     
-    var gravityWell = CGPoint(x: 640, y: 640)
+    var gravityWell = CGPoint(x: 512, y: 512)
+    var gravityWellAngle: Float = 0.0
     
     var frameStartTime = CFAbsoluteTimeGetCurrent()
 
@@ -87,37 +84,48 @@ class ViewController: UIViewController
     
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
     {
+        /*
         let location = event.allTouches()?.anyObject()?.locationInView(imageView)
         
         if let _location = location
         {
-            positionGravityWell(_location)
+            positionGravityWell(location: _location)
         }
+        */
     }
     
     override func touchesMoved(touches: NSSet, withEvent event: UIEvent)
     {
+        /*
         let location = event.allTouches()?.anyObject()?.locationInView(imageView)
         
         if let _location = location
         {
             positionGravityWell(_location)
         }
+*/
     }
     
-    func positionGravityWell(location: CGPoint)
+    func positionGravityWell(#location: CGPoint)
     {
+        // positionGravityWell(x: location.x, y: location.y)
+        /*
         if markerWidget.alpha == 0
         {
             UIView.animateWithDuration(0.25, animations: {self.markerWidget.alpha = 1})
         }
+        */
         
+    }
+    
+    func positionGravityWell(#x: CGFloat, y: CGFloat)
+    {
         let imageScale = imageView.frame.width / CGFloat(imageSide)
         
-        gravityWell.x = location.x / imageScale
-        gravityWell.y = location.y / imageScale
+        gravityWell.x = x // imageScale
+        gravityWell.y = y // imageScale
         
-        markerWidget.frame = CGRect(x: imageView.frame.origin.x + location.x, y: imageView.frame.origin.y + location.y, width: 0, height: 0)
+        markerWidget.frame = CGRect(x: imageView.frame.origin.x + x * imageScale, y: imageView.frame.origin.y + y * imageScale, width: 0, height: 0)
     }
     
     override func touchesEnded(touches: NSSet, withEvent event: UIEvent)
@@ -129,7 +137,7 @@ class ViewController: UIViewController
     
     func setUpParticles()
     {
-        posix_memalign(&particlesMemory, alignment, xvectorByteSize)
+        posix_memalign(&particlesMemory, alignment, particlesMemoryByteSize)
         
         particlesVoidPtr = COpaquePointer(particlesMemory)
         particlesParticlePtr = UnsafeMutablePointer<Particle>(particlesVoidPtr)
@@ -182,11 +190,11 @@ class ViewController: UIViewController
    
             particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
             particle_threadGroups = MTLSize(width:(particleCount + 31) / 32, height:1, depth:1)
-            
-            glow_threadGroupCount = MTLSizeMake(16, 16, 1)
-            glow_threadGroups = MTLSizeMake(Int(imageSide) / glow_threadGroupCount.width, Int(imageSide) / glow_threadGroupCount.height, 1)
-            
+      
             setUpTexture()
+            
+            kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
+            pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
             
             run()
         }
@@ -194,8 +202,17 @@ class ViewController: UIViewController
 
     final func run()
     {
-        println("frametime:" + NSString(format: "%.6f", CFAbsoluteTimeGetCurrent() - frameStartTime))
+        let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
+        println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        
         frameStartTime = CFAbsoluteTimeGetCurrent()
+        
+        gravityWellAngle += 0.06
+        
+        positionGravityWell(x: CGFloat(512 + 100 * sin(gravityWellAngle)),
+                            y: CGFloat(512 + 100 * cos(gravityWellAngle))
+                            )
+        
         
         Async.background()
         {
@@ -203,49 +220,19 @@ class ViewController: UIViewController
         }
         .main
         {
-            self.imageView.image = self.image
-
             self.run();
         }
     }
     
-    final func glowTexture()
-    {
-        commandQueue = device.newCommandQueue()
-        
-        kernelFunction = defaultLibrary.newFunctionWithName("glowShader")
-        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
-        
-        let commandBuffer = commandQueue.commandBuffer()
-        let commandEncoder = commandBuffer.computeCommandEncoder()
-        
-        commandEncoder.setComputePipelineState(pipelineState)
-        
-        commandEncoder.setTexture(textureA, atIndex: 0)
-        commandEncoder.setTexture(textureA, atIndex: 1)
-        commandEncoder.setTexture(textureB, atIndex: 2)
-        
-        commandEncoder.dispatchThreadgroups(glow_threadGroups, threadsPerThreadgroup: glow_threadGroupCount)
-        
-        commandEncoder.endEncoding()
-        commandBuffer.commit()
-        commandBuffer.waitUntilCompleted()
-
-    }
     
     final func applyShader()
     {
-        textureB.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
-
-        kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
-        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
-
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
         
         commandEncoder.setComputePipelineState(pipelineState)
 
-        let particlesBufferNoCopy = device.newBufferWithBytesNoCopy(particlesMemory, length: Int(xvectorByteSize),
+        let particlesBufferNoCopy = device.newBufferWithBytesNoCopy(particlesMemory, length: Int(particlesMemoryByteSize),
             options: nil, deallocator: nil)
         
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
@@ -257,28 +244,32 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
   
         commandEncoder.setTexture(textureB, atIndex: 0)
+        commandEncoder.setTexture(textureB, atIndex: 1)
         
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
         commandEncoder.endEncoding()
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
-        
-        glowTexture()
-        
+ 
         particlesVoidPtr = COpaquePointer(particlesMemory)
         particlesParticlePtr = UnsafeMutablePointer(particlesVoidPtr)
         particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
    
-        textureA.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
+        textureB.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
         
-        let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &imageBytes, length: providerLength))
-        
-        let imageRef = CGImageCreate(UInt(imageSize.width), UInt(imageSize.height), bitsPerComponent, bitsPerPixel, bytesPerRow, rgbColorSpace, bitmapInfo, providerRef, nil, false, renderingIntent)
-        
-        image =  UIImage(CGImage: imageRef)!
+        Async.background()
+        {
+            let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &self.imageBytes, length: self.providerLength))
+            
+            self.imageRef = CGImageCreate(UInt(self.imageSize.width), UInt(self.imageSize.height), self.bitsPerComponent, self.bitsPerPixel, self.bytesPerRow, self.rgbColorSpace, self.bitmapInfo, providerRef, nil, false, self.renderingIntent)
+        }
+        .main
+        {
+            self.imageView.image = UIImage(CGImage: self.imageRef)!
+        }
     }
-
+    
     func setUpTexture()
     {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)

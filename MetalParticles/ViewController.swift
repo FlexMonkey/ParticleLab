@@ -42,7 +42,6 @@ class ViewController: UIViewController
     let markerWidget = MarkerWidget(frame: CGRectZero)
     
     var region: MTLRegion!
-    var textureA: MTLTexture!
     var textureB: MTLTexture! //
     let blankBitmapRawData = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
@@ -224,6 +223,7 @@ class ViewController: UIViewController
         }
     }
     
+    var gravityWellParticle = Particle(positionX: 0, positionY: 0, velocityX: 0, velocityY: 0)
     
     final func applyShader()
     {
@@ -238,7 +238,8 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
 
-        var gravityWellParticle = Particle(positionX: Float(gravityWell.x), positionY: Float(gravityWell.y), velocityX: 0, velocityY: 0)
+        gravityWellParticle.positionX = Float(gravityWell.x)
+        gravityWellParticle.positionY = Float(gravityWell.y)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
@@ -274,7 +275,6 @@ class ViewController: UIViewController
     {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
         
-        textureA = device.newTextureWithDescriptor(textureDescriptor)
         textureB = device.newTextureWithDescriptor(textureDescriptor)
         
        region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))

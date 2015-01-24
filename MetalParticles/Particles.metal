@@ -37,10 +37,13 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                           thisColor.b + (type == 2 ? 0.25 : 0.0),
                           1.0);
     
-    const float distanceSquared = ((thisParticle.positionX - inGravityWell.positionX) * (thisParticle.positionX - inGravityWell.positionX)) +  ((thisParticle.positionY - inGravityWell.positionY) * (thisParticle.positionY - inGravityWell.positionY));
-    const float distance = distanceSquared < 1 ? 1 : sqrt(distanceSquared);
+    const float deltaX = thisParticle.positionX - inGravityWell.positionX;
+    const float deltaY = thisParticle.positionY - inGravityWell.positionY;
     
-    const float factor = (1 / distance) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
+    const float distSquared = (deltaX * deltaX + deltaY * deltaY);
+    const float dist = distSquared < 1 ? 1 : fast::sqrt(distSquared + 1);
+ 
+    const float factor = (1 / dist) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
     
     float newVelocityX = (thisParticle.velocityX * 0.999) + (inGravityWell.positionX - thisParticle.positionX) * factor;
     float newVelocityY = (thisParticle.velocityY * 0.999) + (inGravityWell.positionY - thisParticle.positionY) * factor;
@@ -51,28 +54,23 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     outParticle[id].velocityX = newVelocityX;
     outParticle[id].velocityY = newVelocityY;
     
-    uint2 textureCoordinate(floor(id / 1024.0f),id % 1024);
+    uint2 textureCoordinate(fast::floor(id / 1024.0f),id % 1024);
     
     float4 accumColor = inTexture.read(textureCoordinate);
     
-    for (int j = -2; j <= 2; j++)
+    for (int j = -1; j <= 1; j++)
     {
-        for (int i = -2; i <= 2; i++)
+        for (int i = -1; i <= 1; i++)
         {
             uint2 kernelIndex(textureCoordinate.x + i, textureCoordinate.y + j);
-            accumColor += inTexture.read(kernelIndex).rgba;
+            accumColor.rgb += inTexture.read(kernelIndex).rgb;
         }
     }
     
-    accumColor.rgb = (accumColor.rgb / 28.0f);
+    accumColor.rgb = (accumColor.rgb / 10.75f);
     accumColor.a = 1.0f;
     
     outTexture.write(accumColor, textureCoordinate);
-    
-    /*
-    float4 dimmedColor(0.0,0.0,0.0,1.0);
-    dimmedColor.rgb = inTexture.read(textureCoordinate).rgb * 0.8f;
-    outTexture.write(dimmedColor, textureCoordinate);
-    */
+
     outTexture.write(outColor, particlePosition);
 }

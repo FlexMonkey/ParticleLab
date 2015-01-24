@@ -53,7 +53,7 @@ class ViewController: UIViewController
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 2097152 // 2097152
+    let particleCount: Int = 2097152 // 2097152   1048576
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
     let particlesMemoryByteSize:UInt = UInt(2097152) * UInt(sizeof(Particle))
@@ -95,7 +95,7 @@ class ViewController: UIViewController
             var positionY = Float(arc4random() % UInt32(imageSide))
             let velocityX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityY = (Float(arc4random() % 10) - 5) / 10.0
-      
+     
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -114,7 +114,7 @@ class ViewController: UIViewController
             {
                 positionY = Float(imageSide)
             }
-            
+
             let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY)
     
             particlesParticleBufferPtr[index] = particle
@@ -134,8 +134,8 @@ class ViewController: UIViewController
             defaultLibrary = device.newDefaultLibrary()
             commandQueue = device.newCommandQueue()
    
-            particle_threadGroupCount = MTLSize(width:64,height:1,depth:1)
-            particle_threadGroups = MTLSize(width:(particleCount + 63) / 64, height:1, depth:1)
+            particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
+            particle_threadGroups = MTLSize(width:(particleCount + 31) / 32, height:1, depth:1)
       
             setUpTexture()
             
@@ -152,12 +152,7 @@ class ViewController: UIViewController
         println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
-        
-        gravityWellAngle += 0.06
-        gravityWellParticle.positionX = 512 + 100 * sin(gravityWellAngle)
-        gravityWellParticle.positionY = 512 + 100 * cos(gravityWellAngle)
-        
-        
+  
         Async.background()
         {
             self.applyShader()
@@ -182,6 +177,10 @@ class ViewController: UIViewController
         
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
+        
+        gravityWellAngle += 0.06
+        gravityWellParticle.positionX = 512 + 100 * sin(gravityWellAngle)
+        gravityWellParticle.positionY = 512 + 100 * cos(gravityWellAngle)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)

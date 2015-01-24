@@ -28,34 +28,39 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    uint id [[thread_position_in_grid]])
 {
-    const uint2 particlePosition(inParticles[id].positionX, inParticles[id].positionY);
-    
+    const float imageWidth = 1024;
     const Particle inParticle = inParticles[id];
+    const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
     const int type = id % 3;
     
     const float3 thisColor = inTexture.read(particlePosition).rgb;
-    const float4 outColor(thisColor.r + (type == 0 ? 0.25 : 0.0),
-                          thisColor.g + (type == 1 ? 0.25 : 0.0),
-                          thisColor.b + (type == 2 ? 0.25 : 0.0),
-                          1.0);
 
+    const float4 outColor(thisColor.r + (type == 0 ? 0.15 : 0.0),
+                          thisColor.g + (type == 1 ? 0.15 : 0.0),
+                          thisColor.b + (type == 2 ? 0.15 : 0.0),
+                          1.0);
+    
+    if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)
+    {
+        outTexture.write(outColor, particlePosition);
+    }
+   
     const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(inGravityWell.positionX, inGravityWell.positionY));
     
     const float factor = (1 / dist) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
-    
-    const Particle outParticle = {
+   
+    outParticles[id] = Particle {
         .velocityX =  (inParticle.velocityX * 0.999) + (inGravityWell.positionX - inParticle.positionX) * factor,
         .velocityY =  (inParticle.velocityY * 0.999) + (inGravityWell.positionY - inParticle.positionY) * factor,
         .positionX =  inParticle.positionX + inParticle.velocityX,
-        .positionY =  inParticle.positionY + inParticle.velocityY
-        };
-
-    outParticles[id] = outParticle;
+        .positionY =  inParticle.positionY + inParticle.velocityY};
     
-    uint2 textureCoordinate(fast::floor(id / 1024.0f),id % 1024);
+    // ----
     
-    if (textureCoordinate.x < 1024 && textureCoordinate.y < 1024)
+    uint2 textureCoordinate(fast::floor(id / imageWidth),id % int(imageWidth));
+    
+    if (textureCoordinate.x < imageWidth && textureCoordinate.y < imageWidth)
     {
         float4 accumColor = inTexture.read(textureCoordinate);
         
@@ -73,8 +78,4 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         
         outTexture.write(accumColor, textureCoordinate);
     }
-    
-
-
-    outTexture.write(outColor, particlePosition);
 }

@@ -56,21 +56,26 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     uint2 textureCoordinate(fast::floor(id / 1024.0f),id % 1024);
     
-    float4 accumColor = inTexture.read(textureCoordinate);
-    
-    for (int j = -1; j <= 1; j++)
+    if (textureCoordinate.x < 1024 && textureCoordinate.y < 1024)
     {
-        for (int i = -1; i <= 1; i++)
+        float4 accumColor = inTexture.read(textureCoordinate);
+        
+        for (int j = -1; j <= 1; j++)
         {
-            uint2 kernelIndex(textureCoordinate.x + i, textureCoordinate.y + j);
-            accumColor.rgb += inTexture.read(kernelIndex).rgb;
+            for (int i = -1; i <= 1; i++)
+            {
+                uint2 kernelIndex(textureCoordinate.x + i, textureCoordinate.y + j);
+                accumColor.rgb += inTexture.read(kernelIndex).rgb;
+            }
         }
+        
+        accumColor.rgb = (accumColor.rgb / 10.75f);
+        accumColor.a = 1.0f;
+        
+        outTexture.write(accumColor, textureCoordinate);
     }
     
-    accumColor.rgb = (accumColor.rgb / 10.75f);
-    accumColor.a = 1.0f;
-    
-    outTexture.write(accumColor, textureCoordinate);
+
 
     outTexture.write(outColor, particlePosition);
 }

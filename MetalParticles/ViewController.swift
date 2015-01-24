@@ -42,7 +42,7 @@ class ViewController: UIViewController
     let markerWidget = MarkerWidget(frame: CGRectZero)
     
     var region: MTLRegion!
-    var textureB: MTLTexture! //
+    var particlesTexture: MTLTexture! //
     let blankBitmapRawData = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
     var errorFlag:Bool = false
@@ -102,7 +102,7 @@ class ViewController: UIViewController
         {
             positionGravityWell(_location)
         }
-*/
+        */
     }
     
     func positionGravityWell(#location: CGPoint)
@@ -244,8 +244,8 @@ class ViewController: UIViewController
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
   
-        commandEncoder.setTexture(textureB, atIndex: 0)
-        commandEncoder.setTexture(textureB, atIndex: 1)
+        commandEncoder.setTexture(particlesTexture, atIndex: 0)
+        commandEncoder.setTexture(particlesTexture, atIndex: 1)
         
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
@@ -257,7 +257,7 @@ class ViewController: UIViewController
         particlesParticlePtr = UnsafeMutablePointer(particlesVoidPtr)
         particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
    
-        textureB.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
+        particlesTexture.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
         
         Async.background()
         {
@@ -275,7 +275,7 @@ class ViewController: UIViewController
     {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
         
-        textureB = device.newTextureWithDescriptor(textureDescriptor)
+        particlesTexture = device.newTextureWithDescriptor(textureDescriptor)
         
        region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
     }

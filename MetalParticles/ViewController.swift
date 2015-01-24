@@ -253,9 +253,7 @@ class ViewController: UIViewController
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
  
-        particlesVoidPtr = COpaquePointer(particlesMemory)
-        particlesParticlePtr = UnsafeMutablePointer(particlesVoidPtr)
-        particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
+
    
         particlesTexture.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
         

@@ -37,12 +37,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                           thisColor.b + (type == 2 ? 0.25 : 0.0),
                           1.0);
     
-    const float deltaX = thisParticle.positionX - inGravityWell.positionX;
-    const float deltaY = thisParticle.positionY - inGravityWell.positionY;
+    const float dist = fast::distance( float2(thisParticle.positionX, inGravityWell.positionX), float2(thisParticle.positionX, inGravityWell.positionX));
     
-    const float distSquared = (deltaX * deltaX + deltaY * deltaY);
-    const float dist = distSquared < 1 ? 1 : fast::sqrt(distSquared + 1);
- 
     const float factor = (1 / dist) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
     
     float newVelocityX = (thisParticle.velocityX * 0.999) + (inGravityWell.positionX - thisParticle.positionX) * factor;

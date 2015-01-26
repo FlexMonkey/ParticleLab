@@ -41,11 +41,8 @@ class ViewController: UIViewController
     let imageView =  UIImageView(frame: CGRectZero)
     
     var region: MTLRegion!
-    var particlesTexture_1: MTLTexture!
-    var particlesTexture_2: MTLTexture!
-    
-    var flag = false
-    
+    var particlesTexture: MTLTexture!
+
     let blankBitmapRawData = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
     var errorFlag:Bool = false
@@ -53,17 +50,14 @@ class ViewController: UIViewController
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 2097152 // 2097152   1048576
+    let particleCount: Int = 4096
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(2097152) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(4096) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
-    
-    var gravityWellAngle: Float = 0.0
-    var gravityWellParticle = Particle(positionX: 512, positionY: 512, velocityX: 0, velocityY: 0)
-    
+
     var frameStartTime = CFAbsoluteTimeGetCurrent()
 
     override func viewDidLoad()
@@ -95,25 +89,6 @@ class ViewController: UIViewController
             var positionY = Float(arc4random() % UInt32(imageSide))
             let velocityX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityY = (Float(arc4random() % 10) - 5) / 10.0
-     
-            let positionRule = Int(arc4random() % 4)
-            
-            if positionRule == 0
-            {
-                positionX = 0
-            }
-            else if positionRule == 1
-            {
-                positionX = Float(imageSide)
-            }
-            else if positionRule == 2
-            {
-                positionY = 0
-            }
-            else
-            {
-                positionY = Float(imageSide)
-            }
 
             let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY)
     
@@ -167,6 +142,8 @@ class ViewController: UIViewController
     
     final func applyShader()
     {
+        particlesTexture.replaceRegion(region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
         
@@ -177,24 +154,8 @@ class ViewController: UIViewController
         
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
-        
-        gravityWellAngle += 0.06
-        gravityWellParticle.positionX = 512 + 100 * sin(gravityWellAngle)
-        gravityWellParticle.positionY = 512 + 100 * cos(gravityWellAngle)
-        
-        var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
-        commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
   
-        if flag
-        {
-            commandEncoder.setTexture(particlesTexture_1, atIndex: 0)
-            commandEncoder.setTexture(particlesTexture_2, atIndex: 1)
-        }
-        else
-        {
-            commandEncoder.setTexture(particlesTexture_2, atIndex: 0)
-            commandEncoder.setTexture(particlesTexture_1, atIndex: 1)
-        }
+        commandEncoder.setTexture(particlesTexture, atIndex: 0)
         
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
@@ -202,14 +163,7 @@ class ViewController: UIViewController
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
    
-        if flag
-        {
-            particlesTexture_1.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
-        }
-        else
-        {
-            particlesTexture_2.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
-        }
+        particlesTexture.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
         
         var imageRef: CGImage?
         
@@ -223,16 +177,14 @@ class ViewController: UIViewController
         {
             self.imageView.image = UIImage(CGImage: imageRef)!
         }
-        
-        flag = !flag
+  
     }
     
     func setUpTexture()
     {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
         
-        particlesTexture_1 = device.newTextureWithDescriptor(textureDescriptor)
-        particlesTexture_2 = device.newTextureWithDescriptor(textureDescriptor)
+        particlesTexture = device.newTextureWithDescriptor(textureDescriptor)
         
        region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
     }

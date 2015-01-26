@@ -18,64 +18,158 @@ struct Particle
     float velocityY;
 };
 
+struct SwarmGenome
+{
+    float radius;
+    float c1_cohesion;
+    float c2_alignment;
+    float c3_seperation;
+    float c4_steering;
+    float c5_paceKeeping;
+};
+
+// http://www.reedbeta.com/blog/2013/01/12/quick-and-easy-gpu-random-numbers-in-d3d11/
+uint wang_hash(uint seed)
+{
+    seed = (seed ^ 61) ^ (seed >> 16);
+    seed *= 9;
+    seed = seed ^ (seed >> 4);
+    seed *= 0x27d4eb2d;
+    seed = seed ^ (seed >> 15);
+    return seed;
+}
+
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
-                                   texture2d<float, access::read> inTexture [[texture(1)]],
                                    
                                    const device Particle *inParticles [[ buffer(0) ]],
                                    device Particle *outParticles [[ buffer(1) ]],
-                                   
-                                   constant Particle &inGravityWell [[ buffer(2) ]],
-                                   
+                         
                                    uint id [[thread_position_in_grid]])
 {
-    const float imageWidth = 1024;
+    const SwarmGenome genomeOne = {
+        .radius = 25.0f,
+        .c1_cohesion = 0.25f,
+        .c2_alignment = 0.25f,
+        .c3_seperation = 75.0f,
+        .c4_steering = 0.35f,
+        .c5_paceKeeping = 0.75f
+    };
+    
+    const SwarmGenome genomeTwo = {
+        .radius = 50.0f,
+        .c1_cohesion = 0.165f,
+        .c2_alignment = 1.0f,
+        .c3_seperation = 35.0f,
+        .c4_steering = 0.25f,
+        .c5_paceKeeping = 0.5f
+    };
+    
+    const SwarmGenome genomeThree = {
+        .radius = 15.0f,
+        .c1_cohesion = 1.05f,
+        .c2_alignment = 0.8f,
+        .c3_seperation = 25,
+        .c4_steering = 0.25f,
+        .c5_paceKeeping = 0.5f
+    };
+    
     const Particle inParticle = inParticles[id];
     const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
     const int type = id % 3;
     
-    const float3 thisColor = inTexture.read(particlePosition).rgb;
-
-    const float4 outColor(thisColor.r + (type == 0 ? 0.15 : 0.0),
-                          thisColor.g + (type == 1 ? 0.15 : 0.0),
-                          thisColor.b + (type == 2 ? 0.15 : 0.0),
+    const float4 outColor((type == 0 ? 1 : 0.0),
+                          (type == 1 ? 1 : 0.0),
+                          (type == 2 ? 1 : 0.0),
                           1.0);
     
-    if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)
+    float velocityX = inParticle.velocityX * 0.999;
+    float velocityY = inParticle.velocityY * 0.999;
+    
+    float neigbourCount = 0;
+    float localCentreX = 0;
+    float localCentreY = 0;
+    float localDx = 0;
+    float localDy = 0;
+    float tempAx = velocityX;
+    float tempAy = velocityY;
+    
+    const SwarmGenome genome = type == 0 ? genomeOne : type == 1 ? genomeTwo : genomeThree;
+    
+    for (uint i = 0; i < 4096; i++)
+    {
+        if (i != id)
+        {
+            const Particle candidateNeighbour = inParticles[i];
+ 
+            const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(candidateNeighbour.positionX, candidateNeighbour.positionY));
+            
+            if (dist < genome.radius)
+            {
+                // const float factor = (1 / (dist < 1 ? 1 : dist)) * (type == 0 ? 0.0001 : (type == 1 ? 0.000125 : 0.00015));
+                
+                // velocityX =  velocityX + (otherParticle.positionX - inParticle.positionX) * factor;
+                // velocityY =  velocityY + (otherParticle.positionY - inParticle.positionY) * factor;
+                
+                localCentreX = localCentreX + candidateNeighbour.positionX;
+                localCentreY = localCentreY + candidateNeighbour.positionY;
+                localDx = localDx + candidateNeighbour.velocityX;
+                localDy = localDy + candidateNeighbour.velocityY;
+                
+                neigbourCount = neigbourCount + 1.0f;
+                
+                float foo = (dist < 1 ? 1 : dist) * genome.c3_seperation;
+                
+                tempAx = tempAx + (inParticle.positionX - candidateNeighbour.positionX) / foo;
+                tempAy = tempAy + (inParticle.positionY - candidateNeighbour.positionY) / foo;
+                
+                const uint randomOne = wang_hash(candidateNeighbour.positionX * candidateNeighbour.positionY);
+                const uint randomTwo = wang_hash(candidateNeighbour.positionX * candidateNeighbour.positionY);
+                
+                if ((randomOne % 100) < (genome.c4_steering * 100.0))
+                {
+                    tempAx = tempAx + (randomOne % 4) - 1.5;
+                    tempAy = tempAy + (randomTwo % 4) - 1.5;
+                }
+
+                //         let accelerateMultiplier = (swarmMember.genome.normalSpeed - distance) / distance * swarmMember.genome.c5_paceKeeping;
+                
+                
+            }
+        }
+    }
+    
+    if (neigbourCount > 0)
+    {
+        localCentreX = localCentreX / neigbourCount;
+        localCentreY = localCentreY / neigbourCount;
+        localDx = localDx / neigbourCount;
+        localDy = localDy / neigbourCount;
+        
+        tempAx = tempAx + (localCentreX - inParticle.positionX) * genome.c1_cohesion;
+        tempAy = tempAy + (localCentreY - inParticle.positionY) * genome.c1_cohesion;
+        
+        tempAx = tempAx + (localDx - inParticle.velocityX) * genome.c2_alignment;
+        tempAy = tempAy + (localDy - inParticle.velocityY) * genome.c2_alignment;
+        
+        
+        outParticles[id].velocityX = tempAx / 1;
+        outParticles[id].velocityY = tempAy / 1;
+    }
+    else
+    {
+        outParticles[id].velocityX = velocityX;
+        outParticles[id].velocityY = velocityY;
+    }
+    
+    outParticles[id].positionX = inParticle.positionX + inParticle.velocityX;
+    outParticles[id].positionY = inParticle.positionY + inParticle.velocityY;
+    
+    if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < 1024 && particlePosition.y < 1024)
     {
         outTexture.write(outColor, particlePosition);
     }
    
-    const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(inGravityWell.positionX, inGravityWell.positionY));
-    
-    const float factor = (1 / dist) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
-   
-    outParticles[id] = Particle {
-        .velocityX =  (inParticle.velocityX * 0.999) + (inGravityWell.positionX - inParticle.positionX) * factor,
-        .velocityY =  (inParticle.velocityY * 0.999) + (inGravityWell.positionY - inParticle.positionY) * factor,
-        .positionX =  inParticle.positionX + inParticle.velocityX,
-        .positionY =  inParticle.positionY + inParticle.velocityY};
-    
-    // ----
-    
-    uint2 textureCoordinate(fast::floor(id / imageWidth),id % int(imageWidth));
-    
-    if (textureCoordinate.x < imageWidth && textureCoordinate.y < imageWidth)
-    {
-        float4 accumColor = inTexture.read(textureCoordinate);
-        
-        for (int j = -1; j <= 1; j++)
-        {
-            for (int i = -1; i <= 1; i++)
-            {
-                uint2 kernelIndex(textureCoordinate.x + i, textureCoordinate.y + j);
-                accumColor.rgb += inTexture.read(kernelIndex).rgb;
-            }
-        }
-        
-        accumColor.rgb = (accumColor.rgb / 10.5f);
-        accumColor.a = 1.0f;
-        
-        outTexture.write(accumColor, textureCoordinate);
-    }
+ 
+
 }

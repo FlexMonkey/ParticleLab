@@ -28,6 +28,13 @@ struct SwarmGenome
     float c5_paceKeeping;
 };
 
+struct NeighbourDistance
+{
+    float dist;
+    float x;
+    float y;
+};
+
 // http://www.reedbeta.com/blog/2013/01/12/quick-and-easy-gpu-random-numbers-in-d3d11/
 uint wang_hash(uint seed)
 {
@@ -93,7 +100,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     float localDy = 0;
     float tempAx = velocityX;
     float tempAy = velocityY;
-    
+
     const SwarmGenome genome = type == 0 ? genomeOne : type == 1 ? genomeTwo : genomeThree;
     
     for (uint i = 0; i < 4096; i++)
@@ -132,7 +139,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                     tempAy = tempAy + (randomTwo % 4) - 1.5;
                 }
 
-                //         let accelerateMultiplier = (swarmMember.genome.normalSpeed - distance) / distance * swarmMember.genome.c5_paceKeeping;
+                //
                 
                 
             }
@@ -152,9 +159,10 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         tempAx = tempAx + (localDx - inParticle.velocityX) * genome.c2_alignment;
         tempAy = tempAy + (localDy - inParticle.velocityY) * genome.c2_alignment;
         
+        // float accelerateMultiplier = (1.0f - dist) / dist * genome.c5_paceKeeping;
         
-        outParticles[id].velocityX = tempAx / 1;
-        outParticles[id].velocityY = tempAy / 1;
+        outParticles[id].velocityX = tempAx > 0.5 ? 0.5 : tempAx;
+        outParticles[id].velocityY = tempAy > 0.5 ? 0.5 : tempAy;
     }
     else
     {
@@ -164,6 +172,42 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     outParticles[id].positionX = inParticle.positionX + inParticle.velocityX;
     outParticles[id].positionY = inParticle.positionY + inParticle.velocityY;
+
+    if (outParticles[id].positionX < 0)
+    {
+        outParticles[id].positionX = 1024;
+    }
+    else if (outParticles[id].positionX > 1024)
+    {
+        outParticles[id].positionX = 0;
+    }
+    
+    if (outParticles[id].positionY < 0)
+    {
+        outParticles[id].positionY = 1024;
+    }
+    else if (outParticles[id].positionX > 1024)
+    {
+        outParticles[id].positionY = 0;
+    }
+    
+    if (outParticles[id].velocityX < -5)
+    {
+        outParticles[id].velocityX = -5;
+    }
+    else if (outParticles[id].velocityX > 5)
+    {
+        outParticles[id].velocityX = 5;
+    }
+    
+    if (outParticles[id].velocityY < -5)
+    {
+        outParticles[id].velocityY = -5;
+    }
+    else if (outParticles[id].velocityY > 5)
+    {
+        outParticles[id].velocityY = 5;
+    }
     
     if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < 1024 && particlePosition.y < 1024)
     {

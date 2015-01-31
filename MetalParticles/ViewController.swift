@@ -18,19 +18,19 @@ class ViewController: UIViewController
     let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.PremultipliedLast.rawValue)
     let renderingIntent = kCGRenderingIntentDefault
     
-    let imageSide: UInt = 1024
-    let imageSize = CGSize(width: Int(1024), height: Int(1024))
-    let imageByteCount = Int(1024 * 1024 * 4)
+    let imageSide: UInt = 640
+    let imageSize = CGSize(width: Int(640), height: Int(640))
+    let imageByteCount = Int(640 * 640 * 4)
     
     let bytesPerPixel = UInt(4)
     let bitsPerComponent = UInt(8)
     let bitsPerPixel:UInt = 32
     let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     
-    let bytesPerRow = UInt(4 * 1024)
-    let bytesPerRowInt = Int(4 * 1024)
-    let providerLength = Int(1024 * 1024 * 4) * sizeof(UInt8)
-    var imageBytes = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
+    let bytesPerRow = UInt(4 * 640)
+    let bytesPerRowInt = Int(4 * 640)
+    let providerLength = Int(640 * 640 * 4) * sizeof(UInt8)
+    var imageBytes = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
     
     var kernelFunction: MTLFunction!
     var pipelineState: MTLComputePipelineState!
@@ -43,7 +43,7 @@ class ViewController: UIViewController
     var region: MTLRegion!
     var particlesTexture: MTLTexture!
 
-    let blankBitmapRawData = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
+    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
     
     var errorFlag:Bool = false
  
@@ -90,7 +90,7 @@ class ViewController: UIViewController
             let velocityX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityY = (Float(arc4random() % 10) - 5) / 10.0
 
-            let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY)
+            let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY, velocityX2: velocityX, velocityY2: velocityY)
     
             particlesParticleBufferPtr[index] = particle
         }
@@ -222,5 +222,7 @@ struct Particle
     var positionY: Float = 0
     var velocityX: Float = 0
     var velocityY: Float = 0
+    var velocityX2: Float = 0
+    var velocityY2: Float = 0
 }
 

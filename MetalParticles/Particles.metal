@@ -6,6 +6,9 @@
 //  Copyright (c) 2015 Simon Gladman. All rights reserved.
 //
 //  Thanks to: http://memkite.com/blog/2014/12/15/data-parallel-programming-with-metal-and-swift-for-iphoneipad-gpu/
+//
+//  Playing with Hiroki Sayama's Swarm Chemisty
+//  See: http://bingweb.binghamton.edu/~sayama/SwarmChemistry/
 
 #include <metal_stdlib>
 using namespace metal;
@@ -16,6 +19,8 @@ struct Particle
     float positionY;
     float velocityX;
     float velocityY;
+    float velocityX2;
+    float velocityY2;
 };
 
 struct SwarmGenome
@@ -72,34 +77,34 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     };
     
     const SwarmGenome genomeThree = {
-        .radius = 15.0f,
-        .c1_cohesion = 1.05f,
+        .radius = 65.0f,
+        .c1_cohesion = 0.75f,
         .c2_alignment = 0.8f,
         .c3_seperation = 25,
-        .c4_steering = 0.25f,
-        .c5_paceKeeping = 0.5f
+        .c4_steering = 0.15f,
+        .c5_paceKeeping = 0.25f
     };
     
-    const Particle inParticle = inParticles[id];
+    Particle inParticle = inParticles[id];
     const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
     const int type = id % 3;
     
-    const float4 outColor((type == 0 ? 1 : 0.0),
+    const float4 outColor((type == 0 || type == 2 ? 1 : 0.0),
                           (type == 1 ? 1 : 0.0),
                           (type == 2 ? 1 : 0.0),
                           1.0);
     
-    float velocityX = inParticle.velocityX * 0.999;
-    float velocityY = inParticle.velocityY * 0.999;
+    float velocityX = inParticle.velocityX;
+    float velocityY = inParticle.velocityY;
     
     float neigbourCount = 0;
     float localCentreX = 0;
     float localCentreY = 0;
     float localDx = 0;
     float localDy = 0;
-    float tempAx = velocityX;
-    float tempAy = velocityY;
+    float tempAx = 0;
+    float tempAy = 0;
 
     const SwarmGenome genome = type == 0 ? genomeOne : type == 1 ? genomeTwo : genomeThree;
     
@@ -111,7 +116,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
  
             const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(candidateNeighbour.positionX, candidateNeighbour.positionY));
             
-            if (dist < genome.radius)
+            if (dist < genome.radius && dist > 0.001)
             {
                 // const float factor = (1 / (dist < 1 ? 1 : dist)) * (type == 0 ? 0.0001 : (type == 1 ? 0.000125 : 0.00015));
                 
@@ -130,18 +135,15 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                 tempAx = tempAx + (inParticle.positionX - candidateNeighbour.positionX) / foo;
                 tempAy = tempAy + (inParticle.positionY - candidateNeighbour.positionY) / foo;
                 
-                const uint randomOne = wang_hash(candidateNeighbour.positionX * candidateNeighbour.positionY);
-                const uint randomTwo = wang_hash(candidateNeighbour.positionX * candidateNeighbour.positionY);
+                const int randomOne = int(candidateNeighbour.positionX) % 3;
+                const int randomTwo = int(candidateNeighbour.positionY) % 3;
+                const int randomThree = int(candidateNeighbour.velocityY) % 3;
                 
-                if ((randomOne % 100) < (genome.c4_steering * 100.0))
+                if ((randomThree < 1.0) < (genome.c4_steering * 1.0f))
                 {
-                    tempAx = tempAx + (randomOne % 4) - 1.5;
-                    tempAy = tempAy + (randomTwo % 4) - 1.5;
+                    tempAx = tempAx + (randomOne) - 1;
+                    tempAy = tempAy + (randomTwo) - 1;
                 }
-
-                //
-                
-                
             }
         }
     }
@@ -159,55 +161,43 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         tempAx = tempAx + (localDx - inParticle.velocityX) * genome.c2_alignment;
         tempAy = tempAy + (localDy - inParticle.velocityY) * genome.c2_alignment;
         
-        // float accelerateMultiplier = (1.0f - dist) / dist * genome.c5_paceKeeping;
+        inParticle.velocityX2 += tempAx;
+        inParticle.velocityY2 += tempAy;
         
-        outParticles[id].velocityX = tempAx > 0.5 ? 0.5 : tempAx;
-        outParticles[id].velocityY = tempAy > 0.5 ? 0.5 : tempAy;
+        const float d = sqrt(inParticle.velocityX2 * inParticle.velocityX2 + inParticle.velocityY2 * inParticle.velocityY2);
+        
+        float accelerateMultiplier = (1.0f - d) / d * genome.c5_paceKeeping;
+        
+        inParticle.velocityX2 += inParticle.velocityX2 * accelerateMultiplier;
+        inParticle.velocityY2 += inParticle.velocityY2 * accelerateMultiplier;
     }
-    else
-    {
-        outParticles[id].velocityX = velocityX;
-        outParticles[id].velocityY = velocityY;
-    }
+
+    inParticle.velocityX = inParticle.velocityX2;
+    inParticle.velocityY = inParticle.velocityY2;
     
-    outParticles[id].positionX = inParticle.positionX + inParticle.velocityX;
-    outParticles[id].positionY = inParticle.positionY + inParticle.velocityY;
+    inParticle.positionX += inParticle.velocityX;
+    inParticle.positionY += inParticle.velocityY;
+ 
+    outParticles[id] = inParticle;
 
     if (outParticles[id].positionX < 0)
     {
-        outParticles[id].positionX = 1024;
+        outParticles[id].positionX = 640;
     }
-    else if (outParticles[id].positionX > 1024)
+    else if (outParticles[id].positionX > 640)
     {
         outParticles[id].positionX = 0;
     }
     
     if (outParticles[id].positionY < 0)
     {
-        outParticles[id].positionY = 1024;
+        outParticles[id].positionY = 640;
     }
-    else if (outParticles[id].positionX > 1024)
+    else if (outParticles[id].positionX > 640)
     {
         outParticles[id].positionY = 0;
     }
-    
-    if (outParticles[id].velocityX < -5)
-    {
-        outParticles[id].velocityX = -5;
-    }
-    else if (outParticles[id].velocityX > 5)
-    {
-        outParticles[id].velocityX = 5;
-    }
-    
-    if (outParticles[id].velocityY < -5)
-    {
-        outParticles[id].velocityY = -5;
-    }
-    else if (outParticles[id].velocityY > 5)
-    {
-        outParticles[id].velocityY = 5;
-    }
+ 
     
     if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < 1024 && particlePosition.y < 1024)
     {

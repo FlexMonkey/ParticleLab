@@ -55,10 +55,10 @@ class ViewController: UIViewController
     var glow_threadGroupCount:MTLSize!
     var glow_threadGroups: MTLSize!
     
-    let particleCount: Int = 4096 * 2
+    let particleCount: Int = 4096
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(4096 * 2) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(4096) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!

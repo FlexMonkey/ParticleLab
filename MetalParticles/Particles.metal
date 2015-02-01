@@ -71,9 +71,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    uint id [[thread_position_in_grid]])
 {
     const SwarmGenome genomeOne = {
-        .radius = 0.25f,
+        .radius = 0.4f,
         .c1_cohesion = 0.25f,
-        .c2_alignment = 0.25f,
+        .c2_alignment = 0.35f,
         .c3_seperation = 0.05f,
         .c4_steering = 0.35f,
         .c5_paceKeeping = 0.75f
@@ -89,12 +89,12 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     };
     
     const SwarmGenome genomeThree = {
-        .radius = 0.65f,
-        .c1_cohesion = 0.55f,
+        .radius = 0.2f,
+        .c1_cohesion = 0.45f,
         .c2_alignment = 0.8f,
-        .c3_seperation = 0.175f,
-        .c4_steering = 0.85f,
-        .c5_paceKeeping = 0.25f
+        .c3_seperation = 0.075f,
+        .c4_steering = 0.9f,
+        .c5_paceKeeping = 0.15f
     };
     
     Particle inParticle = inParticles[id];
@@ -146,8 +146,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                     const int randomOne = fast::cos(candidateNeighbour.positionX + candidateNeighbour.velocityY);
                     const int randomTwo = fast::sin(candidateNeighbour.positionY + candidateNeighbour.velocityX);
                     
-                    tempAx = tempAx + randomOne * 5;
-                    tempAy = tempAy + randomTwo * 5 ;
+                    tempAx = tempAx + randomOne * 8;
+                    tempAy = tempAy + randomTwo * 8;
                 }
             }
         }

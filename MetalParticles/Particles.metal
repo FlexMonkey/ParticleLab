@@ -40,47 +40,58 @@ struct NeighbourDistance
     float y;
 };
 
-// http://www.reedbeta.com/blog/2013/01/12/quick-and-easy-gpu-random-numbers-in-d3d11/
-uint wang_hash(uint seed)
+kernel void glowShader(texture2d<float, access::read> inTexture [[texture(0)]],
+                       texture2d<float, access::write> outTexture [[texture(1)]],
+                       texture2d<float, access::read> inTextureB [[texture(2)]],
+                       uint2 gid [[thread_position_in_grid]])
 {
-    seed = (seed ^ 61) ^ (seed >> 16);
-    seed *= 9;
-    seed = seed ^ (seed >> 4);
-    seed *= 0x27d4eb2d;
-    seed = seed ^ (seed >> 15);
-    return seed;
+    float4 accumColor(0,0,0,0);
+    
+    for (int j = -1; j <= 1; j++)
+    {
+        for (int i = -1; i <= 1; i++)
+        {
+            uint2 kernelIndex(gid.x + i, gid.y + j);
+            accumColor += inTexture.read(kernelIndex).rgba;
+        }
+    }
+    
+    accumColor.rgb = (accumColor.rgb / 10.0f) + inTextureB.read(gid).rgb;
+    accumColor.a = 1.0f;
+    
+    outTexture.write(accumColor, gid);
 }
 
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
-                                   
+                                    texture2d<float, access::read> inTexture [[texture(1)]],
                                    const device Particle *inParticles [[ buffer(0) ]],
                                    device Particle *outParticles [[ buffer(1) ]],
                          
                                    uint id [[thread_position_in_grid]])
 {
     const SwarmGenome genomeOne = {
-        .radius = 25.0f,
+        .radius = 0.25f,
         .c1_cohesion = 0.25f,
         .c2_alignment = 0.25f,
-        .c3_seperation = 75.0f,
+        .c3_seperation = 0.15f,
         .c4_steering = 0.35f,
         .c5_paceKeeping = 0.75f
     };
     
     const SwarmGenome genomeTwo = {
-        .radius = 50.0f,
+        .radius = 0.50f,
         .c1_cohesion = 0.165f,
-        .c2_alignment = 1.0f,
-        .c3_seperation = 35.0f,
+        .c2_alignment = 0.5f,
+        .c3_seperation = 0.35f,
         .c4_steering = 0.25f,
         .c5_paceKeeping = 0.5f
     };
     
     const SwarmGenome genomeThree = {
-        .radius = 65.0f,
-        .c1_cohesion = 0.75f,
+        .radius = 0.65f,
+        .c1_cohesion = 0.55f,
         .c2_alignment = 0.8f,
-        .c3_seperation = 25,
+        .c3_seperation = 0.25f,
         .c4_steering = 0.15f,
         .c5_paceKeeping = 0.25f
     };
@@ -90,14 +101,11 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const int type = id % 3;
     
-    const float4 outColor((type == 0 || type == 2 ? 1 : 0.0),
-                          (type == 1 ? 1 : 0.0),
-                          (type == 2 ? 1 : 0.0),
+    const float4 outColor((type == 0 ? 1 : 0.5),
+                          (type == 1 ? 1 : 0.5),
+                          (type == 2 ? 1 : 0.5),
                           1.0);
-    
-    float velocityX = inParticle.velocityX;
-    float velocityY = inParticle.velocityY;
-    
+
     float neigbourCount = 0;
     float localCentreX = 0;
     float localCentreY = 0;
@@ -116,13 +124,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
  
             const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(candidateNeighbour.positionX, candidateNeighbour.positionY));
             
-            if (dist < genome.radius && dist > 0.001)
+            if (dist < genome.radius * 100)
             {
-                // const float factor = (1 / (dist < 1 ? 1 : dist)) * (type == 0 ? 0.0001 : (type == 1 ? 0.000125 : 0.00015));
-                
-                // velocityX =  velocityX + (otherParticle.positionX - inParticle.positionX) * factor;
-                // velocityY =  velocityY + (otherParticle.positionY - inParticle.positionY) * factor;
-                
                 localCentreX = localCentreX + candidateNeighbour.positionX;
                 localCentreY = localCentreY + candidateNeighbour.positionY;
                 localDx = localDx + candidateNeighbour.velocityX;
@@ -130,7 +133,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                 
                 neigbourCount = neigbourCount + 1.0f;
                 
-                float foo = (dist < 1 ? 1 : dist) * genome.c3_seperation;
+                float foo = (dist < 1 ? 1 : dist) * genome.c3_seperation * 100.0f;
                 
                 tempAx = tempAx + (inParticle.positionX - candidateNeighbour.positionX) / foo;
                 tempAy = tempAy + (inParticle.positionY - candidateNeighbour.positionY) / foo;
@@ -141,8 +144,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                 
                 if ((randomThree < 1.0) < (genome.c4_steering * 1.0f))
                 {
-                    tempAx = tempAx + (randomOne) - 1;
-                    tempAy = tempAy + (randomTwo) - 1;
+                    tempAx = tempAx + (randomOne - 1) / 2.0f;
+                    tempAy = tempAy + (randomTwo - 1) / 2.0f;
                 }
             }
         }
@@ -182,28 +185,33 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
 
     if (outParticles[id].positionX < 0)
     {
-        outParticles[id].positionX = 640;
+        outParticles[id].positionX = 800;
     }
-    else if (outParticles[id].positionX > 640)
+    else if (outParticles[id].positionX > 800)
     {
         outParticles[id].positionX = 0;
     }
     
     if (outParticles[id].positionY < 0)
     {
-        outParticles[id].positionY = 640;
+        outParticles[id].positionY = 800;
     }
-    else if (outParticles[id].positionX > 640)
+    else if (outParticles[id].positionX > 800)
     {
         outParticles[id].positionY = 0;
     }
  
+    const float4 inColor = inTexture.read(particlePosition).rgba;
+    outTexture.write(inColor + outColor, particlePosition);
     
-    if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < 1024 && particlePosition.y < 1024)
-    {
-        outTexture.write(outColor, particlePosition);
-    }
-   
+    const float4 inColor2 = inTexture.read(particlePosition - uint2(1, 1)).rgba;
+    outTexture.write(inColor2 + outColor, particlePosition - uint2(1, 1));
+    
+    const float4 inColor3 = inTexture.read(particlePosition - uint2(0, 1)).rgba;
+    outTexture.write(inColor3 + outColor, particlePosition - uint2(0, 1));
+    
+    const float4 inColor4 = inTexture.read(particlePosition - uint2(1, 0)).rgba;
+    outTexture.write(inColor4 + outColor, particlePosition - uint2(1, 0));
  
 
 }

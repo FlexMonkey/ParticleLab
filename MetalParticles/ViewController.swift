@@ -18,19 +18,20 @@ class ViewController: UIViewController
     let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.PremultipliedLast.rawValue)
     let renderingIntent = kCGRenderingIntentDefault
     
-    let imageSide: UInt = 640
-    let imageSize = CGSize(width: Int(640), height: Int(640))
-    let imageByteCount = Int(640 * 640 * 4)
+    let imageSide: UInt = 800
+    let imageSize = CGSize(width: Int(800), height: Int(800))
+    let imageByteCount = Int(800 * 800 * 4)
     
     let bytesPerPixel = UInt(4)
     let bitsPerComponent = UInt(8)
     let bitsPerPixel:UInt = 32
     let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
     
-    let bytesPerRow = UInt(4 * 640)
-    let bytesPerRowInt = Int(4 * 640)
-    let providerLength = Int(640 * 640 * 4) * sizeof(UInt8)
-    var imageBytes = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
+    let bytesPerRow = UInt(4 * 800)
+    let bytesPerRowInt = Int(4 * 800)
+    let providerLength = Int(800 * 800 * 4) * sizeof(UInt8)
+    var imageBytes = [UInt8](count: Int(800 * 800 * 4), repeatedValue: 0)
+    let blankBitmapRawData = [UInt8](count: Int(800 * 800 * 4), repeatedValue: 0)
     
     var kernelFunction: MTLFunction!
     var pipelineState: MTLComputePipelineState!
@@ -41,14 +42,18 @@ class ViewController: UIViewController
     let imageView =  UIImageView(frame: CGRectZero)
     
     var region: MTLRegion!
-    var particlesTexture: MTLTexture!
-
-    let blankBitmapRawData = [UInt8](count: Int(640 * 640 * 4), repeatedValue: 0)
+    // var particlesTexture: MTLTexture!
     
+    var textureA: MTLTexture!
+    var textureB: MTLTexture!
+
     var errorFlag:Bool = false
  
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
+    
+    var glow_threadGroupCount:MTLSize!
+    var glow_threadGroups: MTLSize!
     
     let particleCount: Int = 4096
     var particlesMemory:UnsafeMutablePointer<Void> = nil
@@ -59,6 +64,8 @@ class ViewController: UIViewController
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
 
     var frameStartTime = CFAbsoluteTimeGetCurrent()
+    
+    let useGlowAndTrails = false
 
     override func viewDidLoad()
     {
@@ -112,6 +119,10 @@ class ViewController: UIViewController
             particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
             particle_threadGroups = MTLSize(width:(particleCount + 31) / 32, height:1, depth:1)
       
+            glow_threadGroupCount = MTLSizeMake(16, 16, 1)
+            glow_threadGroups = MTLSizeMake(Int(imageSide) / glow_threadGroupCount.width, Int(imageSide) / glow_threadGroupCount.height, 1)
+
+            
             setUpTexture()
             
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
@@ -138,12 +149,37 @@ class ViewController: UIViewController
         }
     }
     
-    
+    final func glowTexture()
+    {
+        commandQueue = device.newCommandQueue()
+        
+        kernelFunction = defaultLibrary.newFunctionWithName("glowShader")
+        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
+        
+        let commandBuffer = commandQueue.commandBuffer()
+        let commandEncoder = commandBuffer.computeCommandEncoder()
+        
+        commandEncoder.setComputePipelineState(pipelineState)
+        
+        commandEncoder.setTexture(textureA, atIndex: 0)
+        commandEncoder.setTexture(textureA, atIndex: 1)
+        commandEncoder.setTexture(textureB, atIndex: 2)
+        
+        commandEncoder.dispatchThreadgroups(glow_threadGroups, threadsPerThreadgroup: glow_threadGroupCount)
+        
+        commandEncoder.endEncoding()
+        commandBuffer.commit()
+        commandBuffer.waitUntilCompleted()
+        
+    }
     
     final func applyShader()
     {
-        particlesTexture.replaceRegion(region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+        textureB.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
 
+        kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
+        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
+        
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
         
@@ -155,15 +191,24 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
   
-        commandEncoder.setTexture(particlesTexture, atIndex: 0)
+        commandEncoder.setTexture(textureB, atIndex: 0)
+        commandEncoder.setTexture(textureB, atIndex: 1)
         
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
         commandEncoder.endEncoding()
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
-   
-        particlesTexture.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
+        
+        if useGlowAndTrails
+        {
+            glowTexture()
+            textureA.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
+        }
+        else
+        {
+            textureB.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
+        }
         
         var imageRef: CGImage?
         
@@ -184,7 +229,8 @@ class ViewController: UIViewController
     {
         let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
         
-        particlesTexture = device.newTextureWithDescriptor(textureDescriptor)
+        textureA = device.newTextureWithDescriptor(textureDescriptor)
+        textureB = device.newTextureWithDescriptor(textureDescriptor)
         
        region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
     }

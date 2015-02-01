@@ -74,7 +74,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         .radius = 0.25f,
         .c1_cohesion = 0.25f,
         .c2_alignment = 0.25f,
-        .c3_seperation = 0.15f,
+        .c3_seperation = 0.05f,
         .c4_steering = 0.35f,
         .c5_paceKeeping = 0.75f
     };
@@ -92,8 +92,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         .radius = 0.65f,
         .c1_cohesion = 0.55f,
         .c2_alignment = 0.8f,
-        .c3_seperation = 0.05f,
-        .c4_steering = 0.15f,
+        .c3_seperation = 0.175f,
+        .c4_steering = 0.85f,
         .c5_paceKeeping = 0.25f
     };
     
@@ -139,14 +139,15 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                 tempAx = tempAx + (inParticle.positionX - candidateNeighbour.positionX) / foo;
                 tempAy = tempAy + (inParticle.positionY - candidateNeighbour.positionY) / foo;
                 
-                const int randomOne = int(candidateNeighbour.positionX) % 3;
-                const int randomTwo = int(candidateNeighbour.positionY) % 3;
-                const int randomThree = int(candidateNeighbour.velocityY) % 3;
+                const float randomThree = fast::abs(fast::cos(candidateNeighbour.velocityX + candidateNeighbour.velocityY));
                 
-                if ((randomThree < 1.0) < (genome.c4_steering * 1.0f))
+                if (randomThree < genome.c4_steering)
                 {
-                    tempAx = tempAx + (randomOne - 1) / 2.0f;
-                    tempAy = tempAy + (randomTwo - 1) / 2.0f;
+                    const int randomOne = fast::cos(candidateNeighbour.positionX + candidateNeighbour.velocityY);
+                    const int randomTwo = fast::sin(candidateNeighbour.positionY + candidateNeighbour.velocityX);
+                    
+                    tempAx = tempAx + randomOne * 5;
+                    tempAy = tempAy + randomTwo * 5 ;
                 }
             }
         }
@@ -168,7 +169,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         inParticle.velocityX2 += tempAx;
         inParticle.velocityY2 += tempAy;
         
-        const float d = sqrt(inParticle.velocityX2 * inParticle.velocityX2 + inParticle.velocityY2 * inParticle.velocityY2);
+        const float d = fast::sqrt(inParticle.velocityX2 * inParticle.velocityX2 + inParticle.velocityY2 * inParticle.velocityY2);
         
         float accelerateMultiplier = (1.0f - d) / d * genome.c5_paceKeeping;
         
@@ -184,20 +185,20 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
  
     outParticles[id] = inParticle;
 
-    if (outParticles[id].positionX < 0)
+    if (outParticles[id].positionX <= 0)
     {
         outParticles[id].positionX = 800;
     }
-    else if (outParticles[id].positionX > 800)
+    else if (outParticles[id].positionX >= 800)
     {
         outParticles[id].positionX = 0;
     }
     
-    if (outParticles[id].positionY < 0)
+    if (outParticles[id].positionY <= 0)
     {
         outParticles[id].positionY = 800;
     }
-    else if (outParticles[id].positionX > 800)
+    else if (outParticles[id].positionX >= 800)
     {
         outParticles[id].positionY = 0;
     }

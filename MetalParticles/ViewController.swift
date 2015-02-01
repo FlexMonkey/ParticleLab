@@ -94,8 +94,8 @@ class ViewController: UIViewController
         {
             var positionX = Float(arc4random_uniform(UInt32(imageSide)))
             var positionY = Float(arc4random_uniform(UInt32(imageSide)))
-            let velocityX = (Float(arc4random_uniform(10)) - 5) / 10.0
-            let velocityY = (Float(arc4random_uniform(10)) - 5) / 10.0
+            let velocityX: Float = 0.0
+            let velocityY: Float = 0.0
 
             let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY, velocityX2: velocityX, velocityY2: velocityY, type: Float(index % 3))
     

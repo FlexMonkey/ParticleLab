@@ -21,6 +21,7 @@ struct Particle
     float velocityY;
     float velocityX2;
     float velocityY2;
+    float type;
 };
 
 struct SwarmGenome
@@ -82,7 +83,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         .radius = 0.50f,
         .c1_cohesion = 0.165f,
         .c2_alignment = 0.5f,
-        .c3_seperation = 0.35f,
+        .c3_seperation = 0.20f,
         .c4_steering = 0.25f,
         .c5_paceKeeping = 0.5f
     };
@@ -91,7 +92,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         .radius = 0.65f,
         .c1_cohesion = 0.55f,
         .c2_alignment = 0.8f,
-        .c3_seperation = 0.25f,
+        .c3_seperation = 0.05f,
         .c4_steering = 0.15f,
         .c5_paceKeeping = 0.25f
     };
@@ -99,7 +100,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     Particle inParticle = inParticles[id];
     const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
-    const int type = id % 3;
+    const int type = int(inParticle.type);
     
     const float4 outColor((type == 0 ? 1 : 0.5),
                           (type == 1 ? 1 : 0.5),

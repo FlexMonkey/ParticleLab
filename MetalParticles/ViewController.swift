@@ -55,10 +55,10 @@ class ViewController: UIViewController
     var glow_threadGroupCount:MTLSize!
     var glow_threadGroups: MTLSize!
     
-    let particleCount: Int = 4096
+    let particleCount: Int = 4096 * 2
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(4096) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(4096 * 2) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
@@ -92,12 +92,12 @@ class ViewController: UIViewController
  
         for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex
         {
-            var positionX = Float(arc4random() % UInt32(imageSide))
-            var positionY = Float(arc4random() % UInt32(imageSide))
-            let velocityX = (Float(arc4random() % 10) - 5) / 10.0
-            let velocityY = (Float(arc4random() % 10) - 5) / 10.0
+            var positionX = Float(arc4random_uniform(UInt32(imageSide)))
+            var positionY = Float(arc4random_uniform(UInt32(imageSide)))
+            let velocityX = (Float(arc4random_uniform(10)) - 5) / 10.0
+            let velocityY = (Float(arc4random_uniform(10)) - 5) / 10.0
 
-            let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY, velocityX2: velocityX, velocityY2: velocityY)
+            let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY, velocityX2: velocityX, velocityY2: velocityY, type: Float(index % 3))
     
             particlesParticleBufferPtr[index] = particle
         }
@@ -270,5 +270,6 @@ struct Particle
     var velocityY: Float = 0
     var velocityX2: Float = 0
     var velocityY2: Float = 0
+    var type: Float = 0
 }
 

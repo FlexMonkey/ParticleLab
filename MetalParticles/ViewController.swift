@@ -66,7 +66,17 @@ class ViewController: UIViewController
     var frameStartTime = CFAbsoluteTimeGetCurrent()
     
     let useGlowAndTrails = false
+    
+    var numericDials = [ParameterWidget]()
+    var speciesSegmentedControl = UISegmentedControl(items: ["Red", "Green", "Blue"])
+    let fieldNames = ["Radius", "Cohesion", "Alignment", "Seperation", "Steering", "Pace Keeping"]
 
+    var redGenome = SwarmGenome(radius: 0.4, c1_cohesion: 0.25, c2_alignment: 0.35, c3_seperation: 0.05, c4_steering: 0.35, c5_paceKeeping: 0.75)
+    var greenGenome = SwarmGenome(radius: 0.5, c1_cohesion: 0.165, c2_alignment: 0.5, c3_seperation: 0.2, c4_steering: 0.25, c5_paceKeeping: 0.5)
+    var blueGenome = SwarmGenome(radius: 0.2, c1_cohesion: 0.45, c2_alignment: 0.8, c3_seperation: 0.075, c4_steering: 0.9, c5_paceKeeping: 0.15)
+    
+    var genomes = [SwarmGenome]()
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -75,11 +85,56 @@ class ViewController: UIViewController
 
         imageView.contentMode = UIViewContentMode.ScaleAspectFill
 
+        speciesSegmentedControl.tintColor = UIColor.darkGrayColor()
+        speciesSegmentedControl.addTarget(self, action: "speciesChangeHandler", forControlEvents: UIControlEvents.ValueChanged)
+        view.addSubview(speciesSegmentedControl)
+        
+        for i in 0 ... 5
+        {
+            let numericDial = ParameterWidget(frame: CGRectZero)
+            numericDial.fieldName = fieldNames[i]
+            numericDial.addTarget(self, action: "parameterChangeHandler", forControlEvents: UIControlEvents.ValueChanged)
+            numericDials.append(numericDial)
+            
+            view.addSubview(numericDial)
+        }
+        
         view.addSubview(imageView)
+        
+        genomes = [redGenome, greenGenome, blueGenome]
         
         setUpParticles()
         
         setUpMetal()
+        
+        speciesSegmentedControl.selectedSegmentIndex = 0
+        speciesChangeHandler()
+    }
+    
+    func parameterChangeHandler()
+    {
+        genomes[speciesSegmentedControl.selectedSegmentIndex].radius = numericDials[0].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c1_cohesion = numericDials[1].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c2_alignment = numericDials[2].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c3_seperation = numericDials[3].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c4_steering = numericDials[4].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c5_paceKeeping = numericDials[5].value
+        
+        redGenome = genomes[0]
+        greenGenome = genomes[1]
+        blueGenome = genomes[2]
+    }
+    
+    func speciesChangeHandler()
+    {
+        let selectedGenome = genomes[speciesSegmentedControl.selectedSegmentIndex]
+        
+        numericDials[0].value = selectedGenome.radius
+        numericDials[1].value = selectedGenome.c1_cohesion
+        numericDials[2].value = selectedGenome.c2_alignment
+        numericDials[3].value = selectedGenome.c3_seperation
+        numericDials[4].value = selectedGenome.c4_steering
+        numericDials[5].value = selectedGenome.c5_paceKeeping
     }
     
     func setUpParticles()
@@ -191,6 +246,15 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
   
+        let redBuffer: MTLBuffer = device.newBufferWithBytes(&redGenome, length: sizeof(SwarmGenome), options: nil)
+        commandEncoder.setBuffer(redBuffer, offset: 0, atIndex: 2)
+        
+        let greenBuffer: MTLBuffer = device.newBufferWithBytes(&greenGenome, length: sizeof(SwarmGenome), options: nil)
+        commandEncoder.setBuffer(greenBuffer, offset: 0, atIndex: 3)
+        
+        let blueBuffer: MTLBuffer = device.newBufferWithBytes(&blueGenome, length: sizeof(SwarmGenome), options: nil)
+        commandEncoder.setBuffer(blueBuffer, offset: 0, atIndex: 4)
+        
         commandEncoder.setTexture(textureB, atIndex: 0)
         commandEncoder.setTexture(textureB, atIndex: 1)
         
@@ -238,20 +302,25 @@ class ViewController: UIViewController
 
     override func viewDidLayoutSubviews()
     {
-        if view.frame.height > view.frame.width
-        {
-           let imageSide = view.frame.width
-            
-           imageView.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: 01)
-        }
-        else
-        {
-            let imageSide = view.frame.height
-            
-            imageView.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
-        }
+        let imageSide = view.frame.height
         
+        imageView.frame = CGRect(x: 0 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
+ 
+        let dialOriginY = Int(topLayoutGuide.length)
+        let dialWidth = Int(view.frame.width - view.frame.height)
+        let dialOriginX = Int(view.frame.width) - dialWidth
         
+        speciesSegmentedControl.frame = CGRect(x: dialOriginX, y: dialOriginY, width: dialWidth, height: 30)
+        
+        for (idx: Int, numericDial: ParameterWidget) in enumerate(numericDials)
+        {
+            numericDial.frame = CGRect(x: dialOriginX, y: 40 + dialOriginY + idx * 60, width: dialWidth, height: 55)
+        }
+    }
+    
+    override func supportedInterfaceOrientations() -> Int
+    {
+        return Int(UIInterfaceOrientationMask.Landscape.rawValue)
     }
     
     override func didReceiveMemoryWarning()
@@ -272,4 +341,16 @@ struct Particle
     var velocityY2: Float = 0
     var type: Float = 0
 }
+
+struct SwarmGenome
+{
+    var radius: Float = 0
+    var c1_cohesion: Float = 0
+    var c2_alignment: Float = 0
+    var c3_seperation: Float = 0
+    var c4_steering: Float = 0
+    var c5_paceKeeping: Float = 0
+}
+
+
 

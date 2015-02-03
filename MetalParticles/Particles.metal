@@ -204,7 +204,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     {
         outParticles[id].positionY = 800;
     }
-    else if (outParticles[id].positionX >= 800)
+    else if (outParticles[id].positionY >= 800)
     {
         outParticles[id].positionY = 0;
     }

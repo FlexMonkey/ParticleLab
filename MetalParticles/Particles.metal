@@ -48,16 +48,7 @@ kernel void glowShader(texture2d<float, access::read> inTexture [[texture(0)]],
 {
     float4 accumColor(0,0,0,0);
     
-    for (int j = -1; j <= 1; j++)
-    {
-        for (int i = -1; i <= 1; i++)
-        {
-            uint2 kernelIndex(gid.x + i, gid.y + j);
-            accumColor += inTexture.read(kernelIndex).rgba;
-        }
-    }
-    
-    accumColor.rgb = (accumColor.rgb / 10.0f) + inTextureB.read(gid).rgb;
+    accumColor.rgb = (inTexture.read(gid).rgb * 0.9) + inTextureB.read(gid).rgb;
     accumColor.a = 1.0f;
     
     outTexture.write(accumColor, gid);
@@ -74,43 +65,16 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    uint id [[thread_position_in_grid]])
 {
-    /*
-    const SwarmGenome genomeOne = {
-        .radius = 0.4f,
-        .c1_cohesion = 0.25f,
-        .c2_alignment = 0.35f,
-        .c3_seperation = 0.05f,
-        .c4_steering = 0.35f,
-        .c5_paceKeeping = 0.75f
-    };
-    
-    const SwarmGenome genomeTwo = {
-        .radius = 0.50f,
-        .c1_cohesion = 0.165f,
-        .c2_alignment = 0.5f,
-        .c3_seperation = 0.20f,
-        .c4_steering = 0.25f,
-        .c5_paceKeeping = 0.5f
-    };
-    
-    const SwarmGenome genomeThree = {
-        .radius = 0.2f,
-        .c1_cohesion = 0.45f,
-        .c2_alignment = 0.8f,
-        .c3_seperation = 0.075f,
-        .c4_steering = 0.9f,
-        .c5_paceKeeping = 0.15f
-    };
-     */
+   
     
     Particle inParticle = inParticles[id];
     const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
     const int type = int(inParticle.type);
     
-    const float4 outColor((type == 0 ? 1 : 0.5),
-                          (type == 1 ? 1 : 0.5),
-                          (type == 2 ? 1 : 0.5),
+    const float4 outColor((type == 0 ? 0.75 : 0.5),
+                          (type == 1 ? 0.75 : 0.5),
+                          (type == 2 ? 0.75 : 0.5),
                           1.0);
 
     float neigbourCount = 0;

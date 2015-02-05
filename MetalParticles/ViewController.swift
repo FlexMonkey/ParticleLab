@@ -42,7 +42,6 @@ class ViewController: UIViewController
     let imageView =  UIImageView(frame: CGRectZero)
     
     var region: MTLRegion!
-    // var particlesTexture: MTLTexture!
     
     var textureA: MTLTexture!
     var textureB: MTLTexture!
@@ -65,7 +64,10 @@ class ViewController: UIViewController
 
     var frameStartTime = CFAbsoluteTimeGetCurrent()
     
-    let useGlowAndTrails = false
+    var useGlowAndTrails = false
+    
+    let toolbar = UIToolbar(frame: CGRectZero)
+    var resetParticlesFlag = false
     
     var parameterWidgets = [ParameterWidget]()
     var speciesSegmentedControl = UISegmentedControl(items: ["Red", "Green", "Blue"])
@@ -102,6 +104,13 @@ class ViewController: UIViewController
         }
         
         view.addSubview(imageView)
+        
+        let resetBarButtonItem = UIBarButtonItem(title: "Reset", style: UIBarButtonItemStyle.Plain, target: self, action: "resetParticles")
+        let toggleTrailsButtonItem = UIBarButtonItem(title: "Trails", style: UIBarButtonItemStyle.Plain, target: self, action: "toggleTrails")
+        
+        toolbar.items = [resetBarButtonItem, toggleTrailsButtonItem]
+        
+        view.addSubview(toolbar)
         
         genomes = [redGenome, greenGenome, blueGenome]
         
@@ -147,15 +156,20 @@ class ViewController: UIViewController
         particlesParticlePtr = UnsafeMutablePointer<Particle>(particlesVoidPtr)
         particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
  
+        populateParticles()
+    }
+    
+    final func populateParticles()
+    {
         for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex
         {
             var positionX = Float(arc4random_uniform(UInt32(imageSide)))
             var positionY = Float(arc4random_uniform(UInt32(imageSide)))
             let velocityX: Float = 0.0
             let velocityY: Float = 0.0
-
+            
             let particle = Particle(positionX: positionX, positionY: positionY, velocityX: velocityX, velocityY: velocityY, velocityX2: velocityX, velocityY2: velocityY, type: Float(index % 3))
-    
+            
             particlesParticleBufferPtr[index] = particle
         }
     }
@@ -189,12 +203,28 @@ class ViewController: UIViewController
         }
     }
 
+    final func resetParticles()
+    {
+        resetParticlesFlag = true
+    }
+    
+    final func toggleTrails()
+    {
+        useGlowAndTrails = !useGlowAndTrails
+    }
+    
     final func run()
     {
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
         println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
+        
+        if resetParticlesFlag
+        {
+            resetParticlesFlag = false
+            populateParticles()
+        }
   
         Async.background()
         {
@@ -318,6 +348,8 @@ class ViewController: UIViewController
         {
             parameterWidget.frame = CGRect(x: dialOriginX, y: 50 + dialOriginY + idx * 70, width: dialWidth, height: 55).rectByInsetting(dx: 4, dy: 1)
         }
+        
+        toolbar.frame = CGRect(x: dialOriginX, y: Int(view.frame.height) - 40, width: imageSide, height: 40)
     }
     
     override func supportedInterfaceOrientations() -> Int

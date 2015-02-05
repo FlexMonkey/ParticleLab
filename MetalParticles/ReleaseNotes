@@ -1,0 +1,11 @@
+Backlog...
+
+Allow user to choose 2^11 (2048), 2^12(4096) or 2^13(8192 - but 4096 in shader) particles - pass particle count to shader
+Core data support as per redilab - save either genome or entire recipe
+Reset Button
+Presets - also preset per species
+Choose between 1, 2 or three species
+
+Toolbar - reset / presets / particle count
+
+----

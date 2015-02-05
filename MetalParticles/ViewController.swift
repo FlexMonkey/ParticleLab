@@ -67,7 +67,7 @@ class ViewController: UIViewController
     
     let useGlowAndTrails = false
     
-    var numericDials = [ParameterWidget]()
+    var parameterWidgets = [ParameterWidget]()
     var speciesSegmentedControl = UISegmentedControl(items: ["Red", "Green", "Blue"])
     let fieldNames = ["Radius", "Cohesion", "Alignment", "Seperation", "Steering", "Pace Keeping"]
 
@@ -81,22 +81,24 @@ class ViewController: UIViewController
     {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor.blackColor()
+        view.backgroundColor = UIColor.darkGrayColor()
 
         imageView.contentMode = UIViewContentMode.ScaleAspectFill
+        imageView.backgroundColor = UIColor.blackColor()
 
-        speciesSegmentedControl.tintColor = UIColor.darkGrayColor()
+        speciesSegmentedControl.tintColor = UIColor.whiteColor()
+        
         speciesSegmentedControl.addTarget(self, action: "speciesChangeHandler", forControlEvents: UIControlEvents.ValueChanged)
         view.addSubview(speciesSegmentedControl)
         
         for i in 0 ... 5
         {
-            let numericDial = ParameterWidget(frame: CGRectZero)
-            numericDial.fieldName = fieldNames[i]
-            numericDial.addTarget(self, action: "parameterChangeHandler", forControlEvents: UIControlEvents.ValueChanged)
-            numericDials.append(numericDial)
+            let parameterWidget = ParameterWidget(frame: CGRectZero)
+            parameterWidget.fieldName = fieldNames[i]
+            parameterWidget.addTarget(self, action: "parameterChangeHandler", forControlEvents: UIControlEvents.ValueChanged)
+            parameterWidgets.append(parameterWidget)
             
-            view.addSubview(numericDial)
+            view.addSubview(parameterWidget)
         }
         
         view.addSubview(imageView)
@@ -113,12 +115,12 @@ class ViewController: UIViewController
     
     func parameterChangeHandler()
     {
-        genomes[speciesSegmentedControl.selectedSegmentIndex].radius = numericDials[0].value
-        genomes[speciesSegmentedControl.selectedSegmentIndex].c1_cohesion = numericDials[1].value
-        genomes[speciesSegmentedControl.selectedSegmentIndex].c2_alignment = numericDials[2].value
-        genomes[speciesSegmentedControl.selectedSegmentIndex].c3_seperation = numericDials[3].value
-        genomes[speciesSegmentedControl.selectedSegmentIndex].c4_steering = numericDials[4].value
-        genomes[speciesSegmentedControl.selectedSegmentIndex].c5_paceKeeping = numericDials[5].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].radius = parameterWidgets[0].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c1_cohesion = parameterWidgets[1].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c2_alignment = parameterWidgets[2].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c3_seperation = parameterWidgets[3].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c4_steering = parameterWidgets[4].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].c5_paceKeeping = parameterWidgets[5].value
         
         redGenome = genomes[0]
         greenGenome = genomes[1]
@@ -129,12 +131,12 @@ class ViewController: UIViewController
     {
         let selectedGenome = genomes[speciesSegmentedControl.selectedSegmentIndex]
         
-        numericDials[0].value = selectedGenome.radius
-        numericDials[1].value = selectedGenome.c1_cohesion
-        numericDials[2].value = selectedGenome.c2_alignment
-        numericDials[3].value = selectedGenome.c3_seperation
-        numericDials[4].value = selectedGenome.c4_steering
-        numericDials[5].value = selectedGenome.c5_paceKeeping
+        parameterWidgets[0].value = selectedGenome.radius
+        parameterWidgets[1].value = selectedGenome.c1_cohesion
+        parameterWidgets[2].value = selectedGenome.c2_alignment
+        parameterWidgets[3].value = selectedGenome.c3_seperation
+        parameterWidgets[4].value = selectedGenome.c4_steering
+        parameterWidgets[5].value = selectedGenome.c5_paceKeeping
     }
     
     func setUpParticles()
@@ -302,19 +304,19 @@ class ViewController: UIViewController
 
     override func viewDidLayoutSubviews()
     {
-        let imageSide = view.frame.height
+        let imageSide = Int(view.frame.height - topLayoutGuide.length)
         
-        imageView.frame = CGRect(x: 0 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
+        imageView.frame = CGRect(x: 0 , y: Int(topLayoutGuide.length), width: imageSide, height: imageSide)
  
-        let dialOriginY = Int(topLayoutGuide.length)
-        let dialWidth = Int(view.frame.width - view.frame.height)
+        let dialOriginY = Int(topLayoutGuide.length) + 5
+        let dialWidth = Int(view.frame.width) - imageSide
         let dialOriginX = Int(view.frame.width) - dialWidth
         
-        speciesSegmentedControl.frame = CGRect(x: dialOriginX, y: dialOriginY, width: dialWidth, height: 30)
+        speciesSegmentedControl.frame = CGRect(x: dialOriginX, y: dialOriginY, width: dialWidth, height: 30).rectByInsetting(dx: 4, dy: 0)
         
-        for (idx: Int, numericDial: ParameterWidget) in enumerate(numericDials)
+        for (idx: Int, parameterWidget: ParameterWidget) in enumerate(parameterWidgets)
         {
-            numericDial.frame = CGRect(x: dialOriginX, y: 40 + dialOriginY + idx * 60, width: dialWidth, height: 55)
+            parameterWidget.frame = CGRect(x: dialOriginX, y: 50 + dialOriginY + idx * 70, width: dialWidth, height: 55).rectByInsetting(dx: 4, dy: 1)
         }
     }
     

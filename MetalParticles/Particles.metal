@@ -63,6 +63,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    constant SwarmGenome &genomeTwo [[buffer(3)]],
                                    constant SwarmGenome &genomeThree [[buffer(4)]],
                                    
+                                constant float &particleBrightness [[buffer(5)]],
+                                   
                                    uint id [[thread_position_in_grid]])
 {
    
@@ -72,9 +74,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const int type = int(inParticle.type);
     
-    const float4 outColor((type == 0 ? 0.75 : 0.5),
-                          (type == 1 ? 0.75 : 0.5),
-                          (type == 2 ? 0.75 : 0.5),
+    const float4 outColor((type == 0 ? particleBrightness : particleBrightness / 2.0),
+                          (type == 1 ? particleBrightness : particleBrightness / 2.0),
+                          (type == 2 ? particleBrightness : particleBrightness / 2.0),
                           1.0);
 
     float neigbourCount = 0;

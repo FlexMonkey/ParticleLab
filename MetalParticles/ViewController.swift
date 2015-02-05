@@ -65,6 +65,7 @@ class ViewController: UIViewController
     var frameStartTime = CFAbsoluteTimeGetCurrent()
     
     var useGlowAndTrails = false
+    var particleBrightness: Float = 0.8
     
     let toolbar = UIToolbar(frame: CGRectZero)
     var resetParticlesFlag = false
@@ -211,6 +212,10 @@ class ViewController: UIViewController
     final func toggleTrails()
     {
         useGlowAndTrails = !useGlowAndTrails
+        
+        particleBrightness = useGlowAndTrails ? 0.3 : 0.8
+        
+        textureA.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
     }
     
     final func run()
@@ -260,6 +265,8 @@ class ViewController: UIViewController
         
     }
     
+    
+    
     final func applyShader()
     {
         textureB.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
@@ -286,6 +293,9 @@ class ViewController: UIViewController
         
         let blueBuffer: MTLBuffer = device.newBufferWithBytes(&blueGenome, length: sizeof(SwarmGenome), options: nil)
         commandEncoder.setBuffer(blueBuffer, offset: 0, atIndex: 4)
+
+        let particleBrightnessBuffer: MTLBuffer = device.newBufferWithBytes(&particleBrightness, length: sizeof(Float), options: nil)
+        commandEncoder.setBuffer(particleBrightnessBuffer, offset: 0, atIndex: 5)
         
         commandEncoder.setTexture(textureB, atIndex: 0)
         commandEncoder.setTexture(textureB, atIndex: 1)

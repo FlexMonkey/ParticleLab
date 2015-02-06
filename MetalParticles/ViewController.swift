@@ -109,7 +109,13 @@ class ViewController: UIViewController
         let resetBarButtonItem = UIBarButtonItem(title: "Reset", style: UIBarButtonItemStyle.Plain, target: self, action: "resetParticles")
         let toggleTrailsButtonItem = UIBarButtonItem(title: "Trails", style: UIBarButtonItemStyle.Plain, target: self, action: "toggleTrails")
         
-        toolbar.items = [resetBarButtonItem, toggleTrailsButtonItem]
+        let spacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
+
+        
+        let saveTrailsButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
+        let loadTrailsButtonItem = UIBarButtonItem(title: "Load", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
+        
+        toolbar.items = [resetBarButtonItem, toggleTrailsButtonItem, spacer, saveTrailsButtonItem, loadTrailsButtonItem]
         
         view.addSubview(toolbar)
         
@@ -359,7 +365,7 @@ class ViewController: UIViewController
             parameterWidget.frame = CGRect(x: dialOriginX, y: 50 + dialOriginY + idx * 70, width: dialWidth, height: 55).rectByInsetting(dx: 4, dy: 1)
         }
         
-        toolbar.frame = CGRect(x: dialOriginX, y: Int(view.frame.height) - 40, width: imageSide, height: 40)
+        toolbar.frame = CGRect(x: dialOriginX, y: Int(view.frame.height) - 40, width: dialWidth, height: 40)
     }
     
     override func supportedInterfaceOrientations() -> Int

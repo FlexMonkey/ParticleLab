@@ -49,7 +49,7 @@ class ParameterWidget: UIControl, UIPopoverControllerDelegate
     {
         if let fieldName = fieldName
         {
-            label.text = fieldName + " = " + NSString(format: "%.4f", value)
+            label.text = fieldName + " = " + NSString(format: "%.2f", value)
         }
     }
     
@@ -65,12 +65,12 @@ class ParameterWidget: UIControl, UIPopoverControllerDelegate
     {
         didSet
         {
-            slider.value = value
+            slider.setValue(value, animated: true)
             popoulateLabel()
         }
     }
     
-    var minimumValue: Float = 0.00001
+    var minimumValue: Float = 0.0
     {
         didSet
         {

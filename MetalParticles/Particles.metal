@@ -106,7 +106,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                 
                 neigbourCount = neigbourCount + 1.0f;
                 
-                float foo = (dist < 1 ? 1 : dist) * genome.c3_seperation * 100.0f;
+                float foo = (dist < 1 ? 1 : dist) * (0.001 + genome.c3_seperation) * 50.0f;
                 
                 tempAx = tempAx + (inParticle.positionX - candidateNeighbour.positionX) / foo;
                 tempAy = tempAy + (inParticle.positionY - candidateNeighbour.positionY) / foo;

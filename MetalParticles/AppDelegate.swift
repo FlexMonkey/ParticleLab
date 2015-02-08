@@ -40,6 +40,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func applicationWillTerminate(application: UIApplication) {
         // Called when the application is about to terminate. Save data if appropriate. See also applicationDidEnterBackground:.
     }
+    
+    func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool
+    {
+        // open url's of the form: emergent  emergent://xyz=123
+        
+        // create a url of pairs in sequence. e.g red.radius = 0.45, red.cohsion = 0.99, red.align = 0.29 -> emergent://459929
+        
+        let xyz = url
+        
+        println(xyz)
+        
+        
+        
+        return true
+    }
 
 
 }

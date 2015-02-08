@@ -9,4 +9,6 @@ Choose between 1, 2 or three species
 
 Toolbar - reset / presets / particle count
 
+Create shortcut URLS: create a url of pairs in sequence. e.g red.radius = 0.45, red.cohsion = 0.99, red.align = 0.29 -> emergent://459929
+
 ----

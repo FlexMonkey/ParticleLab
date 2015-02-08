@@ -227,7 +227,7 @@ class ViewController: UIViewController
     final func run()
     {
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
-        println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        // println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
         

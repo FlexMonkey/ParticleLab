@@ -143,6 +143,7 @@ class ViewController: UIViewController
         
         println(foo.URL)
         
+        /*
         if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter)
         {
             let twitterController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
@@ -150,8 +151,8 @@ class ViewController: UIViewController
             twitterController.addURL(foo.URL)
             
             presentViewController(twitterController, animated: true, completion: nil)
-
         }
+        */
         
     }
     
@@ -432,7 +433,7 @@ struct SwarmGenome
     
     func toString() -> String
     {
-        return radius.decimalPartToString() + c1_cohesion.decimalPartToString() + c2_alignment.decimalPartToString() + c3_seperation.decimalPartToString() + c4_steering.decimalPartToString() + c5_paceKeeping.decimalPartToString()
+        return radius.decimalPartToString() + c1_cohesion.decimalPartToString() + c2_alignment.decimalPartToString() + c3_seperation.decimalPartToString() + c4_steering.decimalPartToString() + c5_paceKeeping.decimalPartToString() + normalSpeed.decimalPartToString()
     }
 }
 

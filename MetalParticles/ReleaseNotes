@@ -12,3 +12,12 @@ Toolbar - reset / presets / particle count
 Create shortcut URLS: create a url of pairs in sequence. e.g red.radius = 0.45, red.cohsion = 0.99, red.align = 0.29 -> emergent://459929
 
 ----
+
+Recipes:
+
+Cells: emergent:?r=40688914357507&g=50258871255000&b=206880089015100
+Orbits: emergent:?r=40688914357507&g=50258871255000&b=206880089015100
+
+Optional(emergent:?r=70618054117518&g=16799207972168&b=59987836639381)
+Optional(emergent:?r=45673766682117&g=16799217307868&b=87608347801912)
+Optional(emergent:?r=68848268488471&g=27798310307868&b=87689729801958)

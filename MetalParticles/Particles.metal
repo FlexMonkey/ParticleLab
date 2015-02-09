@@ -151,15 +151,6 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         }
         
         float accelerateMultiplier = ((genome.normalSpeed * 4.0f) - d) / d * genome.c5_paceKeeping;
-        
-        // accellerate
-        /*
-         tempSwarm.accelerate(tempDX * (param.normalSpeed - d) / d * param.c5,
-         tempDY * (param.normalSpeed - d) / d * param.c5,
-         tempDZ * (param.normalSpeed - d) / d * param.c5,
-         param.maxSpeed);
-         */
-        
   
         inParticle.velocityX2 += inParticle.velocityX2 * accelerateMultiplier;
         inParticle.velocityY2 += inParticle.velocityY2 * accelerateMultiplier;

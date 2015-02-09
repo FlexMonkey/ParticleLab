@@ -133,27 +133,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
     
     func saveRecipe()
     {
-        let urlComponents = NSURLComponents()
-        urlComponents.scheme = "emergent"
-        
-        let redQueryItem = NSURLQueryItem(name: "r", value: redGenome.toString())
-        let greenQueryItem = NSURLQueryItem(name: "g", value: greenGenome.toString())
-        let blueQueryItem = NSURLQueryItem(name: "b", value: blueGenome.toString())
-        
-        urlComponents.queryItems = [redQueryItem, greenQueryItem, blueQueryItem]
-        
-                // urlComponents.URL is now a properly forced URL
-        
-        /*
-        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter)
-        {
-            let twitterController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
-            twitterController.setInitialText("Ignore this test tweet :)")
-            twitterController.addURL(foo.URL)
-            
-            presentViewController(twitterController, animated: true, completion: nil)
-        }
-        */
+        let url = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
         
         var picker = MFMailComposeViewController()
         picker.mailComposeDelegate = self
@@ -161,7 +141,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
         picker.setSubject("Swarm Chemistry")
         
         let bodyOne = "Here's a swarm chemistry recipe I created in <a href=\"http://flexmonkey.blogspot.co.uk/search/label/Swarm%20Chemistry\">Emergent</a><br><br>"
-        let link = "<a href = \"\(urlComponents.URL!)\">\(urlComponents.URL!)</a>"
+        let link = "<a href = \"\(url)\">\(url)</a>"
         
         if let image = imageView.image
         {
@@ -433,93 +413,6 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
 
 }
 
-struct Particle
-{
-    var positionX: Float = 0
-    var positionY: Float = 0
-    var velocityX: Float = 0
-    var velocityY: Float = 0
-    var velocityX2: Float = 0
-    var velocityY2: Float = 0
-    var type: Float = 0
-}
 
-struct SwarmGenome
-{
-    var radius: Float = 0
-    var c1_cohesion: Float = 0
-    var c2_alignment: Float = 0
-    var c3_seperation: Float = 0
-    var c4_steering: Float = 0
-    var c5_paceKeeping: Float = 0
-    var normalSpeed: Float = 0;
-    
-    func toString() -> String
-    {
-        return radius.decimalPartToString() + c1_cohesion.decimalPartToString() + c2_alignment.decimalPartToString() + c3_seperation.decimalPartToString() + c4_steering.decimalPartToString() + c5_paceKeeping.decimalPartToString() + normalSpeed.decimalPartToString()
-    }
-    
-    static func fromString(value: String) -> SwarmGenome
-    {
-        let r = value[0...1].floatValue / 100.0
-        let c1 = value[2...3].floatValue / 100.0
-        let c2 = value[4...5].floatValue / 100.0
-        let c3 = value[6...7].floatValue / 100.0
-        let c4 = value[8...9].floatValue / 100.0
-        let c5 = value[10...11].floatValue / 100.0
-        let n = value[12...13].floatValue / 100.0
-    
-        return SwarmGenome(radius: r, c1_cohesion: c1, c2_alignment: c2, c3_seperation: c3, c4_steering: c4, c5_paceKeeping: c5, normalSpeed: n)
-    }
-}
 
-    extension Float
-    {
-        func decimalPartToString() -> String
-        {
-            let formatter = NSNumberFormatter()
-            formatter.multiplier = 100
-            formatter.allowsFloats = false
-            formatter.formatWidth = 2
-            formatter.paddingCharacter = "0"
-            
-            return formatter.stringFromNumber(self)!
-        }
-    }
-
-extension String
-{
-    subscript (r: Range<Int>) -> NSString
-    {
-        get
-        {
-            let startIndex = advance(self.startIndex, r.startIndex)
-            let endIndex = advance(startIndex, r.endIndex - r.startIndex)
-            
-            return self[Range(start: startIndex, end: endIndex)]
-        }
-    }
-}
-
-extension UIImage
-{
-    func resizeToBoundingSquare(#boundingSquareSideLength : CGFloat) -> UIImage
-    {
-        let imgScale = self.size.width > self.size.height ? boundingSquareSideLength / self.size.width : boundingSquareSideLength / self.size.height
-        let newWidth = self.size.width * imgScale
-        let newHeight = self.size.height * imgScale
-        let newSize = CGSize(width: newWidth, height: newHeight)
-        
-        UIGraphicsBeginImageContext(newSize)
-        
-        self.drawInRect(CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
-        
-        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
-        
-        UIGraphicsEndImageContext();
-        
-        return resizedImage
-    }
-    
-}
 

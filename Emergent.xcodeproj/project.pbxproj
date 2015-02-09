@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		3EDBA0F11A83BD8100719D14 /* ReleaseNotes in Resources */ = {isa = PBXBuildFile; fileRef = 3EDBA0F01A83BD8100719D14 /* ReleaseNotes */; };
 		BE1D8E7F1A88DA2E00ADD461 /* emrgentLogo_1024.png in Resources */ = {isa = PBXBuildFile; fileRef = BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */; };
+		BE1D8E831A8925CE00ADD461 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E821A8925CE00ADD461 /* Extensions.swift */; };
+		BE1D8E851A89261100ADD461 /* SwarmGenome.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E841A89261100ADD461 /* SwarmGenome.swift */; };
+		BE1D8E881A89269000ADD461 /* URLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E871A89269000ADD461 /* URLUtils.swift */; };
 		BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */; };
 		BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE931A6A2CC000B20D49 /* ViewController.swift */; };
 		BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE951A6A2CC000B20D49 /* Main.storyboard */; };
@@ -34,6 +37,9 @@
 /* Begin PBXFileReference section */
 		3EDBA0F01A83BD8100719D14 /* ReleaseNotes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReleaseNotes; sourceTree = "<group>"; };
 		BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = emrgentLogo_1024.png; sourceTree = "<group>"; };
+		BE1D8E821A8925CE00ADD461 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		BE1D8E841A89261100ADD461 /* SwarmGenome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwarmGenome.swift; sourceTree = "<group>"; };
+		BE1D8E871A89269000ADD461 /* URLUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLUtils.swift; sourceTree = "<group>"; };
 		BE75EE8C1A6A2CC000B20D49 /* Emergent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Emergent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE75EE901A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -76,6 +82,30 @@
 			name = assets;
 			sourceTree = "<group>";
 		};
+		BE1D8E801A8925A700ADD461 /* model */ = {
+			isa = PBXGroup;
+			children = (
+				BE1D8E841A89261100ADD461 /* SwarmGenome.swift */,
+			);
+			name = model;
+			sourceTree = "<group>";
+		};
+		BE1D8E811A8925BE00ADD461 /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				BE1D8E821A8925CE00ADD461 /* Extensions.swift */,
+			);
+			name = extensions;
+			sourceTree = "<group>";
+		};
+		BE1D8E861A89267A00ADD461 /* urlUtils */ = {
+			isa = PBXGroup;
+			children = (
+				BE1D8E871A89269000ADD461 /* URLUtils.swift */,
+			);
+			name = urlUtils;
+			sourceTree = "<group>";
+		};
 		BE75EE831A6A2CC000B20D49 = {
 			isa = PBXGroup;
 			children = (
@@ -97,6 +127,9 @@
 		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
 			isa = PBXGroup;
 			children = (
+				BE1D8E861A89267A00ADD461 /* urlUtils */,
+				BE1D8E811A8925BE00ADD461 /* extensions */,
+				BE1D8E801A8925A700ADD461 /* model */,
 				BE1D8E7D1A88DA0D00ADD461 /* assets */,
 				BE8766FF1A8034AB00951BF4 /* controls */,
 				BE75EEB71A6A82A400B20D49 /* marker */,
@@ -273,12 +306,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE1D8E881A89269000ADD461 /* URLUtils.swift in Sources */,
 				BE75EEB61A6A459C00B20D49 /* Async.swift in Sources */,
+				BE1D8E851A89261100ADD461 /* SwarmGenome.swift in Sources */,
 				BE8767011A8034C100951BF4 /* ParameterWidget.swift in Sources */,
 				BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */,
 				BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */,
 				BE75EEB91A6A82C800B20D49 /* MarkerWidget.swift in Sources */,
 				BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */,
+				BE1D8E831A8925CE00ADD461 /* Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

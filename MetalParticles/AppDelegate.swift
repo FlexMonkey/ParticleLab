@@ -45,21 +45,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     {
         if let swarmChemistryViewController = window?.rootViewController as? ViewController
         {
-            let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false)
-
-            if let queryItems = components?.queryItems as? [NSURLQueryItem]
-            {
-                for (idx: Int, component: NSURLQueryItem) in enumerate(queryItems)
-                {
-                    swarmChemistryViewController.genomes[idx] = SwarmGenome.fromString(component.value!)
-                }
-                
-                swarmChemistryViewController.redGenome = swarmChemistryViewController.genomes[0]
-                swarmChemistryViewController.greenGenome = swarmChemistryViewController.genomes[1]
-                swarmChemistryViewController.blueGenome = swarmChemistryViewController.genomes[2]
-                
-                swarmChemistryViewController.speciesChangeHandler() // updates UI
-            }
+            let genomes = URLUtils.createGenomesFromURL(url)!
+            
+            swarmChemistryViewController.redGenome = genomes.red
+            swarmChemistryViewController.greenGenome = genomes.green
+            swarmChemistryViewController.blueGenome = genomes.blue
+            
+            swarmChemistryViewController.speciesChangeHandler() // updates UI
             
         }
         

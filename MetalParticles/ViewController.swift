@@ -133,14 +133,16 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
     
     func saveRecipe()
     {
-        let foo = NSURLComponents()
-        foo.scheme = "emergent"
+        let urlComponents = NSURLComponents()
+        urlComponents.scheme = "emergent"
         
         let redQueryItem = NSURLQueryItem(name: "r", value: redGenome.toString())
         let greenQueryItem = NSURLQueryItem(name: "g", value: greenGenome.toString())
         let blueQueryItem = NSURLQueryItem(name: "b", value: blueGenome.toString())
         
-        foo.queryItems = [redQueryItem, greenQueryItem, blueQueryItem]
+        urlComponents.queryItems = [redQueryItem, greenQueryItem, blueQueryItem]
+        
+                // urlComponents.URL is now a properly forced URL
         
         /*
         if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter)
@@ -159,7 +161,7 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
         picker.setSubject("Swarm Chemistry")
         
         let bodyOne = "Here's a swarm chemistry recipe I created in <a href=\"http://flexmonkey.blogspot.co.uk/search/label/Swarm%20Chemistry\">Emergent</a><br><br>"
-        let link = "<a href = \"\(foo.URL!)\">\(foo.URL!)</a>"
+        let link = "<a href = \"\(urlComponents.URL!)\">\(urlComponents.URL!)</a>"
         
         if let image = imageView.image
         {
@@ -471,19 +473,19 @@ struct SwarmGenome
     }
 }
 
-extension Float
-{
-    func decimalPartToString() -> String
+    extension Float
     {
-        let formatter = NSNumberFormatter()
-        formatter.multiplier = 100
-        formatter.allowsFloats = false
-        formatter.formatWidth = 2
-        formatter.paddingCharacter = "0"
-        
-        return formatter.stringFromNumber(self)!
+        func decimalPartToString() -> String
+        {
+            let formatter = NSNumberFormatter()
+            formatter.multiplier = 100
+            formatter.allowsFloats = false
+            formatter.formatWidth = 2
+            formatter.paddingCharacter = "0"
+            
+            return formatter.stringFromNumber(self)!
+        }
     }
-}
 
 extension String
 {

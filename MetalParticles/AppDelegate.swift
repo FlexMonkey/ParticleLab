@@ -43,13 +43,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     func application(application: UIApplication, openURL url: NSURL, sourceApplication: String?, annotation: AnyObject?) -> Bool
     {
-        // open url's of the form: emergent  emergent://xyz=123
-        
-        // create a url of pairs in sequence. e.g red.radius = 0.45, red.cohsion = 0.99, red.align = 0.29 -> emergent://459929
-        
         if let swarmChemistryViewController = window?.rootViewController as? ViewController
         {
-            
             let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false)
 
             if let queryItems = components?.queryItems as? [NSURLQueryItem]

@@ -18,6 +18,21 @@
 	<string>1.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
+	<key>CFBundleDisplayName</key>
+	<string></string>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>emergent</string>
+			</array>
+			<key>CFBundleURLName</key>
+			<string>uk.co.flexmonkey.Emergent</string>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>1</string>
 </dict>

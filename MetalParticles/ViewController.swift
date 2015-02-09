@@ -12,11 +12,12 @@ import Metal
 import QuartzCore
 import CoreData
 import Social
+import MessageUI
 
-class ViewController: UIViewController
+class ViewController: UIViewController, MFMailComposeViewControllerDelegate
 {
     
-    let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.PremultipliedLast.rawValue)
+    let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.None.rawValue)
     let renderingIntent = kCGRenderingIntentDefault
     
     let imageSide: UInt = 800
@@ -119,20 +120,7 @@ class ViewController: UIViewController
         toolbar.items = [resetBarButtonItem, toggleTrailsButtonItem, spacer, saveTrailsButtonItem, loadTrailsButtonItem]
         
         view.addSubview(toolbar)
-        
-        //----
-        
-        let testURL = NSURL(fileURLWithPath: "emergent://?r=68848268488471&g=27798310307868&b=87689729801958")
-        let components = NSURLComponents(URL: testURL!, resolvingAgainstBaseURL: false)
-        
-        if let queryItems = components?.queryItems
-        {
-            for component in queryItems
-            {
-                println( " hello!!!  \(component as? NSURLQueryItem)" )
-            }
-        }
-        
+
         genomes = [redGenome, greenGenome, blueGenome]
         
         setUpParticles()
@@ -165,6 +153,28 @@ class ViewController: UIViewController
         }
         */
         
+        var picker = MFMailComposeViewController()
+        picker.mailComposeDelegate = self
+ 
+        picker.setSubject("Swarm Chemistry")
+        
+        let bodyOne = "Here's a swarm chemistry recipe I created in <a href=\"http://flexmonkey.blogspot.co.uk/search/label/Swarm%20Chemistry\">Emergent</a><br><br>"
+        let link = "<a href = \"\(foo.URL!)\">\(foo.URL!)</a>"
+        
+        if let image = imageView.image
+        {
+            picker.addAttachmentData(UIImageJPEGRepresentation(image.resizeToBoundingSquare(boundingSquareSideLength: 480), 1.0), mimeType: "image/jpeg", fileName: "SwarmChemistry.jpg")
+        }
+        
+        picker.setMessageBody(bodyOne + link, isHTML: true)
+        
+        presentViewController(picker, animated: true, completion: nil)
+        
+    }
+    
+    func mailComposeController(controller: MFMailComposeViewController!, didFinishWithResult result: MFMailComposeResult, error: NSError!)
+    {
+        dismissViewControllerAnimated(true, completion: nil)
     }
     
     func parameterChangeHandler()
@@ -267,7 +277,7 @@ class ViewController: UIViewController
     final func run()
     {
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
-        // println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
         
@@ -489,4 +499,25 @@ extension String
     }
 }
 
+extension UIImage
+{
+    func resizeToBoundingSquare(#boundingSquareSideLength : CGFloat) -> UIImage
+    {
+        let imgScale = self.size.width > self.size.height ? boundingSquareSideLength / self.size.width : boundingSquareSideLength / self.size.height
+        let newWidth = self.size.width * imgScale
+        let newHeight = self.size.height * imgScale
+        let newSize = CGSize(width: newWidth, height: newHeight)
+        
+        UIGraphicsBeginImageContext(newSize)
+        
+        self.drawInRect(CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+        
+        let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
+        
+        UIGraphicsEndImageContext();
+        
+        return resizedImage
+    }
+    
+}
 

@@ -47,11 +47,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         // create a url of pairs in sequence. e.g red.radius = 0.45, red.cohsion = 0.99, red.align = 0.29 -> emergent://459929
         
-        let xyz = url
-        
-        println("hello.... \(xyz.query)")
-        
-        
+        if let swarmChemistryViewController = window?.rootViewController as? ViewController
+        {
+            
+            let components = NSURLComponents(URL: url, resolvingAgainstBaseURL: false)
+
+            if let queryItems = components?.queryItems as? [NSURLQueryItem]
+            {
+                for (idx: Int, component: NSURLQueryItem) in enumerate(queryItems)
+                {
+                    swarmChemistryViewController.genomes[idx] = SwarmGenome.fromString(component.value!)
+                }
+                
+                swarmChemistryViewController.redGenome = swarmChemistryViewController.genomes[0]
+                swarmChemistryViewController.greenGenome = swarmChemistryViewController.genomes[1]
+                swarmChemistryViewController.blueGenome = swarmChemistryViewController.genomes[2]
+                
+                swarmChemistryViewController.speciesChangeHandler() // updates UI
+            }
+            
+        }
         
         return true
     }

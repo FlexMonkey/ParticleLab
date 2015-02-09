@@ -120,6 +120,19 @@ class ViewController: UIViewController
         
         view.addSubview(toolbar)
         
+        //----
+        
+        let testURL = NSURL(fileURLWithPath: "emergent://?r=68848268488471&g=27798310307868&b=87689729801958")
+        let components = NSURLComponents(URL: testURL!, resolvingAgainstBaseURL: false)
+        
+        if let queryItems = components?.queryItems
+        {
+            for component in queryItems
+            {
+                println( " hello!!!  \(component as? NSURLQueryItem)" )
+            }
+        }
+        
         genomes = [redGenome, greenGenome, blueGenome]
         
         setUpParticles()
@@ -140,8 +153,6 @@ class ViewController: UIViewController
         let blueQueryItem = NSURLQueryItem(name: "b", value: blueGenome.toString())
         
         foo.queryItems = [redQueryItem, greenQueryItem, blueQueryItem]
-        
-        println(foo.URL)
         
         /*
         if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter)
@@ -435,6 +446,19 @@ struct SwarmGenome
     {
         return radius.decimalPartToString() + c1_cohesion.decimalPartToString() + c2_alignment.decimalPartToString() + c3_seperation.decimalPartToString() + c4_steering.decimalPartToString() + c5_paceKeeping.decimalPartToString() + normalSpeed.decimalPartToString()
     }
+    
+    static func fromString(value: String) -> SwarmGenome
+    {
+        let r = value[0...1].floatValue / 100.0
+        let c1 = value[2...3].floatValue / 100.0
+        let c2 = value[4...5].floatValue / 100.0
+        let c3 = value[6...7].floatValue / 100.0
+        let c4 = value[8...9].floatValue / 100.0
+        let c5 = value[10...11].floatValue / 100.0
+        let n = value[12...13].floatValue / 100.0
+    
+        return SwarmGenome(radius: r, c1_cohesion: c1, c2_alignment: c2, c3_seperation: c3, c4_steering: c4, c5_paceKeeping: c5, normalSpeed: n)
+    }
 }
 
 extension Float
@@ -448,6 +472,20 @@ extension Float
         formatter.paddingCharacter = "0"
         
         return formatter.stringFromNumber(self)!
+    }
+}
+
+extension String
+{
+    subscript (r: Range<Int>) -> NSString
+    {
+        get
+        {
+            let startIndex = advance(self.startIndex, r.startIndex)
+            let endIndex = advance(startIndex, r.endIndex - r.startIndex)
+            
+            return self[Range(start: startIndex, end: endIndex)]
+        }
     }
 }
 

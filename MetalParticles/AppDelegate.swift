@@ -49,7 +49,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         let xyz = url
         
-        println(xyz)
+        println("hello.... \(xyz.query)")
         
         
         

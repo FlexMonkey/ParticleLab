@@ -32,6 +32,7 @@ struct SwarmGenome
     float c3_seperation;
     float c4_steering;
     float c5_paceKeeping;
+    float normalSpeed;
 };
 
 struct NeighbourDistance
@@ -138,13 +139,28 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         tempAx = tempAx + (localDx - inParticle.velocityX) * genome.c2_alignment;
         tempAy = tempAy + (localDy - inParticle.velocityY) * genome.c2_alignment;
         
+        // accellerate
         inParticle.velocityX2 += tempAx;
         inParticle.velocityY2 += tempAy;
         
-        const float d = fast::sqrt(inParticle.velocityX2 * inParticle.velocityX2 + inParticle.velocityY2 * inParticle.velocityY2);
+        float d = fast::sqrt(inParticle.velocityX2 * inParticle.velocityX2 + inParticle.velocityY2 * inParticle.velocityY2);
         
-        float accelerateMultiplier = (1.0f - d) / d * genome.c5_paceKeeping;
+        if (d == 0)
+        {
+            d = 0.001f;
+        }
         
+        float accelerateMultiplier = ((genome.normalSpeed * 4.0f) - d) / d * genome.c5_paceKeeping;
+        
+        // accellerate
+        /*
+         tempSwarm.accelerate(tempDX * (param.normalSpeed - d) / d * param.c5,
+         tempDY * (param.normalSpeed - d) / d * param.c5,
+         tempDZ * (param.normalSpeed - d) / d * param.c5,
+         param.maxSpeed);
+         */
+        
+  
         inParticle.velocityX2 += inParticle.velocityX2 * accelerateMultiplier;
         inParticle.velocityY2 += inParticle.velocityY2 * accelerateMultiplier;
     }

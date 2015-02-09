@@ -11,6 +11,7 @@ import UIKit
 import Metal
 import QuartzCore
 import CoreData
+import Social
 
 class ViewController: UIViewController
 {
@@ -72,11 +73,11 @@ class ViewController: UIViewController
     
     var parameterWidgets = [ParameterWidget]()
     var speciesSegmentedControl = UISegmentedControl(items: ["Red", "Green", "Blue"])
-    let fieldNames = ["Radius", "Cohesion", "Alignment", "Seperation", "Steering", "Pace Keeping"]
+    let fieldNames = ["Radius", "Cohesion", "Alignment", "Seperation", "Steering", "Pace Keeping", "Normal Speed"]
 
-    var redGenome = SwarmGenome(radius: 0.4, c1_cohesion: 0.25, c2_alignment: 0.35, c3_seperation: 0.05, c4_steering: 0.35, c5_paceKeeping: 0.75)
-    var greenGenome = SwarmGenome(radius: 0.5, c1_cohesion: 0.165, c2_alignment: 0.5, c3_seperation: 0.2, c4_steering: 0.25, c5_paceKeeping: 0.5)
-    var blueGenome = SwarmGenome(radius: 0.2, c1_cohesion: 0.45, c2_alignment: 0.8, c3_seperation: 0.075, c4_steering: 0.9, c5_paceKeeping: 0.15)
+    var redGenome = SwarmGenome(radius: 0.4, c1_cohesion: 0.25, c2_alignment: 0.35, c3_seperation: 0.05, c4_steering: 0.35, c5_paceKeeping: 0.75, normalSpeed: 0.6)
+    var greenGenome = SwarmGenome(radius: 0.5, c1_cohesion: 0.165, c2_alignment: 0.5, c3_seperation: 0.2, c4_steering: 0.25, c5_paceKeeping: 0.5, normalSpeed: 0.4)
+    var blueGenome = SwarmGenome(radius: 0.2, c1_cohesion: 0.45, c2_alignment: 0.8, c3_seperation: 0.075, c4_steering: 0.9, c5_paceKeeping: 0.15, normalSpeed: 0.9)
     
     var genomes = [SwarmGenome]()
     
@@ -94,7 +95,7 @@ class ViewController: UIViewController
         speciesSegmentedControl.addTarget(self, action: "speciesChangeHandler", forControlEvents: UIControlEvents.ValueChanged)
         view.addSubview(speciesSegmentedControl)
         
-        for i in 0 ... 5
+        for i in 0 ..< fieldNames.count
         {
             let parameterWidget = ParameterWidget(frame: CGRectZero)
             parameterWidget.fieldName = fieldNames[i]
@@ -112,7 +113,7 @@ class ViewController: UIViewController
         let spacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
 
         
-        let saveTrailsButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
+        let saveTrailsButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: "saveRecipe")
         let loadTrailsButtonItem = UIBarButtonItem(title: "Load", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
         
         toolbar.items = [resetBarButtonItem, toggleTrailsButtonItem, spacer, saveTrailsButtonItem, loadTrailsButtonItem]
@@ -129,6 +130,31 @@ class ViewController: UIViewController
         speciesChangeHandler()
     }
     
+    func saveRecipe()
+    {
+        let foo = NSURLComponents()
+        foo.scheme = "emergent"
+        
+        let redQueryItem = NSURLQueryItem(name: "r", value: redGenome.toString())
+        let greenQueryItem = NSURLQueryItem(name: "g", value: greenGenome.toString())
+        let blueQueryItem = NSURLQueryItem(name: "b", value: blueGenome.toString())
+        
+        foo.queryItems = [redQueryItem, greenQueryItem, blueQueryItem]
+        
+        println(foo.URL)
+        
+        if SLComposeViewController.isAvailableForServiceType(SLServiceTypeTwitter)
+        {
+            let twitterController = SLComposeViewController(forServiceType: SLServiceTypeTwitter)
+            twitterController.setInitialText("Ignore this test tweet :)")
+            twitterController.addURL(foo.URL)
+            
+            presentViewController(twitterController, animated: true, completion: nil)
+
+        }
+        
+    }
+    
     func parameterChangeHandler()
     {
         genomes[speciesSegmentedControl.selectedSegmentIndex].radius = parameterWidgets[0].value
@@ -137,6 +163,7 @@ class ViewController: UIViewController
         genomes[speciesSegmentedControl.selectedSegmentIndex].c3_seperation = parameterWidgets[3].value
         genomes[speciesSegmentedControl.selectedSegmentIndex].c4_steering = parameterWidgets[4].value
         genomes[speciesSegmentedControl.selectedSegmentIndex].c5_paceKeeping = parameterWidgets[5].value
+        genomes[speciesSegmentedControl.selectedSegmentIndex].normalSpeed = parameterWidgets[6].value
         
         redGenome = genomes[0]
         greenGenome = genomes[1]
@@ -153,6 +180,7 @@ class ViewController: UIViewController
         parameterWidgets[3].value = selectedGenome.c3_seperation
         parameterWidgets[4].value = selectedGenome.c4_steering
         parameterWidgets[5].value = selectedGenome.c5_paceKeeping
+        parameterWidgets[6].value = selectedGenome.normalSpeed
     }
     
     func setUpParticles()
@@ -400,7 +428,26 @@ struct SwarmGenome
     var c3_seperation: Float = 0
     var c4_steering: Float = 0
     var c5_paceKeeping: Float = 0
+    var normalSpeed: Float = 0;
+    
+    func toString() -> String
+    {
+        return radius.decimalPartToString() + c1_cohesion.decimalPartToString() + c2_alignment.decimalPartToString() + c3_seperation.decimalPartToString() + c4_steering.decimalPartToString() + c5_paceKeeping.decimalPartToString()
+    }
 }
 
+extension Float
+{
+    func decimalPartToString() -> String
+    {
+        let formatter = NSNumberFormatter()
+        formatter.multiplier = 100
+        formatter.allowsFloats = false
+        formatter.formatWidth = 2
+        formatter.paddingCharacter = "0"
+        
+        return formatter.stringFromNumber(self)!
+    }
+}
 
 

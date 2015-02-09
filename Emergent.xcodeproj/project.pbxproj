@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		3EDBA0F11A83BD8100719D14 /* ReleaseNotes in Resources */ = {isa = PBXBuildFile; fileRef = 3EDBA0F01A83BD8100719D14 /* ReleaseNotes */; };
+		BE1D8E7F1A88DA2E00ADD461 /* emrgentLogo_1024.png in Resources */ = {isa = PBXBuildFile; fileRef = BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */; };
 		BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */; };
 		BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE931A6A2CC000B20D49 /* ViewController.swift */; };
 		BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE951A6A2CC000B20D49 /* Main.storyboard */; };
@@ -32,7 +33,8 @@
 
 /* Begin PBXFileReference section */
 		3EDBA0F01A83BD8100719D14 /* ReleaseNotes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReleaseNotes; sourceTree = "<group>"; };
-		BE75EE8C1A6A2CC000B20D49 /* MetalParticles.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MetalParticles.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = emrgentLogo_1024.png; sourceTree = "<group>"; };
+		BE75EE8C1A6A2CC000B20D49 /* Emergent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Emergent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE75EE901A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BE75EE931A6A2CC000B20D49 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
@@ -66,6 +68,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		BE1D8E7D1A88DA0D00ADD461 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */,
+			);
+			name = assets;
+			sourceTree = "<group>";
+		};
 		BE75EE831A6A2CC000B20D49 = {
 			isa = PBXGroup;
 			children = (
@@ -78,7 +88,7 @@
 		BE75EE8D1A6A2CC000B20D49 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				BE75EE8C1A6A2CC000B20D49 /* MetalParticles.app */,
+				BE75EE8C1A6A2CC000B20D49 /* Emergent.app */,
 				BE75EEA11A6A2CC000B20D49 /* MetalParticlesTests.xctest */,
 			);
 			name = Products;
@@ -87,6 +97,7 @@
 		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
 			isa = PBXGroup;
 			children = (
+				BE1D8E7D1A88DA0D00ADD461 /* assets */,
 				BE8766FF1A8034AB00951BF4 /* controls */,
 				BE75EEB71A6A82A400B20D49 /* marker */,
 				BE75EEB41A6A458E00B20D49 /* async */,
@@ -176,7 +187,7 @@
 			);
 			name = MetalParticles;
 			productName = MetalParticles;
-			productReference = BE75EE8C1A6A2CC000B20D49 /* MetalParticles.app */;
+			productReference = BE75EE8C1A6A2CC000B20D49 /* Emergent.app */;
 			productType = "com.apple.product-type.application";
 		};
 		BE75EEA01A6A2CC000B20D49 /* MetalParticlesTests */ = {
@@ -216,7 +227,7 @@
 					};
 				};
 			};
-			buildConfigurationList = BE75EE871A6A2CC000B20D49 /* Build configuration list for PBXProject "MetalParticles" */;
+			buildConfigurationList = BE75EE871A6A2CC000B20D49 /* Build configuration list for PBXProject "Emergent" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -240,6 +251,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE1D8E7F1A88DA2E00ADD461 /* emrgentLogo_1024.png in Resources */,
 				BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */,
 				BE75EE9C1A6A2CC000B20D49 /* LaunchScreen.xib in Resources */,
 				3EDBA0F11A83BD8100719D14 /* ReleaseNotes in Resources */,
@@ -400,7 +412,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = s;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Emergent;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
@@ -413,7 +425,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MTL_FAST_MATH = YES;
 				MTL_OPTIMIZATION_LEVEL = s;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Emergent;
 				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
@@ -433,7 +445,6 @@
 				INFOPLIST_FILE = MetalParticlesTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalParticles.app/MetalParticles";
 			};
 			name = Debug;
 		};
@@ -448,14 +459,13 @@
 				INFOPLIST_FILE = MetalParticlesTests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/MetalParticles.app/MetalParticles";
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		BE75EE871A6A2CC000B20D49 /* Build configuration list for PBXProject "MetalParticles" */ = {
+		BE75EE871A6A2CC000B20D49 /* Build configuration list for PBXProject "Emergent" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				BE75EEA91A6A2CC000B20D49 /* Debug */,

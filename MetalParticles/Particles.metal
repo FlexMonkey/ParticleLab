@@ -18,55 +18,64 @@ struct Particle
     float velocityY;
 };
 
-kernel void glowShader(texture2d<float, access::read> inTexture [[texture(0)]],
-                       texture2d<float, access::write> outTexture [[texture(1)]],
-                       texture2d<float, access::read> inTextureB [[texture(2)]],
-                       uint2 gid [[thread_position_in_grid]])
-{
-    float4 accumColor(0,0,0,0);
-    
-    for (int j = -2; j <= 2; j++)
-    {
-        for (int i = -2; i <= 2; i++)
-        {
-            uint2 kernelIndex(gid.x + i, gid.y + j);
-            accumColor += inTexture.read(kernelIndex).rgba;
-        }
-    }
-    
-    accumColor.rgb = (accumColor.rgb / 27.0f) + inTextureB.read(gid).rgb;
-    accumColor.a = 1.0f;
-    
-    outTexture.write(accumColor, gid);
-}
-
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
-                                   const device Particle *inParticle [[ buffer(0) ]],
-                                   device Particle *outParticle [[ buffer(1) ]],
+                                   texture2d<float, access::read> inTexture [[texture(1)]],
+                                   
+                                   const device Particle *inParticles [[ buffer(0) ]],
+                                   device Particle *outParticles [[ buffer(1) ]],
+                                   
                                    constant Particle &inGravityWell [[ buffer(2) ]],
+                                   
                                    uint id [[thread_position_in_grid]])
 {
-    const uint2 particlePosition(inParticle[id].positionX, inParticle[id].positionY);
-    
-    const Particle thisParticle = inParticle[id];
+    const float imageWidth = 1024;
+    const Particle inParticle = inParticles[id];
+    const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
     const int type = id % 3;
     
-    const float4 outColor(type == 0 ? 1.0 : 0.0 , type == 1 ? 1.0 : 0.0  , type == 2 ? 1.0 : 0.0 , 1.0);
+    const float3 thisColor = inTexture.read(particlePosition).rgb;
+
+    const float4 outColor(thisColor.r + (type == 0 ? 0.15 : 0.0),
+                          thisColor.g + (type == 1 ? 0.15 : 0.0),
+                          thisColor.b + (type == 2 ? 0.15 : 0.0),
+                          1.0);
     
-    const float distanceSquared = ((thisParticle.positionX - inGravityWell.positionX) * (thisParticle.positionX - inGravityWell.positionX)) +  ((thisParticle.positionY - inGravityWell.positionY) * (thisParticle.positionY - inGravityWell.positionY));
-    const float distance = distanceSquared < 1 ? 1 : sqrt(distanceSquared);
+    if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)
+    {
+        outTexture.write(outColor, particlePosition);
+    }
+   
+    const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(inGravityWell.positionX, inGravityWell.positionY));
     
-    const float factor = (1 / distance) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
+    const float factor = (1 / dist) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
+   
+    outParticles[id] = Particle {
+        .velocityX =  (inParticle.velocityX * 0.999) + (inGravityWell.positionX - inParticle.positionX) * factor,
+        .velocityY =  (inParticle.velocityY * 0.999) + (inGravityWell.positionY - inParticle.positionY) * factor,
+        .positionX =  inParticle.positionX + inParticle.velocityX,
+        .positionY =  inParticle.positionY + inParticle.velocityY};
     
-    float newVelocityX = (thisParticle.velocityX * 0.999) + (inGravityWell.positionX - thisParticle.positionX) * factor;
-    float newVelocityY = (thisParticle.velocityY * 0.999) + (inGravityWell.positionY - thisParticle.positionY) * factor;
+    // ----
     
-    outParticle[id].positionX = thisParticle.positionX + thisParticle.velocityX;
-    outParticle[id].positionY = thisParticle.positionY + thisParticle.velocityY;
+    uint2 textureCoordinate(fast::floor(id / imageWidth),id % int(imageWidth));
     
-    outParticle[id].velocityX = newVelocityX;
-    outParticle[id].velocityY = newVelocityY;
-    
-    outTexture.write(outColor, particlePosition);
+    if (textureCoordinate.x < imageWidth && textureCoordinate.y < imageWidth)
+    {
+        float4 accumColor = inTexture.read(textureCoordinate);
+        
+        for (int j = -1; j <= 1; j++)
+        {
+            for (int i = -1; i <= 1; i++)
+            {
+                uint2 kernelIndex(textureCoordinate.x + i, textureCoordinate.y + j);
+                accumColor.rgb += inTexture.read(kernelIndex).rgb;
+            }
+        }
+        
+        accumColor.rgb = (accumColor.rgb / 10.5f);
+        accumColor.a = 1.0f;
+        
+        outTexture.write(accumColor, textureCoordinate);
+    }
 }

@@ -153,7 +153,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     func saveRecipe()
     {
         let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
-        let thumbnailImage = imageView.image!.resizeToBoundingSquare(boundingSquareSideLength: 480)
+        let thumbnailImage = resizeToBoundingSquare(imageView.image!, boundingSquareSideLength: 480)
 
         coreDataDelegate.save(recipeURL.absoluteString!, thumbnailImage: thumbnailImage)
     }

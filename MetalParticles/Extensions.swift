@@ -8,6 +8,7 @@
 
 import Foundation
 import UIKit
+import CoreImage
 
 extension Float
 {
@@ -37,24 +38,33 @@ extension String
     }
 }
 
-extension UIImage
-{
-    func resizeToBoundingSquare(#boundingSquareSideLength : CGFloat) -> UIImage
+
+func resizeToBoundingSquare(sourceImage: UIImage, #boundingSquareSideLength : CGFloat) -> UIImage
     {
-        let imgScale = self.size.width > self.size.height ? boundingSquareSideLength / self.size.width : boundingSquareSideLength / self.size.height
-        let newWidth = self.size.width * imgScale
-        let newHeight = self.size.height * imgScale
+        let ciContext = CIContext(options: nil)
+        
+        let imgScale = sourceImage.size.width > sourceImage.size.height ? boundingSquareSideLength / sourceImage.size.width : boundingSquareSideLength / sourceImage.size.height
+        let newWidth = sourceImage.size.width * imgScale
+        let newHeight = sourceImage.size.height * imgScale
         let newSize = CGSize(width: newWidth, height: newHeight)
         
         UIGraphicsBeginImageContext(newSize)
         
-        self.drawInRect(CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
+        sourceImage.drawInRect(CGRect(x: 0, y: 0, width: newWidth, height: newHeight))
         
         let resizedImage = UIGraphicsGetImageFromCurrentImageContext()
         
         UIGraphicsEndImageContext();
         
-        return resizedImage
+        let gammaFilter = CIFilter(name: "CIGammaAdjust")
+        gammaFilter.setValue(CIImage(image: resizedImage), forKey: "inputImage")
+        gammaFilter.setValue(0.33, forKey: "inputPower")
+        let outputImageData = gammaFilter.valueForKey("outputImage") as CIImage!
+        
+        let filteredImageRef: CGImage = ciContext.createCGImage(outputImageData, fromRect: outputImageData.extent())
+        
+        
+        return UIImage(CGImage: filteredImageRef)!
     }
     
-}
+

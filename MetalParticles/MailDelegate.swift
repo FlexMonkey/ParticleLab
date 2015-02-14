@@ -30,7 +30,7 @@ class MailDelegate: NSObject, MFMailComposeViewControllerDelegate
         
         if let image = image
         {
-            picker.addAttachmentData(UIImageJPEGRepresentation(image.resizeToBoundingSquare(boundingSquareSideLength: 480), 1.0), mimeType: "image/jpeg", fileName: "SwarmChemistry.jpg")
+            picker.addAttachmentData(UIImageJPEGRepresentation(resizeToBoundingSquare(image, boundingSquareSideLength: 480), 1.0), mimeType: "image/jpeg", fileName: "SwarmChemistry.jpg")
         }
         
         picker.setMessageBody(bodyOne + link, isHTML: true)

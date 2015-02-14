@@ -13,6 +13,10 @@
 		BE1D8E851A89261100ADD461 /* SwarmGenome.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E841A89261100ADD461 /* SwarmGenome.swift */; };
 		BE1D8E881A89269000ADD461 /* URLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E871A89269000ADD461 /* URLUtils.swift */; };
 		BE4ED4E61A8F1ACB00B122A5 /* MailDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4E51A8F1ACB00B122A5 /* MailDelegate.swift */; };
+		BE4ED4EA1A8F224800B122A5 /* Emergent.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4E81A8F224800B122A5 /* Emergent.xcdatamodeld */; };
+		BE4ED4EC1A8F22D800B122A5 /* EmergentEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4EB1A8F22D800B122A5 /* EmergentEntity.swift */; };
+		BE4ED4EE1A8F24A800B122A5 /* CoreDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4ED1A8F24A800B122A5 /* CoreDataDelegate.swift */; };
+		BE4ED4F11A8F290D00B122A5 /* BrowseAndLoadController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4F01A8F290D00B122A5 /* BrowseAndLoadController.swift */; };
 		BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */; };
 		BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE931A6A2CC000B20D49 /* ViewController.swift */; };
 		BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE951A6A2CC000B20D49 /* Main.storyboard */; };
@@ -42,6 +46,10 @@
 		BE1D8E841A89261100ADD461 /* SwarmGenome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwarmGenome.swift; sourceTree = "<group>"; };
 		BE1D8E871A89269000ADD461 /* URLUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLUtils.swift; sourceTree = "<group>"; };
 		BE4ED4E51A8F1ACB00B122A5 /* MailDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MailDelegate.swift; sourceTree = "<group>"; };
+		BE4ED4E91A8F224800B122A5 /* Emergent.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Emergent.xcdatamodel; sourceTree = "<group>"; };
+		BE4ED4EB1A8F22D800B122A5 /* EmergentEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmergentEntity.swift; sourceTree = "<group>"; };
+		BE4ED4ED1A8F24A800B122A5 /* CoreDataDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataDelegate.swift; sourceTree = "<group>"; };
+		BE4ED4F01A8F290D00B122A5 /* BrowseAndLoadController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowseAndLoadController.swift; sourceTree = "<group>"; };
 		BE75EE8C1A6A2CC000B20D49 /* Emergent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Emergent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE75EE901A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -116,6 +124,25 @@
 			name = actionsDelegates;
 			sourceTree = "<group>";
 		};
+		BE4ED4E71A8F222200B122A5 /* coreData */ = {
+			isa = PBXGroup;
+			children = (
+				BE4ED4EF1A8F28FA00B122A5 /* browseAndLoad */,
+				BE4ED4E81A8F224800B122A5 /* Emergent.xcdatamodeld */,
+				BE4ED4EB1A8F22D800B122A5 /* EmergentEntity.swift */,
+				BE4ED4ED1A8F24A800B122A5 /* CoreDataDelegate.swift */,
+			);
+			name = coreData;
+			sourceTree = "<group>";
+		};
+		BE4ED4EF1A8F28FA00B122A5 /* browseAndLoad */ = {
+			isa = PBXGroup;
+			children = (
+				BE4ED4F01A8F290D00B122A5 /* BrowseAndLoadController.swift */,
+			);
+			name = browseAndLoad;
+			sourceTree = "<group>";
+		};
 		BE75EE831A6A2CC000B20D49 = {
 			isa = PBXGroup;
 			children = (
@@ -137,6 +164,7 @@
 		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
 			isa = PBXGroup;
 			children = (
+				BE4ED4E71A8F222200B122A5 /* coreData */,
 				BE4ED4E41A8F1AB500B122A5 /* actionsDelegates */,
 				BE1D8E861A89267A00ADD461 /* urlUtils */,
 				BE1D8E811A8925BE00ADD461 /* extensions */,
@@ -320,13 +348,17 @@
 				BE1D8E881A89269000ADD461 /* URLUtils.swift in Sources */,
 				BE75EEB61A6A459C00B20D49 /* Async.swift in Sources */,
 				BE1D8E851A89261100ADD461 /* SwarmGenome.swift in Sources */,
+				BE4ED4EC1A8F22D800B122A5 /* EmergentEntity.swift in Sources */,
 				BE8767011A8034C100951BF4 /* ParameterWidget.swift in Sources */,
 				BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */,
+				BE4ED4EA1A8F224800B122A5 /* Emergent.xcdatamodeld in Sources */,
 				BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */,
 				BE75EEB91A6A82C800B20D49 /* MarkerWidget.swift in Sources */,
+				BE4ED4F11A8F290D00B122A5 /* BrowseAndLoadController.swift in Sources */,
 				BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */,
 				BE1D8E831A8925CE00ADD461 /* Extensions.swift in Sources */,
 				BE4ED4E61A8F1ACB00B122A5 /* MailDelegate.swift in Sources */,
+				BE4ED4EE1A8F24A800B122A5 /* CoreDataDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -541,6 +573,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		BE4ED4E81A8F224800B122A5 /* Emergent.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				BE4ED4E91A8F224800B122A5 /* Emergent.xcdatamodel */,
+			);
+			currentVersion = BE4ED4E91A8F224800B122A5 /* Emergent.xcdatamodel */;
+			path = Emergent.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = BE75EE841A6A2CC000B20D49 /* Project object */;
 }

@@ -13,7 +13,7 @@ import QuartzCore
 import CoreData
 import Social
 
-class ViewController: UIViewController
+class ViewController: UIViewController, BrowseAndLoadDelegate
 {
     
     let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.None.rawValue)
@@ -79,10 +79,18 @@ class ViewController: UIViewController
     var greenGenome = SwarmGenome(radius: 0.5, c1_cohesion: 0.165, c2_alignment: 0.5, c3_seperation: 0.2, c4_steering: 0.25, c5_paceKeeping: 0.5, normalSpeed: 0.4)
     var blueGenome = SwarmGenome(radius: 0.2, c1_cohesion: 0.45, c2_alignment: 0.8, c3_seperation: 0.075, c4_steering: 0.9, c5_paceKeeping: 0.15, normalSpeed: 0.9)
     
-    var genomes = [SwarmGenome]()
+    var genomes: [SwarmGenome] = [SwarmGenome]()
+    {
+        didSet
+        {
+            redGenome = genomes[0]
+            greenGenome = genomes[1]
+            blueGenome = genomes[2]
+        }
+    }
     
     lazy var mailDelegate: MailDelegate = {return MailDelegate(viewController: self)}()
-
+    lazy var coreDataDelegate: CoreDataDelegate = {return CoreDataDelegate(view: self.view)}()
     
     override func viewDidLoad()
     {
@@ -131,6 +139,8 @@ class ViewController: UIViewController
         
         speciesSegmentedControl.selectedSegmentIndex = 0
         speciesChangeHandler()
+        
+        coreDataDelegate.browseAndLoadDelegate = self
     }
     
     func mailRecipe()
@@ -138,6 +148,32 @@ class ViewController: UIViewController
         let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
         
         mailDelegate.mailRecipe(recipeURL: recipeURL, image: imageView.image)
+    }
+    
+    func saveRecipe()
+    {
+        let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
+        let thumbnailImage = imageView.image!.resizeToBoundingSquare(boundingSquareSideLength: 480)
+
+        coreDataDelegate.save(recipeURL.absoluteString!, thumbnailImage: thumbnailImage)
+    }
+    
+    func loadRecipe()
+    {
+        coreDataDelegate.load()
+    }
+    
+    func swarmChemistryRecipeSelected(swarmChemistryRecipe: NSURL)
+    {
+        let loadedGenomes = URLUtils.createGenomesFromURL(swarmChemistryRecipe)!
+        
+        println("lolading \(swarmChemistryRecipe)")
+        
+        genomes[0] = loadedGenomes.red
+        genomes[1] = loadedGenomes.green
+        genomes[2] = loadedGenomes.blue
+
+        speciesChangeHandler()
     }
     
     func parameterChangeHandler()
@@ -149,10 +185,6 @@ class ViewController: UIViewController
         genomes[speciesSegmentedControl.selectedSegmentIndex].c4_steering = parameterWidgets[4].value
         genomes[speciesSegmentedControl.selectedSegmentIndex].c5_paceKeeping = parameterWidgets[5].value
         genomes[speciesSegmentedControl.selectedSegmentIndex].normalSpeed = parameterWidgets[6].value
-        
-        redGenome = genomes[0]
-        greenGenome = genomes[1]
-        blueGenome = genomes[2]
     }
     
     func speciesChangeHandler()
@@ -240,7 +272,7 @@ class ViewController: UIViewController
     final func run()
     {
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
-        println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        //println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
         

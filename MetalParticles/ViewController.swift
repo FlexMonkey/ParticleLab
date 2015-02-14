@@ -12,9 +12,8 @@ import Metal
 import QuartzCore
 import CoreData
 import Social
-import MessageUI
 
-class ViewController: UIViewController, MFMailComposeViewControllerDelegate
+class ViewController: UIViewController
 {
     
     let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.None.rawValue)
@@ -82,6 +81,9 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
     
     var genomes = [SwarmGenome]()
     
+    lazy var mailDelegate: MailDelegate = {return MailDelegate(viewController: self)}()
+
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -109,15 +111,15 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
         view.addSubview(imageView)
         
         let resetBarButtonItem = UIBarButtonItem(title: "Reset", style: UIBarButtonItemStyle.Plain, target: self, action: "resetParticles")
-        let toggleTrailsButtonItem = UIBarButtonItem(title: "Trails", style: UIBarButtonItemStyle.Plain, target: self, action: "toggleTrails")
+        // let toggleTrailsButtonItem = UIBarButtonItem(title: "Trails", style: UIBarButtonItemStyle.Plain, target: self, action: "toggleTrails")
         
         let spacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
 
+        let mailButtonItem = UIBarButtonItem(title: "Mail", style: UIBarButtonItemStyle.Plain, target: self, action: "mailRecipe")
+        let saveButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: "saveRecipe")
+        let loadButtonItem = UIBarButtonItem(title: "Load", style: UIBarButtonItemStyle.Plain, target: self, action: "loadRecipe")
         
-        let saveTrailsButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: "saveRecipe")
-        let loadTrailsButtonItem = UIBarButtonItem(title: "Load", style: UIBarButtonItemStyle.Plain, target: self, action: nil)
-        
-        toolbar.items = [resetBarButtonItem, toggleTrailsButtonItem, spacer, saveTrailsButtonItem, loadTrailsButtonItem]
+        toolbar.items = [resetBarButtonItem, spacer, mailButtonItem, saveButtonItem, loadButtonItem]
         
         view.addSubview(toolbar)
 
@@ -131,32 +133,11 @@ class ViewController: UIViewController, MFMailComposeViewControllerDelegate
         speciesChangeHandler()
     }
     
-    func saveRecipe()
+    func mailRecipe()
     {
-        let url = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
+        let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
         
-        var picker = MFMailComposeViewController()
-        picker.mailComposeDelegate = self
- 
-        picker.setSubject("Swarm Chemistry")
-        
-        let bodyOne = "Here's a swarm chemistry recipe I created in <a href=\"http://flexmonkey.blogspot.co.uk/search/label/Swarm%20Chemistry\">Emergent</a><br><br>"
-        let link = "<a href = \"\(url)\">\(url)</a>"
-        
-        if let image = imageView.image
-        {
-            picker.addAttachmentData(UIImageJPEGRepresentation(image.resizeToBoundingSquare(boundingSquareSideLength: 480), 1.0), mimeType: "image/jpeg", fileName: "SwarmChemistry.jpg")
-        }
-        
-        picker.setMessageBody(bodyOne + link, isHTML: true)
-        
-        presentViewController(picker, animated: true, completion: nil)
-        
-    }
-    
-    func mailComposeController(controller: MFMailComposeViewController!, didFinishWithResult result: MFMailComposeResult, error: NSError!)
-    {
-        dismissViewControllerAnimated(true, completion: nil)
+        mailDelegate.mailRecipe(recipeURL: recipeURL, image: imageView.image)
     }
     
     func parameterChangeHandler()

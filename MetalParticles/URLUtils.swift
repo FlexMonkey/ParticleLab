@@ -5,6 +5,7 @@
 //  Created by Simon Gladman on 09/02/2015.
 //  Copyright (c) 2015 Simon Gladman. All rights reserved.
 //
+// TODO - make more robust to handle malformed URLs properly
 
 import Foundation
 

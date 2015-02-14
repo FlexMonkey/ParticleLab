@@ -26,7 +26,7 @@ extension Float
 extension String
 {
     subscript (r: Range<Int>) -> NSString
-        {
+    {
         get
         {
             let startIndex = advance(self.startIndex, r.startIndex)

@@ -68,6 +68,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     var useGlowAndTrails = false
     var particleBrightness: Float = 0.8
     
+    var saveButtonItem: UIBarButtonItem!
     let toolbar = UIToolbar(frame: CGRectZero)
     var resetParticlesFlag = false
     
@@ -120,16 +121,21 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         
         view.addSubview(imageView)
         
-        let resetBarButtonItem = UIBarButtonItem(title: "Reset", style: UIBarButtonItemStyle.Plain, target: self, action: "resetParticles")
+        let resetBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: "resetParticles")
+        
         // let toggleTrailsButtonItem = UIBarButtonItem(title: "Trails", style: UIBarButtonItemStyle.Plain, target: self, action: "toggleTrails")
         
         let spacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-
-        let mailButtonItem = UIBarButtonItem(title: "Mail", style: UIBarButtonItemStyle.Plain, target: self, action: "mailRecipe")
-        let saveButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: "saveRecipe")
-        let loadButtonItem = UIBarButtonItem(title: "Load", style: UIBarButtonItemStyle.Plain, target: self, action: "loadRecipe")
+        let mailButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: "mailRecipe")
         
-        toolbar.items = [resetBarButtonItem, spacer, mailButtonItem, saveButtonItem, loadButtonItem]
+        
+        saveButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: "saveRecipe")
+     
+        let loadButtonItem = UIBarButtonItem(title: "Load", style: UIBarButtonItemStyle.Plain, target: self, action: "loadRecipe")
+
+        saveButtonItem.enabled = false
+        
+        toolbar.items = [resetBarButtonItem, spacer, mailButtonItem, spacer, saveButtonItem, spacer, loadButtonItem]
         
         view.addSubview(toolbar)
 
@@ -143,6 +149,14 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         speciesChangeHandler()
         
         coreDataDelegate.browseAndLoadDelegate = self
+    }
+    
+    var saveEnabled: Bool = false
+    {
+        didSet
+        {
+            saveButtonItem.enabled = saveEnabled
+        }
     }
     
     override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
@@ -192,6 +206,8 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         let thumbnailImage = resizeToBoundingSquare(imageView.image!, boundingSquareSideLength: 480)
 
         coreDataDelegate.save(recipeURL.absoluteString!, thumbnailImage: thumbnailImage)
+        
+        saveEnabled = false
     }
     
     func loadRecipe()
@@ -214,6 +230,8 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     
     func parameterChangeHandler()
     {
+        saveEnabled = true
+        
         genomes[speciesSegmentedControl.selectedSegmentIndex].radius = parameterWidgets[0].value
         genomes[speciesSegmentedControl.selectedSegmentIndex].c1_cohesion = parameterWidgets[1].value
         genomes[speciesSegmentedControl.selectedSegmentIndex].c2_alignment = parameterWidgets[2].value

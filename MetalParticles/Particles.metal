@@ -64,7 +64,10 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    constant SwarmGenome &genomeTwo [[buffer(3)]],
                                    constant SwarmGenome &genomeThree [[buffer(4)]],
                                    
-                                constant float &particleBrightness [[buffer(5)]],
+                                   constant float &particleBrightness [[buffer(5)]],
+                                   
+                                   constant float &gravityWellX [[buffer(6)]],
+                                   constant float &gravityWellY [[buffer(7)]],
                                    
                                    uint id [[thread_position_in_grid]])
 {
@@ -88,6 +91,16 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     float tempAx = 0;
     float tempAy = 0;
 
+    if (gravityWellX > 1 && gravityWellY > 1)
+    {
+        const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(gravityWellX, gravityWellY));
+        
+        const float factor = (1 / (dist < 1 ? 1 : dist)) * 10;
+        
+        inParticle.velocityX = inParticle.velocityX + (inParticle.positionX - gravityWellX) * factor;
+        inParticle.velocityY = inParticle.velocityY + (inParticle.positionY - gravityWellY) * factor;
+    }
+    
     const SwarmGenome genome = type == 0 ? genomeOne : type == 1 ? genomeTwo : genomeThree;
     
     for (uint i = 0; i < 4096; i++)

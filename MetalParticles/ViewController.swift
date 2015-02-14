@@ -79,6 +79,8 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     var greenGenome = SwarmGenome(radius: 0.5, c1_cohesion: 0.165, c2_alignment: 0.5, c3_seperation: 0.2, c4_steering: 0.25, c5_paceKeeping: 0.5, normalSpeed: 0.4)
     var blueGenome = SwarmGenome(radius: 0.2, c1_cohesion: 0.45, c2_alignment: 0.8, c3_seperation: 0.075, c4_steering: 0.9, c5_paceKeeping: 0.15, normalSpeed: 0.9)
     
+    var gravityWell = CGPoint(x: -1, y: -1)
+    
     var genomes: [SwarmGenome] = [SwarmGenome]()
     {
         didSet
@@ -141,6 +143,40 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         speciesChangeHandler()
         
         coreDataDelegate.browseAndLoadDelegate = self
+    }
+    
+    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    {
+        let location = event.allTouches()?.anyObject()?.locationInView(imageView)
+        
+        if let _location = location
+        {
+            positionGravityWell(_location)
+        }
+    }
+    
+    override func touchesMoved(touches: NSSet, withEvent event: UIEvent)
+    {
+        let location = event.allTouches()?.anyObject()?.locationInView(imageView)
+        
+        if let _location = location
+        {
+            positionGravityWell(_location)
+        }
+    }
+    
+    override func touchesEnded(touches: NSSet, withEvent event: UIEvent)
+    {
+        gravityWell.x = -1
+        gravityWell.y = -1
+    }
+    
+    func positionGravityWell(location: CGPoint)
+    {
+        let imageScale = imageView.frame.width / CGFloat(imageSide)
+        
+        gravityWell.x = location.x / imageScale
+        gravityWell.y = location.y / imageScale
     }
     
     func mailRecipe()
@@ -272,7 +308,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     final func run()
     {
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
-        //println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
         
@@ -348,6 +384,14 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         let particleBrightnessBuffer: MTLBuffer = device.newBufferWithBytes(&particleBrightness, length: sizeof(Float), options: nil)
         commandEncoder.setBuffer(particleBrightnessBuffer, offset: 0, atIndex: 5)
         
+        var gravityWellX = Float(gravityWell.x)
+        var inGravityWellXBuffer: MTLBuffer = device.newBufferWithBytes(&gravityWellX, length: sizeof(Float), options: nil)
+        commandEncoder.setBuffer(inGravityWellXBuffer, offset: 0, atIndex: 6)
+        
+        var gravityWellY = Float(gravityWell.y)
+        var inGravityWellYBuffer: MTLBuffer = device.newBufferWithBytes(&gravityWellY, length: sizeof(Float), options: nil)
+        commandEncoder.setBuffer(inGravityWellYBuffer, offset: 0, atIndex: 7)
+
         commandEncoder.setTexture(textureB, atIndex: 0)
         commandEncoder.setTexture(textureB, atIndex: 1)
         

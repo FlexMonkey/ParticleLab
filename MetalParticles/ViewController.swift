@@ -93,7 +93,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     }
     
     lazy var mailDelegate: MailDelegate = {return MailDelegate(viewController: self)}()
-    lazy var coreDataDelegate: CoreDataDelegate = {return CoreDataDelegate(view: self.view)}()
+    lazy var coreDataDelegate: CoreDataDelegate = {return CoreDataDelegate(viewController: self)}()
     
     override func viewDidLoad()
     {
@@ -213,6 +213,8 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     func loadRecipe()
     {
         coreDataDelegate.load()
+        
+        saveEnabled = false
     }
     
     func swarmChemistryRecipeSelected(swarmChemistryRecipe: NSURL)
@@ -323,8 +325,24 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         textureA.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
     }
     
+    var isRunning: Bool = false
+    {
+        didSet
+        {
+            if isRunning && oldValue != isRunning
+            {
+                self.run()
+            }
+        }
+    }
+    
     final func run()
     {
+        if device == nil || !isRunning
+        {
+            return
+        }
+        
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
         println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         

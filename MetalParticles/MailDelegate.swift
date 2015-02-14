@@ -11,9 +11,9 @@ import UIKit
 
 class MailDelegate: NSObject, MFMailComposeViewControllerDelegate
 {
-    private var viewController: UIViewController
+    private var viewController: ViewController
     
-    init(viewController: UIViewController)
+    init(viewController: ViewController)
     {
         self.viewController = viewController
     }
@@ -35,12 +35,14 @@ class MailDelegate: NSObject, MFMailComposeViewControllerDelegate
         
         picker.setMessageBody(bodyOne + link, isHTML: true)
         
+        viewController.isRunning = false
+        
         viewController.presentViewController(picker, animated: true, completion: nil)
         
     }
     
     func mailComposeController(controller: MFMailComposeViewController!, didFinishWithResult result: MFMailComposeResult, error: NSError!)
     {
-        viewController.dismissViewControllerAnimated(true, completion: nil)
+        viewController.dismissViewControllerAnimated(true, completion: {self.viewController.isRunning = true})
     }
 }

@@ -18,13 +18,13 @@ class CoreDataDelegate: NSObject,  UIPopoverControllerDelegate
     let managedObjectContext: NSManagedObjectContext
     let browseAndLoadController: BrowseAndLoadController
     let popoverController: UIPopoverController
-    let view: UIView
+    let viewController: ViewController
     
     var browseAndLoadDelegate: BrowseAndLoadDelegate?
     
-    init(view: UIView)
+    init(viewController: ViewController)
     {
-        self.view = view
+        self.viewController = viewController
         
         appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
         managedObjectContext = appDelegate.managedObjectContext!
@@ -52,7 +52,9 @@ class CoreDataDelegate: NSObject,  UIPopoverControllerDelegate
         
         if let fetchResults = managedObjectContext.executeFetchRequest(fetchRequest, error: nil) as? [EmergentEntity]
         {
-            popoverController.presentPopoverFromRect(view.frame, inView: view, permittedArrowDirections: UIPopoverArrowDirection.allZeros, animated: true)
+            viewController.isRunning = false
+            
+            popoverController.presentPopoverFromRect(viewController.view.frame, inView: viewController.view, permittedArrowDirections: UIPopoverArrowDirection.allZeros, animated: true)
             
             browseAndLoadController.fetchResults = fetchResults
         }
@@ -70,6 +72,8 @@ class CoreDataDelegate: NSObject,  UIPopoverControllerDelegate
                 }
             }
         }
+        
+        viewController.isRunning = true
     }
     
 }

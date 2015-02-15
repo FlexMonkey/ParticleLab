@@ -36,8 +36,6 @@ struct SwarmGenome
     
     static func fromString(value: String) -> SwarmGenome
     {
-        println("countElements(value) = \(countElements(value))")
-        
         if countElements(value) != 14
         {
             return SwarmGenome(radius: 0.83, c1_cohesion: 0.65, c2_alignment: 0.97, c3_seperation: 0.3, c4_steering: 0.41, c5_paceKeeping: 0.5, normalSpeed: 0.9)

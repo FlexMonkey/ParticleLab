@@ -76,6 +76,8 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     var speciesSegmentedControl = UISegmentedControl(items: ["Red", "Green", "Blue"])
     let fieldNames = ["Radius", "Cohesion", "Alignment", "Seperation", "Steering", "Pace Keeping", "Normal Speed"]
 
+    let infoButton: UIButton = UIButton.buttonWithType(UIButtonType.InfoLight) as UIButton
+    
     var redGenome = SwarmGenome(radius: 0.6, c1_cohesion: 0.83, c2_alignment: 0.39, c3_seperation: 0.4, c4_steering: 0.93, c5_paceKeeping: 0.1, normalSpeed: 0.83)
     var greenGenome = SwarmGenome(radius: 0.29, c1_cohesion: 0.92, c2_alignment: 0.24, c3_seperation: 0.1, c4_steering: 0.32, c5_paceKeeping: 0.9, normalSpeed: 0.73)
     var blueGenome = SwarmGenome(radius: 0.83, c1_cohesion: 0.65, c2_alignment: 0.97, c3_seperation: 0.3, c4_steering: 0.41, c5_paceKeeping: 0.5, normalSpeed: 0.9)
@@ -138,6 +140,9 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         
         view.addSubview(toolbar)
 
+        infoButton.tintColor = UIColor.whiteColor()
+        infoButton.addTarget(self, action: "showInfo", forControlEvents: UIControlEvents.TouchDown)
+        view.addSubview(infoButton)
         
         if let previousState = NSUserDefaults.standardUserDefaults().URLForKey("swarmChemistryRecipe")
         {
@@ -201,6 +206,37 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         
         gravityWell.x = location.x / imageScale
         gravityWell.y = location.y / imageScale
+    }
+    
+    func showInfo()
+    {
+        let alertController = UIAlertController(title: "Emergent v1.0\nSwarm Chemistry Simulation",
+            message: "\nSimon Gladman | February 2015\n\nBased on work by Hiroki Sayama\n\nIcon created by Maurizio Fusillo from the Noun Project",
+            preferredStyle: UIAlertControllerStyle.Alert)
+        
+        let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
+        let openSwarmChemistry = UIAlertAction(title: "Swarm Chemistry", style: .Default, handler: visitBinghamton)
+        let openBlogAction = UIAlertAction(title: "Open Blog", style: .Default, handler: visitFlexMonkey)
+        
+        
+        alertController.addAction(openSwarmChemistry)
+        alertController.addAction(openBlogAction)
+        alertController.addAction(okAction)
+        
+        if let viewController = UIApplication.sharedApplication().keyWindow!.rootViewController
+        {
+            viewController.presentViewController(alertController, animated: true, completion: nil)
+        }
+    }
+    
+    func visitBinghamton(value: UIAlertAction!)
+    {
+        UIApplication.sharedApplication().openURL(NSURL(string: "http://bingweb.binghamton.edu/~sayama/SwarmChemistry/")!)
+    }
+    
+    func visitFlexMonkey(value: UIAlertAction!)
+    {
+        UIApplication.sharedApplication().openURL(NSURL(string: "http://flexmonkey.blogspot.co.uk/search/label/Swarm%20Chemistry")!)
     }
     
     func mailRecipe()
@@ -346,9 +382,9 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
                 let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
                 
                 NSUserDefaults.standardUserDefaults().setURL(recipeURL, forKey: "swarmChemistryRecipe")
-                
-                println("saving state")
             }
+            
+            println("isrunning = \(isRunning)")
         }
     }
     
@@ -508,7 +544,9 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         let dialWidth = Int(view.frame.width) - imageSide
         let dialOriginX = Int(view.frame.width) - dialWidth
         
-        speciesSegmentedControl.frame = CGRect(x: dialOriginX, y: dialOriginY - 4, width: dialWidth, height: 30).rectByInsetting(dx: 4, dy: 0)
+        speciesSegmentedControl.frame = CGRect(x: dialOriginX, y: dialOriginY - 4, width: dialWidth - 30, height: 30).rectByInsetting(dx: 4, dy: 0)
+        
+        infoButton.frame = CGRect(x: Int(view.frame.width) - 30, y: dialOriginY - 4, width: 30, height: 30)
         
         for (idx: Int, parameterWidget: ParameterWidget) in enumerate(parameterWidgets)
         {
@@ -516,7 +554,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         }
         
         toolbar.frame = CGRect(x: dialOriginX, y: Int(view.frame.height) - 40, width: dialWidth, height: 40)
-        
+
         speciesChangeHandler()
     }
     

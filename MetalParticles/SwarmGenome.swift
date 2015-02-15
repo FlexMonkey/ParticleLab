@@ -19,6 +19,8 @@ struct Particle
     var type: Float = 0
 }
 
+let SwarmGenomeZero = SwarmGenome()
+
 struct SwarmGenome
 {
     var radius: Float = 0

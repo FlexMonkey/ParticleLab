@@ -82,7 +82,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     
     var gravityWell = CGPoint(x: -1, y: -1)
     
-    var genomes: [SwarmGenome] = [SwarmGenome]()
+    var genomes: [SwarmGenome] = [SwarmGenome](count: 3, repeatedValue: SwarmGenomeZero)
     {
         didSet
         {
@@ -127,8 +127,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         
         let spacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
         let mailButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: "mailRecipe")
-        
-        
+
         saveButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: "saveRecipe")
      
         let loadButtonItem = UIBarButtonItem(title: "Load", style: UIBarButtonItemStyle.Plain, target: self, action: "loadRecipe")
@@ -139,7 +138,18 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         
         view.addSubview(toolbar)
 
-        genomes = [redGenome, greenGenome, blueGenome]
+        
+        if let previousState = NSUserDefaults.standardUserDefaults().URLForKey("swarmChemistryRecipe")
+        {
+            let loadedGenomes = URLUtils.createGenomesFromURL(previousState)!
+            
+            genomes = [loadedGenomes.red, loadedGenomes.green, loadedGenomes.blue]
+        }
+        else
+        {
+            genomes = [redGenome, greenGenome, blueGenome]
+        }
+        
         
         setUpParticles()
         
@@ -220,9 +230,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     func swarmChemistryRecipeSelected(swarmChemistryRecipe: NSURL)
     {
         let loadedGenomes = URLUtils.createGenomesFromURL(swarmChemistryRecipe)!
-        
-        println("lolading \(swarmChemistryRecipe)")
-        
+     
         genomes[0] = loadedGenomes.red
         genomes[1] = loadedGenomes.green
         genomes[2] = loadedGenomes.blue
@@ -333,6 +341,14 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
             {
                 self.run()
             }
+            else
+            {
+                let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
+                
+                NSUserDefaults.standardUserDefaults().setURL(recipeURL, forKey: "swarmChemistryRecipe")
+                
+                println("saving state")
+            }
         }
     }
     
@@ -344,7 +360,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         }
         
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
-        println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        // println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
         
@@ -475,6 +491,15 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
 
     override func viewDidLayoutSubviews()
     {
+        if errorFlag
+        {
+            let alertController = UIAlertController(title: "Emergent v1.0\nParticle System Explorer", message: "\nSorry! Emergent requires an iPad with an A7 or later processor. It appears your device is earlier.", preferredStyle: UIAlertControllerStyle.Alert)
+            
+            presentViewController(alertController, animated: true, completion: nil)
+            
+            errorFlag = false
+        }
+        
         let imageSide = Int(view.frame.height - topLayoutGuide.length)
         
         imageView.frame = CGRect(x: 0 , y: Int(topLayoutGuide.length), width: imageSide, height: imageSide)

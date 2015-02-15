@@ -82,7 +82,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     
     var gravityWell = CGPoint(x: -1, y: -1)
     
-    var genomes: [SwarmGenome] = [SwarmGenome](count: 3, repeatedValue: SwarmGenomeZero)
+    var genomes: [SwarmGenome] = [SwarmGenome]()
     {
         didSet
         {
@@ -516,6 +516,8 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         }
         
         toolbar.frame = CGRect(x: dialOriginX, y: Int(view.frame.height) - 40, width: dialWidth, height: 40)
+        
+        speciesChangeHandler()
     }
     
     override func supportedInterfaceOrientations() -> Int

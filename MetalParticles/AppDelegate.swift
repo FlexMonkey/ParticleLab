@@ -55,14 +55,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     {
         if let swarmChemistryViewController = window?.rootViewController as? ViewController
         {
-            let genomes = URLUtils.createGenomesFromURL(url)!
-            
-            swarmChemistryViewController.redGenome = genomes.red
-            swarmChemistryViewController.greenGenome = genomes.green
-            swarmChemistryViewController.blueGenome = genomes.blue
-            
-            swarmChemistryViewController.speciesChangeHandler() // updates UI
-            
+            swarmChemistryViewController.swarmChemistryRecipeSelected(url)
         }
         
         return true

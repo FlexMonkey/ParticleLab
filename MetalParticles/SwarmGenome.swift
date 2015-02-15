@@ -19,8 +19,6 @@ struct Particle
     var type: Float = 0
 }
 
-let SwarmGenomeZero = SwarmGenome()
-
 struct SwarmGenome
 {
     var radius: Float = 0
@@ -38,6 +36,13 @@ struct SwarmGenome
     
     static func fromString(value: String) -> SwarmGenome
     {
+        println("countElements(value) = \(countElements(value))")
+        
+        if countElements(value) != 14
+        {
+            return SwarmGenome(radius: 0.83, c1_cohesion: 0.65, c2_alignment: 0.97, c3_seperation: 0.3, c4_steering: 0.41, c5_paceKeeping: 0.5, normalSpeed: 0.9)
+        }
+        
         let r = value[0...1].floatValue / 100.0
         let c1 = value[2...3].floatValue / 100.0
         let c2 = value[4...5].floatValue / 100.0

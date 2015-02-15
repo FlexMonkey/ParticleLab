@@ -215,8 +215,8 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
             preferredStyle: UIAlertControllerStyle.Alert)
         
         let okAction = UIAlertAction(title: "OK", style: .Default, handler: nil)
-        let openSwarmChemistry = UIAlertAction(title: "Swarm Chemistry", style: .Default, handler: visitBinghamton)
-        let openBlogAction = UIAlertAction(title: "Open Blog", style: .Default, handler: visitFlexMonkey)
+        let openSwarmChemistry = UIAlertAction(title: "Learn about Swarm Chemistry", style: .Default, handler: visitBinghamton)
+        let openBlogAction = UIAlertAction(title: "Open Development Blog", style: .Default, handler: visitFlexMonkey)
         
         
         alertController.addAction(openSwarmChemistry)
@@ -383,8 +383,6 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
                 
                 NSUserDefaults.standardUserDefaults().setURL(recipeURL, forKey: "swarmChemistryRecipe")
             }
-            
-            println("isrunning = \(isRunning)")
         }
     }
     

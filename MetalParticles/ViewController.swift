@@ -76,9 +76,9 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     var speciesSegmentedControl = UISegmentedControl(items: ["Red", "Green", "Blue"])
     let fieldNames = ["Radius", "Cohesion", "Alignment", "Seperation", "Steering", "Pace Keeping", "Normal Speed"]
 
-    var redGenome = SwarmGenome(radius: 0.4, c1_cohesion: 0.25, c2_alignment: 0.35, c3_seperation: 0.05, c4_steering: 0.35, c5_paceKeeping: 0.75, normalSpeed: 0.6)
-    var greenGenome = SwarmGenome(radius: 0.5, c1_cohesion: 0.165, c2_alignment: 0.5, c3_seperation: 0.2, c4_steering: 0.25, c5_paceKeeping: 0.5, normalSpeed: 0.4)
-    var blueGenome = SwarmGenome(radius: 0.2, c1_cohesion: 0.45, c2_alignment: 0.8, c3_seperation: 0.075, c4_steering: 0.9, c5_paceKeeping: 0.15, normalSpeed: 0.9)
+    var redGenome = SwarmGenome(radius: 0.6, c1_cohesion: 0.83, c2_alignment: 0.39, c3_seperation: 0.4, c4_steering: 0.93, c5_paceKeeping: 0.1, normalSpeed: 0.83)
+    var greenGenome = SwarmGenome(radius: 0.29, c1_cohesion: 0.92, c2_alignment: 0.24, c3_seperation: 0.1, c4_steering: 0.32, c5_paceKeeping: 0.9, normalSpeed: 0.73)
+    var blueGenome = SwarmGenome(radius: 0.83, c1_cohesion: 0.65, c2_alignment: 0.97, c3_seperation: 0.3, c4_steering: 0.41, c5_paceKeeping: 0.5, normalSpeed: 0.9)
     
     var gravityWell = CGPoint(x: -1, y: -1)
     
@@ -508,7 +508,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         let dialWidth = Int(view.frame.width) - imageSide
         let dialOriginX = Int(view.frame.width) - dialWidth
         
-        speciesSegmentedControl.frame = CGRect(x: dialOriginX, y: dialOriginY, width: dialWidth, height: 30).rectByInsetting(dx: 4, dy: 0)
+        speciesSegmentedControl.frame = CGRect(x: dialOriginX, y: dialOriginY - 4, width: dialWidth, height: 30).rectByInsetting(dx: 4, dy: 0)
         
         for (idx: Int, parameterWidget: ParameterWidget) in enumerate(parameterWidgets)
         {

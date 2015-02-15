@@ -10,7 +10,7 @@
             <rect key="frame" x="0.0" y="0.0" width="480" height="480"/>
             <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
             <subviews>
-                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="emrgentLogo_1024.png" translatesAutoresizingMaskIntoConstraints="NO" id="Eiz-8g-MFW">
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="splash.jpg" translatesAutoresizingMaskIntoConstraints="NO" id="Eiz-8g-MFW">
                     <rect key="frame" x="0.0" y="0.0" width="240" height="128"/>
                 </imageView>
             </subviews>
@@ -49,6 +49,6 @@
         </view>
     </objects>
     <resources>
-        <image name="emrgentLogo_1024.png" width="1024" height="1024"/>
+        <image name="splash.jpg" width="1024" height="768"/>
     </resources>
 </document>

@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		3EDBA0F11A83BD8100719D14 /* ReleaseNotes in Resources */ = {isa = PBXBuildFile; fileRef = 3EDBA0F01A83BD8100719D14 /* ReleaseNotes */; };
-		BE1D8E7F1A88DA2E00ADD461 /* emrgentLogo_1024.png in Resources */ = {isa = PBXBuildFile; fileRef = BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */; };
 		BE1D8E831A8925CE00ADD461 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E821A8925CE00ADD461 /* Extensions.swift */; };
 		BE1D8E851A89261100ADD461 /* SwarmGenome.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E841A89261100ADD461 /* SwarmGenome.swift */; };
 		BE1D8E881A89269000ADD461 /* URLUtils.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE1D8E871A89269000ADD461 /* URLUtils.swift */; };
@@ -17,6 +16,7 @@
 		BE4ED4EC1A8F22D800B122A5 /* EmergentEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4EB1A8F22D800B122A5 /* EmergentEntity.swift */; };
 		BE4ED4EE1A8F24A800B122A5 /* CoreDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4ED1A8F24A800B122A5 /* CoreDataDelegate.swift */; };
 		BE4ED4F11A8F290D00B122A5 /* BrowseAndLoadController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4ED4F01A8F290D00B122A5 /* BrowseAndLoadController.swift */; };
+		BE4ED4F31A90898800B122A5 /* splash.jpg in Resources */ = {isa = PBXBuildFile; fileRef = BE4ED4F21A90898800B122A5 /* splash.jpg */; };
 		BE75EE921A6A2CC000B20D49 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */; };
 		BE75EE941A6A2CC000B20D49 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EE931A6A2CC000B20D49 /* ViewController.swift */; };
 		BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE951A6A2CC000B20D49 /* Main.storyboard */; };
@@ -41,7 +41,6 @@
 
 /* Begin PBXFileReference section */
 		3EDBA0F01A83BD8100719D14 /* ReleaseNotes */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = ReleaseNotes; sourceTree = "<group>"; };
-		BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = emrgentLogo_1024.png; sourceTree = "<group>"; };
 		BE1D8E821A8925CE00ADD461 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		BE1D8E841A89261100ADD461 /* SwarmGenome.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwarmGenome.swift; sourceTree = "<group>"; };
 		BE1D8E871A89269000ADD461 /* URLUtils.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = URLUtils.swift; sourceTree = "<group>"; };
@@ -50,6 +49,7 @@
 		BE4ED4EB1A8F22D800B122A5 /* EmergentEntity.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EmergentEntity.swift; sourceTree = "<group>"; };
 		BE4ED4ED1A8F24A800B122A5 /* CoreDataDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataDelegate.swift; sourceTree = "<group>"; };
 		BE4ED4F01A8F290D00B122A5 /* BrowseAndLoadController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = BrowseAndLoadController.swift; sourceTree = "<group>"; };
+		BE4ED4F21A90898800B122A5 /* splash.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; name = splash.jpg; path = assets/splash.jpg; sourceTree = "<group>"; };
 		BE75EE8C1A6A2CC000B20D49 /* Emergent.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Emergent.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE75EE901A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -87,7 +87,7 @@
 		BE1D8E7D1A88DA0D00ADD461 /* assets */ = {
 			isa = PBXGroup;
 			children = (
-				BE1D8E7E1A88DA2E00ADD461 /* emrgentLogo_1024.png */,
+				BE4ED4F21A90898800B122A5 /* splash.jpg */,
 			);
 			name = assets;
 			sourceTree = "<group>";
@@ -323,11 +323,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BE1D8E7F1A88DA2E00ADD461 /* emrgentLogo_1024.png in Resources */,
 				BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */,
 				BE75EE9C1A6A2CC000B20D49 /* LaunchScreen.xib in Resources */,
 				3EDBA0F11A83BD8100719D14 /* ReleaseNotes in Resources */,
 				BE75EE991A6A2CC000B20D49 /* Images.xcassets in Resources */,
+				BE4ED4F31A90898800B122A5 /* splash.jpg in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

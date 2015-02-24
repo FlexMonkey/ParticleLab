@@ -12,6 +12,7 @@ import Metal
 import QuartzCore
 import CoreData
 import Social
+import MessageUI
 
 class ViewController: UIViewController, BrowseAndLoadDelegate
 {
@@ -128,7 +129,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         // let toggleTrailsButtonItem = UIBarButtonItem(title: "Trails", style: UIBarButtonItemStyle.Plain, target: self, action: "toggleTrails")
         
         let spacer = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.FlexibleSpace, target: nil, action: nil)
-        let mailButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: "mailRecipe")
+        
 
         saveButtonItem = UIBarButtonItem(title: "Save", style: UIBarButtonItemStyle.Plain, target: self, action: "saveRecipe")
      
@@ -136,7 +137,16 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
 
         saveButtonItem.enabled = false
         
-        toolbar.items = [resetBarButtonItem, spacer, mailButtonItem, spacer, saveButtonItem, spacer, loadButtonItem]
+        if MFMailComposeViewController.canSendMail()
+        {
+            let mailButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Compose, target: self, action: "mailRecipe")
+            
+            toolbar.items = [resetBarButtonItem, spacer, mailButtonItem, spacer, saveButtonItem, spacer, loadButtonItem]
+        }
+        else
+        {
+            toolbar.items = [resetBarButtonItem, spacer, saveButtonItem, spacer, loadButtonItem]
+        }
         
         view.addSubview(toolbar)
 

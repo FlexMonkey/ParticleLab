@@ -19,7 +19,7 @@ struct Particle
 };
 
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
-                                   texture2d<float, access::read> inTexture [[texture(1)]],
+                                   // texture2d<float, access::read> inTexture [[texture(1)]],
                                    
                                    const device Particle *inParticles [[ buffer(0) ]],
                                    device Particle *outParticles [[ buffer(1) ]],
@@ -34,11 +34,12 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const int type = id % 3;
     
-    const float3 thisColor = inTexture.read(particlePosition).rgb;
+    const float3 thisColor = float3(0,0,0); // inTexture.read(particlePosition).rgb;
 
-    const float4 outColor(thisColor.r + (type == 0 ? 0.15 : 0.0),
-                          thisColor.g + (type == 1 ? 0.15 : 0.0),
-                          thisColor.b + (type == 2 ? 0.15 : 0.0),
+    
+    const float4 outColor(thisColor.r + (type == 0 ? 1 : 0.0),
+                          thisColor.g + (type == 1 ? 1 : 0.0),
+                          thisColor.b + (type == 2 ? 1 : 0.0),
                           1.0);
     
     if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)
@@ -58,6 +59,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     // ----
     
+    /*
     uint2 textureCoordinate(fast::floor(id / imageWidth),id % int(imageWidth));
     
     if (textureCoordinate.x < imageWidth && textureCoordinate.y < imageWidth)
@@ -78,4 +80,5 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         
         outTexture.write(accumColor, textureCoordinate);
     }
+     */
 }

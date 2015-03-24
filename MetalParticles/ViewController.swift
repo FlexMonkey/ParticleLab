@@ -38,7 +38,9 @@ class ViewController: UIViewController
     var device: MTLDevice! = nil
     var commandQueue: MTLCommandQueue! = nil
     
-    let imageView =  UIImageView(frame: CGRectZero)
+    // let imageView =  UIImageView(frame: CGRectZero)
+    
+    let metalLayer = CAMetalLayer()
     
     var region: MTLRegion!
     var particlesTexture_1: MTLTexture!
@@ -72,9 +74,14 @@ class ViewController: UIViewController
         
         view.backgroundColor = UIColor.blackColor()
 
-        imageView.contentMode = UIViewContentMode.ScaleAspectFill
+        // imageView.contentMode = UIViewContentMode.ScaleAspectFill
 
-        view.addSubview(imageView)
+        // view.addSubview(imageView)
+        
+        view.layer.addSublayer(metalLayer)
+        
+        metalLayer.framebufferOnly = false
+
         
         setUpParticles()
         
@@ -124,6 +131,8 @@ class ViewController: UIViewController
     func setUpMetal()
     {
         device = MTLCreateSystemDefaultDevice()
+        
+        metalLayer.device = device
  
         if device == nil
         {
@@ -185,6 +194,7 @@ class ViewController: UIViewController
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
   
+        /*
         if flag
         {
             commandEncoder.setTexture(particlesTexture_1, atIndex: 0)
@@ -195,13 +205,25 @@ class ViewController: UIViewController
             commandEncoder.setTexture(particlesTexture_2, atIndex: 0)
             commandEncoder.setTexture(particlesTexture_1, atIndex: 1)
         }
+        */
         
+        let drawable = metalLayer.newDrawable()
+        
+        
+        commandEncoder.setTexture(drawable.texture, atIndex: 0)
+                
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
         commandEncoder.endEncoding()
+        
+        commandBuffer.presentDrawable(drawable)
+        
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
+        
+        metalLayer
    
+        /*
         if flag
         {
             particlesTexture_1.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
@@ -223,7 +245,7 @@ class ViewController: UIViewController
         {
             self.imageView.image = UIImage(CGImage: imageRef)!
         }
-        
+        */
         flag = !flag
     }
     
@@ -244,13 +266,13 @@ class ViewController: UIViewController
         {
            let imageSide = view.frame.width
             
-           imageView.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: 01)
+           metalLayer.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: 01)
         }
         else
         {
             let imageSide = view.frame.height
             
-            imageView.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
+            metalLayer.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
         }
         
         

@@ -42,7 +42,7 @@ class ViewController: UIViewController
     
     let metalLayer = CAMetalLayer()
     
-    var region: MTLRegion!
+    var region: MTLRegion = MTLRegionMake2D(0, 0, Int(1024), Int(1024))
     var particlesTexture_1: MTLTexture!
     var particlesTexture_2: MTLTexture!
     
@@ -55,10 +55,10 @@ class ViewController: UIViewController
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 2097152 // 2097152   1048576
+    let particleCount: Int = 4194304 // 2097152   1048576
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(2097152) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(4194304) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
@@ -81,7 +81,7 @@ class ViewController: UIViewController
         view.layer.addSublayer(metalLayer)
         
         metalLayer.framebufferOnly = false
-
+        metalLayer.drawableSize = CGSize(width: 1024, height: 1024)
         
         setUpParticles()
         
@@ -143,10 +143,10 @@ class ViewController: UIViewController
             defaultLibrary = device.newDefaultLibrary()
             commandQueue = device.newCommandQueue()
    
-            particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
-            particle_threadGroups = MTLSize(width:(particleCount + 31) / 32, height:1, depth:1)
+            particle_threadGroupCount = MTLSize(width:64,height:1,depth:1)
+            particle_threadGroups = MTLSize(width:(particleCount + 63) / 64, height:1, depth:1)
       
-            setUpTexture()
+            //setUpTexture()
             
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
             pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
@@ -207,10 +207,13 @@ class ViewController: UIViewController
         }
         */
         
-        let drawable = metalLayer.newDrawable()
+        let drawable = metalLayer.nextDrawable()
         
+        drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+
         
         commandEncoder.setTexture(drawable.texture, atIndex: 0)
+        // commandEncoder.setTexture(drawable.texture, atIndex: 1)
                 
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
@@ -219,10 +222,8 @@ class ViewController: UIViewController
         commandBuffer.presentDrawable(drawable)
         
         commandBuffer.commit()
-        commandBuffer.waitUntilCompleted()
-        
-        metalLayer
-   
+        // commandBuffer.waitUntilCompleted()
+  
         /*
         if flag
         {
@@ -274,8 +275,6 @@ class ViewController: UIViewController
             
             metalLayer.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
         }
-        
-        
     }
     
     override func didReceiveMemoryWarning()

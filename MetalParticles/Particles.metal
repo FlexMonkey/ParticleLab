@@ -34,12 +34,12 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const int type = id % 3;
     
-    const float3 thisColor = float3(0,0,0); // inTexture.read(particlePosition).rgb;
+    // const float3 thisColor = float3(0,0,0); // inTexture.read(particlePosition).rgb;
 
     
-    const float4 outColor(thisColor.r + (type == 0 ? 1 : 0.0),
-                          thisColor.g + (type == 1 ? 1 : 0.0),
-                          thisColor.b + (type == 2 ? 1 : 0.0),
+    const float4 outColor((type == 0 ? 1 : 0.0),
+                          (type == 1 ? 1 : 0.0),
+                          (type == 2 ? 1 : 0.0),
                           1.0);
     
     if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)

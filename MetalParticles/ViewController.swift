@@ -74,14 +74,11 @@ class ViewController: UIViewController
         
         view.backgroundColor = UIColor.blackColor()
 
-        // imageView.contentMode = UIViewContentMode.ScaleAspectFill
-
-        // view.addSubview(imageView)
-        
         view.layer.addSublayer(metalLayer)
         
         metalLayer.framebufferOnly = false
         metalLayer.drawableSize = CGSize(width: 1024, height: 1024)
+        metalLayer.drawsAsynchronously = true
         
         setUpParticles()
         
@@ -143,11 +140,9 @@ class ViewController: UIViewController
             defaultLibrary = device.newDefaultLibrary()
             commandQueue = device.newCommandQueue()
    
-            particle_threadGroupCount = MTLSize(width:64,height:1,depth:1)
-            particle_threadGroups = MTLSize(width:(particleCount + 63) / 64, height:1, depth:1)
-      
-            //setUpTexture()
-            
+            particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
+            particle_threadGroups = MTLSize(width:(particleCount + 31) / 32, height:1, depth:1)
+ 
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
             pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
             
@@ -161,15 +156,15 @@ class ViewController: UIViewController
         println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
-  
-        Async.background()
+
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
         {
             self.applyShader()
-        }
-        .main
-        {
-            self.run();
-        }
+            dispatch_async(dispatch_get_main_queue(),
+            {
+                self.run();
+            });
+        });
     }
     
     
@@ -193,27 +188,13 @@ class ViewController: UIViewController
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
-  
-        /*
-        if flag
-        {
-            commandEncoder.setTexture(particlesTexture_1, atIndex: 0)
-            commandEncoder.setTexture(particlesTexture_2, atIndex: 1)
-        }
-        else
-        {
-            commandEncoder.setTexture(particlesTexture_2, atIndex: 0)
-            commandEncoder.setTexture(particlesTexture_1, atIndex: 1)
-        }
-        */
-        
+
         let drawable = metalLayer.nextDrawable()
         
         drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
 
         
         commandEncoder.setTexture(drawable.texture, atIndex: 0)
-        // commandEncoder.setTexture(drawable.texture, atIndex: 1)
                 
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
@@ -223,43 +204,8 @@ class ViewController: UIViewController
         
         commandBuffer.commit()
         // commandBuffer.waitUntilCompleted()
-  
-        /*
-        if flag
-        {
-            particlesTexture_1.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
-        }
-        else
-        {
-            particlesTexture_2.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
-        }
-        
-        var imageRef: CGImage?
-        
-        Async.background()
-        {
-            let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &self.imageBytes, length: self.providerLength))
-            
-            imageRef = CGImageCreate(self.imageSide, self.imageSide, self.bitsPerComponent, self.bitsPerPixel, self.bytesPerRow, self.rgbColorSpace, self.bitmapInfo, providerRef, nil, false, self.renderingIntent)
-        }
-        .main
-        {
-            self.imageView.image = UIImage(CGImage: imageRef)!
-        }
-        */
-        flag = !flag
-    }
-    
-    func setUpTexture()
-    {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
-        
-        particlesTexture_1 = device.newTextureWithDescriptor(textureDescriptor)
-        particlesTexture_2 = device.newTextureWithDescriptor(textureDescriptor)
-        
-       region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
-    }
 
+    }
 
     override func viewDidLayoutSubviews()
     {

@@ -33,13 +33,10 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
     const int type = id % 3;
-    
-    // const float3 thisColor = float3(0,0,0); // inTexture.read(particlePosition).rgb;
 
-    
-    const float4 outColor((type == 0 ? 1 : 0.0),
-                          (type == 1 ? 1 : 0.0),
-                          (type == 2 ? 1 : 0.0),
+    const float4 outColor((type != 0 ? 1 : 0.0),
+                          (type != 1 ? 1 : 0.0),
+                          (type != 2 ? 1 : 0.0),
                           1.0);
     
     if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)
@@ -49,36 +46,11 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
    
     const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(inGravityWell.positionX, inGravityWell.positionY));
     
-    const float factor = (1 / dist) * (type == 0 ? 0.1 : (type == 1 ? 0.125 : 0.15));
+    const float factor = (1 / dist) * (type == 0 ? 0.7 : (type == 1 ? 0.65 : 0.6));
    
     outParticles[id] = Particle {
-        .velocityX =  (inParticle.velocityX * 0.999) + (inGravityWell.positionX - inParticle.positionX) * factor,
-        .velocityY =  (inParticle.velocityY * 0.999) + (inGravityWell.positionY - inParticle.positionY) * factor,
+        .velocityX =  (inParticle.velocityX * 0.998) + (inGravityWell.positionX - inParticle.positionX) * factor,
+        .velocityY =  (inParticle.velocityY * 0.998) + (inGravityWell.positionY - inParticle.positionY) * factor,
         .positionX =  inParticle.positionX + inParticle.velocityX,
         .positionY =  inParticle.positionY + inParticle.velocityY};
-    
-    // ----
-    
-    /*
-    uint2 textureCoordinate(fast::floor(id / imageWidth),id % int(imageWidth));
-    
-    if (textureCoordinate.x < imageWidth && textureCoordinate.y < imageWidth)
-    {
-        float4 accumColor = inTexture.read(textureCoordinate);
-        
-        for (int j = -1; j <= 1; j++)
-        {
-            for (int i = -1; i <= 1; i++)
-            {
-                uint2 kernelIndex(textureCoordinate.x + i, textureCoordinate.y + j);
-                accumColor.rgb += inTexture.read(kernelIndex).rgb;
-            }
-        }
-        
-        accumColor.rgb = (accumColor.rgb / 10.5f);
-        accumColor.a = 1.0f;
-        
-        outTexture.write(accumColor, textureCoordinate);
-    }
-     */
 }

@@ -14,40 +14,20 @@ import CoreData
 
 class ViewController: UIViewController
 {
-    
-    let bitmapInfo = CGBitmapInfo(CGBitmapInfo.ByteOrder32Big.rawValue | CGImageAlphaInfo.PremultipliedLast.rawValue)
-    let renderingIntent = kCGRenderingIntentDefault
-    
     let imageSide: UInt = 1024
-    let imageSize = CGSize(width: Int(1024), height: Int(1024))
-    let imageByteCount = Int(1024 * 1024 * 4)
-    
-    let bytesPerPixel = UInt(4)
-    let bitsPerComponent = UInt(8)
-    let bitsPerPixel:UInt = 32
-    let rgbColorSpace = CGColorSpaceCreateDeviceRGB()
-    
+ 
     let bytesPerRow = UInt(4 * 1024)
-    let bytesPerRowInt = Int(4 * 1024)
-    let providerLength = Int(1024 * 1024 * 4) * sizeof(UInt8)
-    var imageBytes = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
     var kernelFunction: MTLFunction!
     var pipelineState: MTLComputePipelineState!
     var defaultLibrary: MTLLibrary! = nil
     var device: MTLDevice! = nil
     var commandQueue: MTLCommandQueue! = nil
-    
-    // let imageView =  UIImageView(frame: CGRectZero)
-    
+
     let metalLayer = CAMetalLayer()
     
     var region: MTLRegion = MTLRegionMake2D(0, 0, Int(1024), Int(1024))
-    var particlesTexture_1: MTLTexture!
-    var particlesTexture_2: MTLTexture!
-    
-    var flag = false
-    
+ 
     let blankBitmapRawData = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
     var errorFlag:Bool = false

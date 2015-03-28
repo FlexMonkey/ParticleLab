@@ -35,7 +35,7 @@ class ViewController: UIViewController
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 4194304 // 2097152   1048576
+    let particleCount: Int = 4194304 // 4194304 2097152   1048576
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
     let particlesMemoryByteSize:UInt = UInt(4194304) * UInt(sizeof(Particle))
@@ -46,8 +46,6 @@ class ViewController: UIViewController
     var gravityWellAngle: Float = 0.0
     var gravityWellParticle = Particle(positionX: 512, positionY: 512, velocityX: 0, velocityY: 0)
     
-    var frameStartTime = CFAbsoluteTimeGetCurrent()
-
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -57,7 +55,7 @@ class ViewController: UIViewController
         view.layer.addSublayer(metalLayer)
         
         metalLayer.framebufferOnly = false
-        metalLayer.drawableSize = CGSize(width: 1024, height: 1024)
+        metalLayer.drawableSize = CGSize(width: 1024, height: 1024);
         metalLayer.drawsAsynchronously = true
         
         setUpParticles()
@@ -126,17 +124,29 @@ class ViewController: UIViewController
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
             pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
             
+            frameStartTime = CFAbsoluteTimeGetCurrent()
+            
             run()
         }
     }
 
+    var frameStartTime: CFAbsoluteTime!
+    var frameNumber = 0
+    
     final func run()
     {
-        let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
-        println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        frameNumber++
         
-        frameStartTime = CFAbsoluteTimeGetCurrent()
-
+        if frameNumber == 100
+        {
+            let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
+            println(NSString(format: "%.1f", 1 / frametime) + "fps" )
+            
+            frameStartTime = CFAbsoluteTimeGetCurrent()
+            
+            frameNumber = 0
+        }
+        
         dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
         {
             self.applyShader()
@@ -171,19 +181,28 @@ class ViewController: UIViewController
 
         let drawable = metalLayer.nextDrawable()
         
-        drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
-
-        
-        commandEncoder.setTexture(drawable.texture, atIndex: 0)
-                
-        commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
-        
-        commandEncoder.endEncoding()
-        
-        commandBuffer.presentDrawable(drawable)
-        
-        commandBuffer.commit()
-        // commandBuffer.waitUntilCompleted()
+        if let drawable = drawable
+        {
+            drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+            
+            commandEncoder.setTexture(drawable.texture, atIndex: 0)
+                    
+            commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
+            
+            commandEncoder.endEncoding()
+            
+            commandBuffer.commit()
+            
+            commandBuffer.waitUntilScheduled()
+            
+            drawable.present()
+        }
+        else
+        {
+            commandEncoder.endEncoding()
+            
+            println("metalLayer.nextDrawable() returned nil")
+        }
 
     }
 

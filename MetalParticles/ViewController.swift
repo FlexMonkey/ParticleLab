@@ -35,16 +35,18 @@ class ViewController: UIViewController
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 4194304 // 4194304 2097152   1048576
+    let particleCount: Int = 2097152 // 4194304 2097152   1048576
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(4194304) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(2097152) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
     
     var gravityWellAngle: Float = 0.0
     var gravityWellParticle = Particle(positionX: 512, positionY: 512, velocityX: 0, velocityY: 0)
+    
+    var gravityWellParticleTwo = Particle(positionX: 512, positionY: 512, velocityX: 0, velocityY: 0)
     
     override func viewDidLoad()
     {
@@ -103,6 +105,8 @@ class ViewController: UIViewController
         }
     }
     
+    var copiedTexture: MTLTexture!
+    
     func setUpMetal()
     {
         device = MTLCreateSystemDefaultDevice()
@@ -115,6 +119,14 @@ class ViewController: UIViewController
         }
         else
         {
+            // let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.BGRA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
+            
+            // copiedTexture = device.newTextureWithDescriptor(textureDescriptor)
+            // copiedTexture.framebufferOnly = false
+            
+            region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
+            
+            
             defaultLibrary = device.newDefaultLibrary()
             commandQueue = device.newCommandQueue()
    
@@ -157,7 +169,7 @@ class ViewController: UIViewController
         });
     }
     
-    
+    var imageBytes = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
     
     final func applyShader()
     {
@@ -173,20 +185,44 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
         gravityWellAngle += 0.06
-        gravityWellParticle.positionX = 512 + 100 * sin(gravityWellAngle)
-        gravityWellParticle.positionY = 512 + 100 * cos(gravityWellAngle)
+        gravityWellParticle.positionX = 512 + 65 * sin(gravityWellAngle)
+        gravityWellParticle.positionY = 512 + 65 * cos(gravityWellAngle)
+
+        gravityWellParticle.positionX = 512 + 15 * sin(0 - gravityWellAngle / 2)
+        gravityWellParticleTwo.positionY = 512 + 15 * cos(0 - gravityWellAngle / 2)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: sizeofValue(gravityWellParticle), options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
 
+        var inGravityWellTwo = device.newBufferWithBytes(&gravityWellParticleTwo, length: sizeofValue(gravityWellParticle), options: nil)
+        commandEncoder.setBuffer(inGravityWellTwo, offset: 0, atIndex: 3)
+        
         let drawable = metalLayer.nextDrawable()
         
         if let drawable = drawable
         {
-            drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+            /*
+            let blitCommandBuffer = commandQueue.commandBuffer()
+            let blitCommandEncoder = blitCommandBuffer.blitCommandEncoder()
+            blitCommandEncoder.copyFromTexture(drawable.texture, sourceSlice: 0, sourceLevel: 0, sourceOrigin: MTLOrigin(x: 0, y: 0, z: 0), sourceSize: MTLSize(width: 1024, height: 1024, depth: 1), toTexture: copiedTexture, destinationSlice: 0, destinationLevel: 0, destinationOrigin: MTLOrigin(x: 0, y: 0, z: 0))
+
+            blitCommandEncoder.endEncoding()
+            */
             
+            // works, but is slow - use blitCommandEncoder()
+           /*
+            drawable.texture.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
+            copiedTexture.replaceRegion(self.region, mipmapLevel: 0, withBytes: imageBytes, bytesPerRow: Int(bytesPerRow))
+           */
+
+            
+            drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
             commandEncoder.setTexture(drawable.texture, atIndex: 0)
-                    
+            
+            /*
+            commandEncoder.setTexture(copiedTexture, atIndex: 1)
+            */
+
             commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
             
             commandEncoder.endEncoding()

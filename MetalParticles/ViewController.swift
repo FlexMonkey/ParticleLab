@@ -50,11 +50,6 @@ class ViewController: UIViewController
         positionCX: 512, positionCY: 512, velocityCX: 0, velocityCY: 0,
         positionDX: 512, positionDY: 512, velocityDX: 0, velocityDY: 0)
     
-    var gravityWellParticleTwo = Particle(positionX: 512, positionY: 512, velocityX: 0, velocityY: 0,
-        positionBX: 512, positionBY: 512, velocityBX: 0, velocityBY: 0,
-        positionCX: 512, positionCY: 512, velocityCX: 0, velocityCY: 0,
-        positionDX: 512, positionDY: 512, velocityDX: 0, velocityDY: 0)
-    
     override func viewDidLoad()
     {
         super.viewDidLoad()
@@ -101,7 +96,7 @@ class ViewController: UIViewController
             var positionDY = Float(arc4random() % UInt32(imageSide))
             let velocityDX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityDY = (Float(arc4random() % 10) - 5) / 10.0
-            
+       
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -167,11 +162,13 @@ class ViewController: UIViewController
             defaultLibrary = device.newDefaultLibrary()
             commandQueue = device.newCommandQueue()
             
-            particle_threadGroupCount = MTLSize(width:32,height:1,depth:1)
-            particle_threadGroups = MTLSize(width:(particleCount + 31) / 32, height:1, depth:1)
-            
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
             pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
+            
+            let threadExecutionWidth = pipelineState.threadExecutionWidth
+            
+            particle_threadGroupCount = MTLSize(width:threadExecutionWidth,height:1,depth:1)
+            particle_threadGroups = MTLSize(width:(particleCount + threadExecutionWidth - 1) / threadExecutionWidth, height:1, depth:1)
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             
@@ -224,17 +221,14 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
         gravityWellAngle += 0.06
-        gravityWellParticle.positionX = 512 + 65 * sin(gravityWellAngle)
-        gravityWellParticle.positionY = 512 + 65 * cos(gravityWellAngle)
+        gravityWellParticle.positionX = 512 + 55 * sin(gravityWellAngle)
+        gravityWellParticle.positionY = 512 + 55 * cos(gravityWellAngle)
         
-        gravityWellParticle.positionX = 512 + 15 * sin(0 - gravityWellAngle / 2)
-        gravityWellParticleTwo.positionY = 512 + 15 * cos(0 - gravityWellAngle / 2)
+        gravityWellParticle.positionBX = 512 + 205 * cos(0 - gravityWellAngle / 3)
+        gravityWellParticle.positionBY = 512 + 205 * sin(0 - gravityWellAngle / 3)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
-        
-        var inGravityWellTwo = device.newBufferWithBytes(&gravityWellParticleTwo, length: particleSize, options: nil)
-        commandEncoder.setBuffer(inGravityWellTwo, offset: 0, atIndex: 3)
         
         let drawable = metalLayer.nextDrawable()
         

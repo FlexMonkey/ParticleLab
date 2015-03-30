@@ -193,7 +193,7 @@ class ViewController: UIViewController
             frameNumber = 0
         }
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0),
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),
             {
                 self.applyShader()
                 dispatch_async(dispatch_get_main_queue(),
@@ -221,11 +221,11 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
         gravityWellAngle += 0.06
-        gravityWellParticle.positionX = 512 + 30 * sin(gravityWellAngle)
-        gravityWellParticle.positionY = 512 + 30 * cos(gravityWellAngle)
+        gravityWellParticle.positionX = 512 + 10 * sin(gravityWellAngle)
+        gravityWellParticle.positionY = 512 + 10 * cos(gravityWellAngle)
         
-        gravityWellParticle.positionBX = 512 + 150 * cos(0 - gravityWellAngle / 1.5)
-        gravityWellParticle.positionBY = 512 + 150 * sin(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.positionBX = 512 + 50 * cos(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.positionBY = 512 + 50 * sin(0 - gravityWellAngle / 1.5)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
@@ -262,7 +262,7 @@ class ViewController: UIViewController
             
             commandBuffer.commit()
             
-            commandBuffer.waitUntilScheduled()
+            // commandBuffer.waitUntilScheduled()
             
             drawable.present()
         }

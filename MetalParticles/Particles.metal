@@ -55,8 +55,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                           (type == 2 ? 1 : 0.0),
                           1.0);
     
-    const float massOne = (type == 0 ? 0.5 : (type == 1 ? 0.505 : 0.51));
-    const float massTwo = (type == 0 ? 0.2 : (type == 1 ? 0.195 : 0.19));
+    const float massTwo = (type == 0 ? 0.45 : (type == 1 ? 0.46 : 0.47));
+    const float massOne = (type == 0 ? 0.27 : (type == 1 ? 0.26 : 0.25));
     
     const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
@@ -131,23 +131,23 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     outParticles[id] = Particle {
         
-        .velocityX =  (inParticle.velocityX * 0.999) + ((inGravityWell.positionX - inParticle.positionX) * factor) + ((inGravityWell.positionBX - inParticle.positionX) * factorTwo),
-        .velocityY =  (inParticle.velocityY * 0.999) + ((inGravityWell.positionY - inParticle.positionY) * factor) + ((inGravityWell.positionBY - inParticle.positionY) * factorTwo),
+        .velocityX =  (inParticle.velocityX * 0.998) + ((inGravityWell.positionX - inParticle.positionX) * factor) + ((inGravityWell.positionBX - inParticle.positionX) * factorTwo),
+        .velocityY =  (inParticle.velocityY * 0.998) + ((inGravityWell.positionY - inParticle.positionY) * factor) + ((inGravityWell.positionBY - inParticle.positionY) * factorTwo),
         .positionX =  inParticle.positionX + inParticle.velocityX,
         .positionY =  inParticle.positionY + inParticle.velocityY,
     
-        .velocityBX =  (inParticle.velocityBX * 0.999) + ((inGravityWell.positionX - inParticle.positionBX) * factorB) + ((inGravityWell.positionBX - inParticle.positionBX) * factorBTwo),
-        .velocityBY =  (inParticle.velocityBY * 0.999) + ((inGravityWell.positionY - inParticle.positionBY) * factorB) + ((inGravityWell.positionBY - inParticle.positionBY) * factorBTwo),
+        .velocityBX =  (inParticle.velocityBX * 0.998) + ((inGravityWell.positionX - inParticle.positionBX) * factorB) + ((inGravityWell.positionBX - inParticle.positionBX) * factorBTwo),
+        .velocityBY =  (inParticle.velocityBY * 0.998) + ((inGravityWell.positionY - inParticle.positionBY) * factorB) + ((inGravityWell.positionBY - inParticle.positionBY) * factorBTwo),
         .positionBX =  inParticle.positionBX + inParticle.velocityBX,
         .positionBY =  inParticle.positionBY + inParticle.velocityBY,
         
-        .velocityCX =  (inParticle.velocityCX * 0.999) + ((inGravityWell.positionX - inParticle.positionCX) * factorC) + ((inGravityWell.positionBX - inParticle.positionCX) * factorCTwo),
-        .velocityCY =  (inParticle.velocityCY * 0.999) + ((inGravityWell.positionY - inParticle.positionCY) * factorC) + ((inGravityWell.positionBY - inParticle.positionCY) * factorCTwo),
+        .velocityCX =  (inParticle.velocityCX * 0.998) + ((inGravityWell.positionX - inParticle.positionCX) * factorC) + ((inGravityWell.positionBX - inParticle.positionCX) * factorCTwo),
+        .velocityCY =  (inParticle.velocityCY * 0.998) + ((inGravityWell.positionY - inParticle.positionCY) * factorC) + ((inGravityWell.positionBY - inParticle.positionCY) * factorCTwo),
         .positionCX =  inParticle.positionCX + inParticle.velocityCX,
         .positionCY =  inParticle.positionCY + inParticle.velocityCY,
         
-        .velocityDX =  (inParticle.velocityDX * 0.999) + ((inGravityWell.positionX - inParticle.positionDX) * factorD) + ((inGravityWell.positionBX - inParticle.positionDX) * factorDTwo),
-        .velocityDY =  (inParticle.velocityDY * 0.999) + ((inGravityWell.positionY - inParticle.positionDY) * factorD) + ((inGravityWell.positionBY - inParticle.positionDY) * factorDTwo),
+        .velocityDX =  (inParticle.velocityDX * 0.998) + ((inGravityWell.positionX - inParticle.positionDX) * factorD) + ((inGravityWell.positionBX - inParticle.positionDX) * factorDTwo),
+        .velocityDY =  (inParticle.velocityDY * 0.998) + ((inGravityWell.positionY - inParticle.positionDY) * factorD) + ((inGravityWell.positionBY - inParticle.positionDY) * factorDTwo),
         .positionDX =  inParticle.positionDX + inParticle.velocityDX,
         .positionDY =  inParticle.positionDY + inParticle.velocityDY
         };

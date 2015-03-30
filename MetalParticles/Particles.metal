@@ -16,6 +16,21 @@ struct Particle
     float positionY;
     float velocityX;
     float velocityY;
+    
+    float positionBX;
+    float positionBY;
+    float velocityBX;
+    float velocityBY;
+    
+    float positionCX;
+    float positionCY;
+    float velocityCX;
+    float velocityCY;
+    
+    float positionDX;
+    float positionDY;
+    float velocityDX;
+    float velocityDY;
 };
 
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
@@ -31,35 +46,113 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
 {
     const float imageWidth = 1024;
     const Particle inParticle = inParticles[id];
-    const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
+
+    
     
     const int type = id % 3;
 
-    const float3 thisColor = float3(0,0,0); // inTexture.read(particlePosition).rgb;
+    // const float3 thisColor = float3(0,0,0); // inTexture.read(particlePosition).rgb;
     
-    const float4 outColor(thisColor.r + (type != 0 ? 1 : 0.0),
-                          thisColor.g +  (type != 1 ? 1 : 0.0),
-                          thisColor.b + (type != 2 ? 1 : 0.0),
+    const float4 outColor((type != 0 ? 1 : 0.0),
+                          (type != 1 ? 1 : 0.0),
+                          (type != 2 ? 1 : 0.0),
                           1.0);
+    
+    const float massOne = (type == 0 ? 0.42 : (type == 1 ? 0.41 : 0.4));
+    const float massTwo = (type == 0 ? 0.2 : (type == 1 ? 0.19 : 0.18));
+    
+    const uint2 particlePosition(inParticle.positionX, inParticle.positionY);
     
     if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)
     {
         outTexture.write(outColor, particlePosition);
     }
    
-    const float dist = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(inGravityWell.positionX, inGravityWell.positionY));
-    const float distTwo = fast::distance(float2(inParticle.positionX, inParticle.positionY), float2(inGravityWellTwo.positionX, inGravityWellTwo.positionY));
+    const float2 particlePositionFloat(inParticle.positionX, inParticle.positionY);
     
-    const float factor = (1 / dist) * (type == 0 ? 0.4 : (type == 1 ? 0.39 : 0.38));
-    const float factorTwo = (1 / distTwo) * (type == 0 ? 0.2 : (type == 1 ? 0.19 : 0.18));
-   
+    const float dist = fast::distance(particlePositionFloat, float2(inGravityWell.positionX, inGravityWell.positionY));
+    const float distTwo = fast::distance(particlePositionFloat, float2(inGravityWellTwo.positionX, inGravityWellTwo.positionY));
+    
+    const float factor = (1 / dist) * massOne;
+    const float factorTwo = (1 / distTwo) * massTwo;
+
+    // ---
+    
+    const uint2 particlePositionB(inParticle.positionBX, inParticle.positionBY);
+    
+    if (particlePositionB.x > 0 && particlePositionB.y > 0 && particlePositionB.x < imageWidth && particlePositionB.y < imageWidth)
+    {
+        outTexture.write(outColor, particlePositionB);
+    }
+    
+    const float2 particlePositionBFloat(inParticle.positionBX, inParticle.positionBY);
+    
+    const float distB = fast::distance(particlePositionBFloat, float2(inGravityWell.positionX, inGravityWell.positionY));
+    const float distBTwo = fast::distance(particlePositionBFloat, float2(inGravityWellTwo.positionX, inGravityWellTwo.positionY));
+    
+    const float factorB = (1 / distB) * massOne;
+    const float factorBTwo = (1 / distBTwo) * massTwo;
+    
+    // ---
+
+    
+    const uint2 particlePositionC(inParticle.positionCX, inParticle.positionCY);
+    
+    if (particlePositionC.x > 0 && particlePositionC.y > 0 && particlePositionC.x < imageWidth && particlePositionC.y < imageWidth)
+    {
+        outTexture.write(outColor, particlePositionC);
+    }
+    
+    const float2 particlePositionCFloat(inParticle.positionCX, inParticle.positionCY);
+    
+    const float distC = fast::distance(particlePositionCFloat, float2(inGravityWell.positionX, inGravityWell.positionY));
+    const float distCTwo = fast::distance(particlePositionCFloat, float2(inGravityWellTwo.positionX, inGravityWellTwo.positionY));
+    
+    const float factorC = (1 / distC) * massOne;
+    const float factorCTwo = (1 / distCTwo) * massTwo;
+    
+    // ---
+    
+    
+    const uint2 particlePositionD(inParticle.positionDX, inParticle.positionDY);
+    
+    if (particlePositionD.x > 0 && particlePositionD.y > 0 && particlePositionD.x < imageWidth && particlePositionD.y < imageWidth)
+    {
+        outTexture.write(outColor, particlePositionD);
+    }
+    
+    const float2 particlePositionDFloat(inParticle.positionDX, inParticle.positionDY);
+    
+    const float distD = fast::distance(particlePositionDFloat, float2(inGravityWell.positionX, inGravityWell.positionY));
+    const float distDTwo = fast::distance(particlePositionDFloat, float2(inGravityWellTwo.positionX, inGravityWellTwo.positionY));
+    
+    const float factorD = (1 / distD) * massOne;
+    const float factorDTwo = (1 / distDTwo) * massTwo;
+    
+    // ---
+    
     outParticles[id] = Particle {
-        .velocityX =  (inParticle.velocityX * 0.998) + ((inGravityWell.positionX - inParticle.positionX) * factor) - ((inGravityWellTwo.positionX - inParticle.positionX) * factorTwo),
-        .velocityY =  (inParticle.velocityY * 0.998) + ((inGravityWell.positionY - inParticle.positionY) * factor) - ((inGravityWellTwo.positionY - inParticle.positionY) * factorTwo),
+        
+        .velocityX =  (inParticle.velocityX * 0.995) + ((inGravityWell.positionX - inParticle.positionX) * factor) - ((inGravityWellTwo.positionX - inParticle.positionX) * factorTwo),
+        .velocityY =  (inParticle.velocityY * 0.995) + ((inGravityWell.positionY - inParticle.positionY) * factor) - ((inGravityWellTwo.positionY - inParticle.positionY) * factorTwo),
         .positionX =  inParticle.positionX + inParticle.velocityX,
-        .positionY =  inParticle.positionY + inParticle.velocityY};
+        .positionY =  inParticle.positionY + inParticle.velocityY,
     
-    
+        .velocityBX =  (inParticle.velocityBX * 0.995) + ((inGravityWell.positionX - inParticle.positionBX) * factorB) - ((inGravityWellTwo.positionX - inParticle.positionBX) * factorBTwo),
+        .velocityBY =  (inParticle.velocityBY * 0.995) + ((inGravityWell.positionY - inParticle.positionBY) * factorB) - ((inGravityWellTwo.positionY - inParticle.positionBY) * factorBTwo),
+        .positionBX =  inParticle.positionBX + inParticle.velocityBX,
+        .positionBY =  inParticle.positionBY + inParticle.velocityBY,
+        
+        .velocityCX =  (inParticle.velocityCX * 0.995) + ((inGravityWell.positionX - inParticle.positionCX) * factorC) - ((inGravityWellTwo.positionX - inParticle.positionCX) * factorCTwo),
+        .velocityCY =  (inParticle.velocityCY * 0.995) + ((inGravityWell.positionY - inParticle.positionCY) * factorC) - ((inGravityWellTwo.positionY - inParticle.positionCY) * factorCTwo),
+        .positionCX =  inParticle.positionCX + inParticle.velocityCX,
+        .positionCY =  inParticle.positionCY + inParticle.velocityCY,
+        
+        .velocityDX =  (inParticle.velocityDX * 0.995) + ((inGravityWell.positionX - inParticle.positionDX) * factorD) - ((inGravityWellTwo.positionX - inParticle.positionDX) * factorDTwo),
+        .velocityDY =  (inParticle.velocityDY * 0.995) + ((inGravityWell.positionY - inParticle.positionDY) * factorD) - ((inGravityWellTwo.positionY - inParticle.positionDY) * factorDTwo),
+        .positionDX =  inParticle.positionDX + inParticle.velocityDX,
+        .positionDY =  inParticle.positionDY + inParticle.velocityDY
+        };
     
     // ----
     /*

@@ -6,6 +6,9 @@
 //  Copyright (c) 2015 Simon Gladman. All rights reserved.
 //
 //  Reengineered based on technique from http://memkite.com/blog/2014/12/30/example-of-sharing-memory-between-gpu-and-cpu-with-swift-and-metal-for-ios8/
+//
+//  Thanks to https://twitter.com/atveit for tips - espewcially using float4x4!!!
+//  Thanks to https://twitter.com/warrenm for examples, especially implemnting matrix 4x4 in Swift
 
 import UIKit
 import Metal
@@ -45,10 +48,10 @@ class ViewController: UIViewController
     
     var gravityWellAngle: Float = 0.0
     
-    var gravityWellParticle = Particle(positionX: 512, positionY: 512, velocityX: 0, velocityY: 0,
-        positionBX: 512, positionBY: 512, velocityBX: 0, velocityBY: 0,
-        positionCX: 512, positionCY: 512, velocityCX: 0, velocityCY: 0,
-        positionDX: 512, positionDY: 512, velocityDX: 0, velocityDY: 0)
+    var gravityWellParticle = Particle(X: Vector4(x: 0, y: 0, z: 0, w: 0),
+        Y: Vector4(x: 0, y: 0, z: 0, w: 0),
+        Z: Vector4(x: 0, y: 0, z: 0, w: 0),
+        W: Vector4(x: 0, y: 0, z: 0, w: 0))
     
     override func viewDidLoad()
     {
@@ -97,6 +100,7 @@ class ViewController: UIViewController
             let velocityDX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityDY = (Float(arc4random() % 10) - 5) / 10.0
        
+            /*
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -127,11 +131,13 @@ class ViewController: UIViewController
                 positionCY = Float(imageSide)
                 positionDY = Float(imageSide)
             }
+*/
             
-            let particle = Particle(positionX: positionX, positionY: positionY,velocityX: velocityX, velocityY: velocityY,
-                positionBX: positionBX, positionBY: positionBY, velocityBX: velocityBX, velocityBY: velocityBY,
-                positionCX: positionCX, positionCY: positionCY, velocityCX: velocityCX, velocityCY: velocityCY,
-                positionDX: positionDX, positionDY: positionDY, velocityDX: velocityDX, velocityDY: velocityDY)
+            
+            let particle = Particle(X: Vector4(x: positionX, y: positionY, z: velocityX, w: velocityY),
+                Y: Vector4(x: positionBX, y: positionBY, z: velocityBX, w: velocityBY),
+                Z: Vector4(x: positionCX, y: positionCY, z: velocityCX, w: velocityCY),
+                W: Vector4(x: positionDX, y: positionDY, z: velocityDX, w: velocityDY))
             
             particlesParticleBufferPtr[index] = particle
         }
@@ -221,11 +227,11 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
         gravityWellAngle += 0.06
-        gravityWellParticle.positionX = 512 + 10 * sin(gravityWellAngle)
-        gravityWellParticle.positionY = 512 + 10 * cos(gravityWellAngle)
+        gravityWellParticle.X.x = 512 + 10 * sin(gravityWellAngle)
+        gravityWellParticle.X.y = 512 + 10 * cos(gravityWellAngle)
         
-        gravityWellParticle.positionBX = 512 + 50 * cos(0 - gravityWellAngle / 1.5)
-        gravityWellParticle.positionBY = 512 + 50 * sin(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.Y.x = 512 + 50 * cos(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.Y.y = 512 + 50 * sin(0 - gravityWellAngle / 1.5)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
@@ -299,6 +305,23 @@ class ViewController: UIViewController
     
 }
 
+struct Particle // Matrix4x4
+{
+    var X: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+    var Y: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+    var Z: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+    var W: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+}
+
+struct Vector4
+{
+    var x: Float32 = 0
+    var y: Float32 = 0
+    var z: Float32 = 0
+    var w: Float32 = 0
+}
+
+/*
 struct Particle
 {
     var positionX: Float = 0
@@ -321,4 +344,5 @@ struct Particle
     var velocityDX: Float = 0
     var velocityDY: Float = 0
 }
+*/
 

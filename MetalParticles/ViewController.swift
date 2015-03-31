@@ -48,10 +48,10 @@ class ViewController: UIViewController
     
     var gravityWellAngle: Float = 0.0
     
-    var gravityWellParticle = Particle(X: Vector4(x: 0, y: 0, z: 0, w: 0),
-        Y: Vector4(x: 0, y: 0, z: 0, w: 0),
-        Z: Vector4(x: 0, y: 0, z: 0, w: 0),
-        W: Vector4(x: 0, y: 0, z: 0, w: 0))
+    var gravityWellParticle = Particle(A: Vector4(x: 0, y: 0, z: 0, w: 0),
+        B: Vector4(x: 0, y: 0, z: 0, w: 0),
+        C: Vector4(x: 0, y: 0, z: 0, w: 0),
+        D: Vector4(x: 0, y: 0, z: 0, w: 0))
     
     override func viewDidLoad()
     {
@@ -80,10 +80,10 @@ class ViewController: UIViewController
         
         for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex
         {
-            var positionX = Float(arc4random() % UInt32(imageSide))
-            var positionY = Float(arc4random() % UInt32(imageSide))
-            let velocityX = (Float(arc4random() % 10) - 5) / 10.0
-            let velocityY = (Float(arc4random() % 10) - 5) / 10.0
+            var positionAX = Float(arc4random() % UInt32(imageSide))
+            var positionAY = Float(arc4random() % UInt32(imageSide))
+            let velocityAX = (Float(arc4random() % 10) - 5) / 10.0
+            let velocityAY = (Float(arc4random() % 10) - 5) / 10.0
             
             var positionBX = Float(arc4random() % UInt32(imageSide))
             var positionBY = Float(arc4random() % UInt32(imageSide))
@@ -104,37 +104,37 @@ class ViewController: UIViewController
             
             if positionRule == 0
             {
-                positionX = 0
+                positionAX = 0
                 positionBX = 0
                 positionCX = 0
                 positionDX = 0
             }
             else if positionRule == 1
             {
-                positionX = Float(imageSide)
+                positionAX = Float(imageSide)
                 positionBX = Float(imageSide)
                 positionCX = Float(imageSide)
                 positionDX = Float(imageSide)
             }
             else if positionRule == 2
             {
-                positionY = 0
+                positionAY = 0
                 positionBY = 0
                 positionCY = 0
                 positionDY = 0
             }
             else
             {
-                positionY = Float(imageSide)
+                positionAY = Float(imageSide)
                 positionBY = Float(imageSide)
                 positionCY = Float(imageSide)
                 positionDY = Float(imageSide)
             }
             
-            let particle = Particle(X: Vector4(x: positionX, y: positionY, z: velocityX, w: velocityY),
-                Y: Vector4(x: positionBX, y: positionBY, z: velocityBX, w: velocityBY),
-                Z: Vector4(x: positionCX, y: positionCY, z: velocityCX, w: velocityCY),
-                W: Vector4(x: positionDX, y: positionDY, z: velocityDX, w: velocityDY))
+            let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: velocityAX, w: velocityAY),
+                B: Vector4(x: positionBX, y: positionBY, z: velocityBX, w: velocityBY),
+                C: Vector4(x: positionCX, y: positionCY, z: velocityCX, w: velocityCY),
+                D: Vector4(x: positionDX, y: positionDY, z: velocityDX, w: velocityDY))
             
             particlesParticleBufferPtr[index] = particle
         }
@@ -224,11 +224,11 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
         gravityWellAngle += 0.06
-        gravityWellParticle.X.x = 512 + 10 * sin(gravityWellAngle)
-        gravityWellParticle.X.y = 512 + 10 * cos(gravityWellAngle)
+        gravityWellParticle.A.x = 512 + 10 * sin(gravityWellAngle)
+        gravityWellParticle.A.y = 512 + 10 * cos(gravityWellAngle)
         
-        gravityWellParticle.Y.x = 512 + 50 * cos(0 - gravityWellAngle / 1.5)
-        gravityWellParticle.Y.y = 512 + 50 * sin(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.B.x = 512 + 50 * cos(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.B.y = 512 + 50 * sin(0 - gravityWellAngle / 1.5)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
@@ -304,10 +304,10 @@ class ViewController: UIViewController
 
 struct Particle // Matrix4x4
 {
-    var X: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
-    var Y: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
-    var Z: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
-    var W: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+    var A: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+    var B: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+    var C: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
+    var D: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
 }
 
 struct Vector4
@@ -317,5 +317,8 @@ struct Vector4
     var z: Float32 = 0
     var w: Float32 = 0
 }
+
+
+
 
 

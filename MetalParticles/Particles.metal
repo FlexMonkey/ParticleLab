@@ -36,20 +36,20 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float massTwo = (type == 0 ? 0.45 : (type == 1 ? 0.46 : 0.47));
     const float massOne = (type == 0 ? 0.27 : (type == 1 ? 0.26 : 0.25));
     
-    const uint2 particlePosition(inParticle[0].x, inParticle[0].y);
+    const uint2 particlePositionA(inParticle[0].x, inParticle[0].y);
     
-    if (particlePosition.x > 0 && particlePosition.y > 0 && particlePosition.x < imageWidth && particlePosition.y < imageWidth)
+    if (particlePositionA.x > 0 && particlePositionA.y > 0 && particlePositionA.x < imageWidth && particlePositionA.y < imageWidth)
     {
-        outTexture.write(outColor, particlePosition);
+        outTexture.write(outColor, particlePositionA);
     }
     
-    const float2 particlePositionFloat(inParticle[0].x, inParticle[0].y);
+    const float2 particlePositionAFloat(inParticle[0].x, inParticle[0].y);
     
-    const float dist = fast::distance(particlePositionFloat, float2(inGravityWell[0].x, inGravityWell[0].y));
-    const float distTwo = fast::distance(particlePositionFloat, float2(inGravityWell[1].x, inGravityWell[1].y));
+    const float distA = fast::distance(particlePositionAFloat, float2(inGravityWell[0].x, inGravityWell[0].y));
+    const float distATwo = fast::distance(particlePositionAFloat, float2(inGravityWell[1].x, inGravityWell[1].y));
     
-    const float factor = (1 / dist) * massOne;
-    const float factorTwo = (1 / distTwo) * massTwo;
+    const float factorA = (1 / distA) * massOne;
+    const float factorATwo = (1 / distATwo) * massTwo;
     
     // ---
     
@@ -109,8 +109,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float4 particleA = {
         inParticle[0].x + inParticle[0].z,
         inParticle[0].y + inParticle[0].w,
-        (inParticle[0].z * 0.998) + ((inGravityWell[0].x - inParticle[0].x) * factor) + ((inGravityWell[1].x - inParticle[0].x) * factorTwo),
-        (inParticle[0].w * 0.998) + ((inGravityWell[0].y - inParticle[0].y) * factor) + ((inGravityWell[1].y - inParticle[0].y) * factorTwo)
+        (inParticle[0].z * 0.998) + ((inGravityWell[0].x - inParticle[0].x) * factorA) + ((inGravityWell[1].x - inParticle[0].x) * factorATwo),
+        (inParticle[0].w * 0.998) + ((inGravityWell[0].y - inParticle[0].y) * factorA) + ((inGravityWell[1].y - inParticle[0].y) * factorATwo)
     };
     
     

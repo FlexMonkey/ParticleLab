@@ -100,7 +100,6 @@ class ViewController: UIViewController
             let velocityDX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityDY = (Float(arc4random() % 10) - 5) / 10.0
        
-            /*
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -131,8 +130,6 @@ class ViewController: UIViewController
                 positionCY = Float(imageSide)
                 positionDY = Float(imageSide)
             }
-*/
-            
             
             let particle = Particle(X: Vector4(x: positionX, y: positionY, z: velocityX, w: velocityY),
                 Y: Vector4(x: positionBX, y: positionBY, z: velocityBX, w: velocityBY),
@@ -321,28 +318,4 @@ struct Vector4
     var w: Float32 = 0
 }
 
-/*
-struct Particle
-{
-    var positionX: Float = 0
-    var positionY: Float = 0
-    var velocityX: Float = 0
-    var velocityY: Float = 0
-    
-    var positionBX: Float = 0
-    var positionBY: Float = 0
-    var velocityBX: Float = 0
-    var velocityBY: Float = 0
-    
-    var positionCX: Float = 0
-    var positionCY: Float = 0
-    var velocityCX: Float = 0
-    var velocityCY: Float = 0
-    
-    var positionDX: Float = 0
-    var positionDY: Float = 0
-    var velocityDX: Float = 0
-    var velocityDY: Float = 0
-}
-*/
 

@@ -33,8 +33,8 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                           (type == 2 ? 1 : 0.0),
                           1.0);
     
-    const float massTwo = (type == 0 ? 0.45 : (type == 1 ? 0.46 : 0.47));
-    const float massOne = (type == 0 ? 0.27 : (type == 1 ? 0.26 : 0.25));
+    const float massOne = (type == 0 ? 0.45 : (type == 1 ? 0.46 : 0.47));
+    const float massTwo = (type == 0 ? 0.27 : (type == 1 ? 0.26 : 0.25));
     
     const uint2 particlePositionA(inParticle[0].x, inParticle[0].y);
     

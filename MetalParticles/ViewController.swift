@@ -224,11 +224,11 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
         gravityWellAngle += 0.06
-        gravityWellParticle.A.x = 512 + 10 * sin(gravityWellAngle)
-        gravityWellParticle.A.y = 512 + 10 * cos(gravityWellAngle)
+        gravityWellParticle.A.x = 512 + 35 * sin(gravityWellAngle)
+        gravityWellParticle.A.y = 512 + 35 * cos(gravityWellAngle)
         
-        gravityWellParticle.B.x = 512 + 50 * cos(0 - gravityWellAngle / 1.5)
-        gravityWellParticle.B.y = 512 + 50 * sin(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.B.x = gravityWellParticle.A.x + 35 * sin(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.B.y = gravityWellParticle.A.y + 35 * cos(0 - gravityWellAngle / 1.5)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)

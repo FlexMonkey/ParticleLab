@@ -196,14 +196,7 @@ class ViewController: UIViewController
             frameNumber = 0
         }
         
-        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0),
-            {
-                self.applyShader()
-                dispatch_async(dispatch_get_main_queue(),
-                    {
-                        self.run();
-                });
-        });
+        self.applyShader()
     }
     
     var imageBytes = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
@@ -269,11 +262,14 @@ class ViewController: UIViewController
             
             commandEncoder.endEncoding()
             
+            commandBuffer.presentDrawable(drawable)
+            
             commandBuffer.commit()
             
             // commandBuffer.waitUntilScheduled()
             
-            drawable.present()
+            // drawable.present()
+            
         }
         else
         {
@@ -282,6 +278,10 @@ class ViewController: UIViewController
             println("metalLayer.nextDrawable() returned nil")
         }
         
+        dispatch_async(dispatch_get_main_queue(),
+        {
+                self.run();
+        })
     }
     
     override func viewDidLayoutSubviews()

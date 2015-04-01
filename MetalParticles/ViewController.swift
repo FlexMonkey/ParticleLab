@@ -99,7 +99,7 @@ class ViewController: UIViewController
             var positionDY = Float(arc4random() % UInt32(imageSide))
             let velocityDX = (Float(arc4random() % 10) - 5) / 10.0
             let velocityDY = (Float(arc4random() % 10) - 5) / 10.0
-       
+
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -130,7 +130,7 @@ class ViewController: UIViewController
                 positionCY = Float(imageSide)
                 positionDY = Float(imageSide)
             }
-            
+
             let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: velocityAX, w: velocityAY),
                 B: Vector4(x: positionBX, y: positionBY, z: velocityBX, w: velocityBY),
                 C: Vector4(x: positionCX, y: positionCY, z: velocityCX, w: velocityCY),
@@ -224,11 +224,17 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
         gravityWellAngle += 0.06
-        gravityWellParticle.A.x = 512 + 35 * sin(gravityWellAngle)
-        gravityWellParticle.A.y = 512 + 35 * cos(gravityWellAngle)
+        gravityWellParticle.A.x = 150 + 75 * sin(gravityWellAngle)
+        gravityWellParticle.A.y = 150 + 75 * cos(gravityWellAngle)
         
-        gravityWellParticle.B.x = gravityWellParticle.A.x + 35 * sin(0 - gravityWellAngle / 1.5)
-        gravityWellParticle.B.y = gravityWellParticle.A.y + 35 * cos(0 - gravityWellAngle / 1.5)
+        gravityWellParticle.B.x = 874 + 75 * cos(gravityWellAngle)
+        gravityWellParticle.B.y = 874 + 75 * sin(gravityWellAngle)
+
+        gravityWellParticle.C.x = 874 + 75 * cos(gravityWellAngle)
+        gravityWellParticle.C.y = 150 + 75 * sin(gravityWellAngle)
+        
+        gravityWellParticle.D.x = 150 + 75 * sin(gravityWellAngle)
+        gravityWellParticle.D.y = 874 + 75 * cos(gravityWellAngle)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)

@@ -21,20 +21,17 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    uint id [[thread_position_in_grid]])
 {
-    const float imageWidth = 1024;
+    const float imageWidth = 1280;
     const float4x4 inParticle = inParticles[id];
     
     const int type = id % 3;
-    
-    // const float3 thisColor = float3(0,0,0); // inTexture.read(particlePosition).rgb;
     
     const float4 outColor((type == 0 ? 1 : 0.0),
                           (type == 1 ? 1 : 0.0),
                           (type == 2 ? 1 : 0.0),
                           1.0);
     
-    const float massOne = (type == 0 ? 0.25 : (type == 1 ? 0.255 : 0.26));
-    const float massTwo = (type == 0 ? 0.25 : (type == 1 ? 0.255 : 0.26));
+    const float massOne = (type == 0 ? 0.121 : (type == 1 ? 0.120 : 0.119));
     
     const uint2 particlePositionA(inParticle[0].x, inParticle[0].y);
     
@@ -51,9 +48,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float distAFour = fast::distance(particlePositionAFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
     
     const float factorA = (1 / distA) * massOne;
-    const float factorATwo = (1 / distATwo) * massTwo;
+    const float factorATwo = (1 / distATwo) * massOne;
     const float factorAThree = (1 / distAThree) * massOne;
-    const float factorAFour = (1 / distAFour) * massTwo;
+    const float factorAFour = (1 / distAFour) * massOne;
     
     // ---
     
@@ -72,9 +69,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float distBFour = fast::distance(particlePositionBFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
     
     const float factorB = (1 / distB) * massOne;
-    const float factorBTwo = (1 / distBTwo) * massTwo;
+    const float factorBTwo = (1 / distBTwo) * massOne;
     const float factorBThree = (1 / distBThree) * massOne;
-    const float factorBFour = (1 / distBFour) * massTwo;
+    const float factorBFour = (1 / distBFour) * massOne;
     
     // ---
     
@@ -94,9 +91,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float distCFour = fast::distance(particlePositionCFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
     
     const float factorC = (1 / distC) * massOne;
-    const float factorCTwo = (1 / distCTwo) * massTwo;
+    const float factorCTwo = (1 / distCTwo) * massOne;
     const float factorCThree = (1 / distCThree) * massOne;
-    const float factorCFour = (1 / distCFour) * massTwo;
+    const float factorCFour = (1 / distCFour) * massOne;
     
     // ---
     
@@ -116,9 +113,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float distDFour = fast::distance(particlePositionDFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
     
     const float factorD = (1 / distD) * massOne;
-    const float factorDTwo = (1 / distDTwo) * massTwo;
+    const float factorDTwo = (1 / distDTwo) * massOne;
     const float factorDThree = (1 / distDThree) * massOne;
-    const float factorDFour = (1 / distDFour) * massTwo;
+    const float factorDFour = (1 / distDFour) * massOne;
     
     
     // ---
@@ -126,32 +123,32 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float4 particleA = {
         inParticle[0].x + inParticle[0].z,
         inParticle[0].y + inParticle[0].w,
-        (inParticle[0].z * 0.998) + ((inGravityWell[0].x - inParticle[0].x) * factorA) + ((inGravityWell[1].x - inParticle[0].x) * factorATwo) + ((inGravityWell[2].x - inParticle[0].x) * factorAThree) + ((inGravityWell[3].x - inParticle[0].x) * factorAFour),
-        (inParticle[0].w * 0.998) + ((inGravityWell[0].y - inParticle[0].y) * factorA) + ((inGravityWell[1].y - inParticle[0].y) * factorATwo) + ((inGravityWell[2].y - inParticle[0].y) * factorAThree) + ((inGravityWell[3].y - inParticle[0].y) * factorAFour),
+        (inParticle[0].z * 0.999) + ((inGravityWell[0].x - inParticle[0].x) * factorA) + ((inGravityWell[1].x - inParticle[0].x) * factorATwo) + ((inGravityWell[2].x - inParticle[0].x) * factorAThree) + ((inGravityWell[3].x - inParticle[0].x) * factorAFour),
+        (inParticle[0].w * 0.999) + ((inGravityWell[0].y - inParticle[0].y) * factorA) + ((inGravityWell[1].y - inParticle[0].y) * factorATwo) + ((inGravityWell[2].y - inParticle[0].y) * factorAThree) + ((inGravityWell[3].y - inParticle[0].y) * factorAFour),
     };
     
     
     const float4 particleB = {
         inParticle[1].x + inParticle[1].z,
         inParticle[1].y + inParticle[1].w,
-        (inParticle[1].z * 0.998) + ((inGravityWell[0].x - inParticle[1].x) * factorB) + ((inGravityWell[1].x - inParticle[1].x) * factorBTwo) + ((inGravityWell[2].x - inParticle[1].x) * factorBThree) + ((inGravityWell[3].x - inParticle[1].x) * factorBFour),
-        (inParticle[1].w * 0.998) + ((inGravityWell[0].y - inParticle[1].y) * factorB) + ((inGravityWell[1].y - inParticle[1].y) * factorBTwo) + ((inGravityWell[2].y - inParticle[1].y) * factorBThree) + ((inGravityWell[3].y - inParticle[1].y) * factorBFour),
+        (inParticle[1].z * 0.999) + ((inGravityWell[0].x - inParticle[1].x) * factorB) + ((inGravityWell[1].x - inParticle[1].x) * factorBTwo) + ((inGravityWell[2].x - inParticle[1].x) * factorBThree) + ((inGravityWell[3].x - inParticle[1].x) * factorBFour),
+        (inParticle[1].w * 0.999) + ((inGravityWell[0].y - inParticle[1].y) * factorB) + ((inGravityWell[1].y - inParticle[1].y) * factorBTwo) + ((inGravityWell[2].y - inParticle[1].y) * factorBThree) + ((inGravityWell[3].y - inParticle[1].y) * factorBFour),
     };
     
     
     const float4 particleC = {
         inParticle[2].x + inParticle[2].z,
         inParticle[2].y + inParticle[2].w,
-        (inParticle[2].z * 0.998) + ((inGravityWell[0].x - inParticle[2].x) * factorC) + ((inGravityWell[1].x - inParticle[2].x) * factorCTwo) + ((inGravityWell[2].x - inParticle[2].x) * factorCThree) + ((inGravityWell[3].x - inParticle[2].x) * factorCFour),
-        (inParticle[2].w * 0.998) + ((inGravityWell[0].y - inParticle[2].y) * factorC) + ((inGravityWell[1].y - inParticle[2].y) * factorCTwo) + ((inGravityWell[2].y - inParticle[2].y) * factorCThree) + ((inGravityWell[3].y - inParticle[2].y) * factorCFour),
+        (inParticle[2].z * 0.999) + ((inGravityWell[0].x - inParticle[2].x) * factorC) + ((inGravityWell[1].x - inParticle[2].x) * factorCTwo) + ((inGravityWell[2].x - inParticle[2].x) * factorCThree) + ((inGravityWell[3].x - inParticle[2].x) * factorCFour),
+        (inParticle[2].w * 0.999) + ((inGravityWell[0].y - inParticle[2].y) * factorC) + ((inGravityWell[1].y - inParticle[2].y) * factorCTwo) + ((inGravityWell[2].y - inParticle[2].y) * factorCThree) + ((inGravityWell[3].y - inParticle[2].y) * factorCFour),
     };
     
     
     const float4 particleD = {
         inParticle[3].x + inParticle[3].z,
         inParticle[3].y + inParticle[3].w,
-        (inParticle[3].z * 0.998) + ((inGravityWell[0].x - inParticle[3].x) * factorD) + ((inGravityWell[1].x - inParticle[3].x) * factorDTwo) + ((inGravityWell[2].x - inParticle[3].x) * factorDThree) + ((inGravityWell[3].x - inParticle[3].x) * factorDFour),
-        (inParticle[3].w * 0.998) + ((inGravityWell[0].y - inParticle[3].y) * factorD) + ((inGravityWell[1].y - inParticle[3].y) * factorDTwo) + ((inGravityWell[2].y - inParticle[3].y) * factorDThree) + ((inGravityWell[3].y - inParticle[3].y) * factorDFour),
+        (inParticle[3].z * 0.999) + ((inGravityWell[0].x - inParticle[3].x) * factorD) + ((inGravityWell[1].x - inParticle[3].x) * factorDTwo) + ((inGravityWell[2].x - inParticle[3].x) * factorDThree) + ((inGravityWell[3].x - inParticle[3].x) * factorDFour),
+        (inParticle[3].w * 0.999) + ((inGravityWell[0].y - inParticle[3].y) * factorD) + ((inGravityWell[1].y - inParticle[3].y) * factorDTwo) + ((inGravityWell[2].y - inParticle[3].y) * factorDThree) + ((inGravityWell[3].y - inParticle[3].y) * factorDFour),
     };
     
     outParticles[id] = float4x4 (particleA, particleB, particleC, particleD);

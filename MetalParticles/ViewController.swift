@@ -17,9 +17,9 @@ import CoreData
 
 class ViewController: UIViewController
 {
-    let imageSide: UInt = 1024
+    let imageSide: UInt = 1280
     
-    let bytesPerRow = UInt(4 * 1024)
+    let bytesPerRow = UInt(4 * 1280)
     
     var kernelFunction: MTLFunction!
     var pipelineState: MTLComputePipelineState!
@@ -29,19 +29,19 @@ class ViewController: UIViewController
     
     let metalLayer = CAMetalLayer()
     
-    var region: MTLRegion = MTLRegionMake2D(0, 0, Int(1024), Int(1024))
+    var region: MTLRegion = MTLRegionMake2D(0, 0, Int(1280), Int(1280))
     
-    let blankBitmapRawData = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
+    let blankBitmapRawData = [UInt8](count: Int(1280 * 1280 * 4), repeatedValue: 0)
     
     var errorFlag:Bool = false
     
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 1048576 // 4194304 2097152   1048576  524288
+    let particleCount: Int = 524288 // 4194304 2097152   1048576  524288
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(1048576) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(524288) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
@@ -62,7 +62,7 @@ class ViewController: UIViewController
         view.layer.addSublayer(metalLayer)
         
         metalLayer.framebufferOnly = false
-        metalLayer.drawableSize = CGSize(width: 1024, height: 1024);
+        metalLayer.drawableSize = CGSize(width: 1280, height: 1280);
         metalLayer.drawsAsynchronously = true
         
         setUpParticles()
@@ -80,26 +80,18 @@ class ViewController: UIViewController
         
         for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex
         {
-            var positionAX = Float(arc4random() % UInt32(imageSide))
-            var positionAY = Float(arc4random() % UInt32(imageSide))
-            let velocityAX = (Float(arc4random() % 10) - 5) / 10.0
-            let velocityAY = (Float(arc4random() % 10) - 5) / 10.0
-            
-            var positionBX = Float(arc4random() % UInt32(imageSide))
-            var positionBY = Float(arc4random() % UInt32(imageSide))
-            let velocityBX = (Float(arc4random() % 10) - 5) / 10.0
-            let velocityBY = (Float(arc4random() % 10) - 5) / 10.0
-            
-            var positionCX = Float(arc4random() % UInt32(imageSide))
-            var positionCY = Float(arc4random() % UInt32(imageSide))
-            let velocityCX = (Float(arc4random() % 10) - 5) / 10.0
-            let velocityCY = (Float(arc4random() % 10) - 5) / 10.0
-            
-            var positionDX = Float(arc4random() % UInt32(imageSide))
-            var positionDY = Float(arc4random() % UInt32(imageSide))
-            let velocityDX = (Float(arc4random() % 10) - 5) / 10.0
-            let velocityDY = (Float(arc4random() % 10) - 5) / 10.0
+            var positionAX = Float(drand48() * 1280)
+            var positionAY = Float(drand48() * 1280)
 
+            var positionBX = Float(drand48() * 1280)
+            var positionBY = Float(drand48() * 1280)
+
+            var positionCX = Float(drand48() * 1280)
+            var positionCY = Float(drand48() * 1280)
+            
+            var positionDX = Float(drand48() * 1280)
+            var positionDY = Float(drand48() * 1280)
+            
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -130,17 +122,21 @@ class ViewController: UIViewController
                 positionCY = Float(imageSide)
                 positionDY = Float(imageSide)
             }
-
-            let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: velocityAX, w: velocityAY),
-                B: Vector4(x: positionBX, y: positionBY, z: velocityBX, w: velocityBY),
-                C: Vector4(x: positionCX, y: positionCY, z: velocityCX, w: velocityCY),
-                D: Vector4(x: positionDX, y: positionDY, z: velocityDX, w: velocityDY))
+            
+            
+            let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: rand(), w: rand()),
+                B: Vector4(x: positionBX, y: positionBY, z: rand(), w: rand()),
+                C: Vector4(x: positionCX, y: positionCY, z: rand(), w: rand()),
+                D: Vector4(x: positionDX, y: positionDY, z: rand(), w: rand()))
             
             particlesParticleBufferPtr[index] = particle
         }
     }
     
-    var copiedTexture: MTLTexture!
+    func rand() -> Float32
+    {
+        return Float(drand48() - 0.5) * 0.2
+    }
     
     func setUpMetal()
     {
@@ -154,11 +150,6 @@ class ViewController: UIViewController
         }
         else
         {
-            // let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.BGRA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
-            
-            // copiedTexture = device.newTextureWithDescriptor(textureDescriptor)
-            // copiedTexture.framebufferOnly = false
-            
             region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
             
             
@@ -199,7 +190,7 @@ class ViewController: UIViewController
         self.applyShader()
     }
     
-    var imageBytes = [UInt8](count: Int(1024 * 1024 * 4), repeatedValue: 0)
+    var imageBytes = [UInt8](count: Int(1280 * 1280 * 4), repeatedValue: 0)
     
     let particleSize = sizeof(Particle)
     
@@ -216,18 +207,21 @@ class ViewController: UIViewController
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
-        gravityWellAngle += 0.06
-        gravityWellParticle.A.x = 150 + 75 * sin(gravityWellAngle)
-        gravityWellParticle.A.y = 150 + 75 * cos(gravityWellAngle)
+        gravityWellAngle += 0.5
         
-        gravityWellParticle.B.x = 874 + 75 * cos(gravityWellAngle)
-        gravityWellParticle.B.y = 874 + 75 * sin(gravityWellAngle)
+        let gravityWellAngleTwo = gravityWellAngle / 19
+        
+        gravityWellParticle.A.x = (640 + 250 * sin(gravityWellAngleTwo)) + 150 * cos(gravityWellAngle)
+        gravityWellParticle.A.y = (640 + 250 * cos(gravityWellAngleTwo)) + 150 * sin(gravityWellAngle)
+        
+        gravityWellParticle.B.x = (640 + 250 * sin(gravityWellAngleTwo + Float(M_PI))) + 150 * cos(gravityWellAngle)
+        gravityWellParticle.B.y = (640 + 250 * cos(gravityWellAngleTwo + Float(M_PI))) + 150 * sin(gravityWellAngle)
 
-        gravityWellParticle.C.x = 874 + 75 * cos(gravityWellAngle)
-        gravityWellParticle.C.y = 150 + 75 * sin(gravityWellAngle)
+        gravityWellParticle.C.x = (640 + 500 * sin(gravityWellAngleTwo / 0.7 + Float(M_PI * 0.5))) + 25 * cos(gravityWellAngle * 0.7)
+        gravityWellParticle.C.y = (640 + 500 * cos(gravityWellAngleTwo / 0.7 + Float(M_PI * 0.5))) + 25 * sin(gravityWellAngle * 0.7)
         
-        gravityWellParticle.D.x = 150 + 75 * sin(gravityWellAngle)
-        gravityWellParticle.D.y = 874 + 75 * cos(gravityWellAngle)
+        gravityWellParticle.D.x = (640 + 500 * sin(gravityWellAngleTwo / 0.7 + Float(M_PI * 1.5))) + 25 * cos(gravityWellAngle * 0.7)
+        gravityWellParticle.D.y = (640 + 500 * cos(gravityWellAngleTwo / 0.7 + Float(M_PI * 1.5))) + 25 * sin(gravityWellAngle * 0.7)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
@@ -236,39 +230,20 @@ class ViewController: UIViewController
         
         if let drawable = drawable
         {
-            /*
-            let blitCommandBuffer = commandQueue.commandBuffer()
-            let blitCommandEncoder = blitCommandBuffer.blitCommandEncoder()
-            blitCommandEncoder.copyFromTexture(drawable.texture, sourceSlice: 0, sourceLevel: 0, sourceOrigin: MTLOrigin(x: 0, y: 0, z: 0), sourceSize: MTLSize(width: 1024, height: 1024, depth: 1), toTexture: copiedTexture, destinationSlice: 0, destinationLevel: 0, destinationOrigin: MTLOrigin(x: 0, y: 0, z: 0))
-            
-            blitCommandEncoder.endEncoding()
-            */
-            
-            // works, but is slow - use blitCommandEncoder()
-            /*
-            drawable.texture.getBytes(&imageBytes, bytesPerRow: Int(bytesPerRow), fromRegion: region, mipmapLevel: 0)
-            copiedTexture.replaceRegion(self.region, mipmapLevel: 0, withBytes: imageBytes, bytesPerRow: Int(bytesPerRow))
-            */
-            
-            
             drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
             commandEncoder.setTexture(drawable.texture, atIndex: 0)
-            
-            /*
-            commandEncoder.setTexture(copiedTexture, atIndex: 1)
-            */
             
             commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
             
             commandEncoder.endEncoding()
             
-            commandBuffer.presentDrawable(drawable)
+            //commandBuffer.presentDrawable(drawable)
             
             commandBuffer.commit()
             
             // commandBuffer.waitUntilScheduled()
             
-            // drawable.present()
+            drawable.present()
             
         }
         else

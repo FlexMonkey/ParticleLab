@@ -209,7 +209,7 @@ class ViewController: UIViewController
         
         gravityWellAngle += 0.5
         
-        let gravityWellAngleTwo = gravityWellAngle / 19
+        let gravityWellAngleTwo = gravityWellAngle / 9
         
         gravityWellParticle.A.x = (640 + 250 * sin(gravityWellAngleTwo)) + 150 * cos(gravityWellAngle)
         gravityWellParticle.A.y = (640 + 250 * cos(gravityWellAngleTwo)) + 150 * sin(gravityWellAngle)
@@ -217,11 +217,11 @@ class ViewController: UIViewController
         gravityWellParticle.B.x = (640 + 250 * sin(gravityWellAngleTwo + Float(M_PI))) + 150 * cos(gravityWellAngle)
         gravityWellParticle.B.y = (640 + 250 * cos(gravityWellAngleTwo + Float(M_PI))) + 150 * sin(gravityWellAngle)
 
-        gravityWellParticle.C.x = (640 + 500 * sin(gravityWellAngleTwo / 0.7 + Float(M_PI * 0.5))) + 25 * cos(gravityWellAngle * 0.7)
-        gravityWellParticle.C.y = (640 + 500 * cos(gravityWellAngleTwo / 0.7 + Float(M_PI * 0.5))) + 25 * sin(gravityWellAngle * 0.7)
+        gravityWellParticle.C.x = (640 + 500 * sin(gravityWellAngleTwo / 0.3 + Float(M_PI * 0.5))) + 50 * cos(gravityWellAngle * 2.5)
+        gravityWellParticle.C.y = (640 + 500 * cos(gravityWellAngleTwo / 0.3 + Float(M_PI * 0.5))) + 50 * sin(gravityWellAngle * 2.5)
         
-        gravityWellParticle.D.x = (640 + 500 * sin(gravityWellAngleTwo / 0.7 + Float(M_PI * 1.5))) + 25 * cos(gravityWellAngle * 0.7)
-        gravityWellParticle.D.y = (640 + 500 * cos(gravityWellAngleTwo / 0.7 + Float(M_PI * 1.5))) + 25 * sin(gravityWellAngle * 0.7)
+        gravityWellParticle.D.x = (640 + 500 * sin(gravityWellAngleTwo / 0.3 + Float(M_PI * 1.5))) + 50 * cos(gravityWellAngle * 2.5)
+        gravityWellParticle.D.y = (640 + 500 * cos(gravityWellAngleTwo / 0.3 + Float(M_PI * 1.5))) + 50 * sin(gravityWellAngle * 2.5)
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)

@@ -10,6 +10,11 @@
 #include <metal_stdlib>
 using namespace metal;
 
+constant float4 colors[] = {float4(1.0, 0.0 , 0.0 , 1.0), float4(0.0, 1.0, 0.0, 1.0), float4(0.0, 0.0, 1.0, 1.0)};
+
+constant float masses[] = {0.121, 0.120, 0.119};
+
+constant uint imageWidth = 1280;
 
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
                                    // texture2d<float, access::read> inTexture [[texture(1)]],
@@ -21,17 +26,12 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    uint id [[thread_position_in_grid]])
 {
-    const uint imageWidth = 1280;
     const float4x4 inParticle = inParticles[id];
     
     const uint type = id % 3;
     
-    const float4 outColor((type != 0 ? 1 : 0.0),
-                          (type != 1 ? 1 : 0.0),
-                          (type != 2 ? 1 : 0.0),
-                          1.0);
-    
-    const float massOne = (type == 0 ? 0.121 : (type == 1 ? 0.120 : 0.119));
+    const float4 outColor = colors[type];
+    const float massOne = masses[type];
     
     // ---
     

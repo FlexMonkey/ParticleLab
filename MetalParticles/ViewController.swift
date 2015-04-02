@@ -38,10 +38,10 @@ class ViewController: UIViewController
     var particle_threadGroupCount:MTLSize!
     var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 524288 // 4194304 2097152   1048576  524288
+    let particleCount: Int = 1048576 // 4194304 2097152   1048576  524288
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(524288) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt = UInt(1048576) * UInt(sizeof(Particle))
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!

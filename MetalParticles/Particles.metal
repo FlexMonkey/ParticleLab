@@ -21,17 +21,19 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    uint id [[thread_position_in_grid]])
 {
-    const float imageWidth = 1280;
+    const uint imageWidth = 1280;
     const float4x4 inParticle = inParticles[id];
     
-    const int type = id % 3;
+    const uint type = id % 3;
     
-    const float4 outColor((type == 0 ? 1 : 0.0),
-                          (type == 1 ? 1 : 0.0),
-                          (type == 2 ? 1 : 0.0),
+    const float4 outColor((type != 0 ? 1 : 0.0),
+                          (type != 1 ? 1 : 0.0),
+                          (type != 2 ? 1 : 0.0),
                           1.0);
     
     const float massOne = (type == 0 ? 0.121 : (type == 1 ? 0.120 : 0.119));
+    
+    // ---
     
     const uint2 particlePositionA(inParticle[0].x, inParticle[0].y);
     
@@ -42,15 +44,10 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionAFloat(inParticle[0].x, inParticle[0].y);
     
-    const float distA = fast::distance(particlePositionAFloat, float2(inGravityWell[0].x, inGravityWell[0].y));
-    const float distATwo = fast::distance(particlePositionAFloat, float2(inGravityWell[1].x, inGravityWell[1].y));
-    const float distAThree = fast::distance(particlePositionAFloat, float2(inGravityWell[2].x, inGravityWell[2].y));
-    const float distAFour = fast::distance(particlePositionAFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
-    
-    const float factorA = (1 / distA) * massOne;
-    const float factorATwo = (1 / distATwo) * massOne;
-    const float factorAThree = (1 / distAThree) * massOne;
-    const float factorAFour = (1 / distAFour) * massOne;
+    const float factorA = (1 / (fast::distance(particlePositionAFloat, float2(inGravityWell[0].x, inGravityWell[0].y)))) * massOne;
+    const float factorATwo = (1 / (fast::distance(particlePositionAFloat, float2(inGravityWell[1].x, inGravityWell[1].y)))) * massOne;
+    const float factorAThree = (1 / (fast::distance(particlePositionAFloat, float2(inGravityWell[2].x, inGravityWell[2].y)))) * massOne;
+    const float factorAFour = (1 / (fast::distance(particlePositionAFloat, float2(inGravityWell[3].x, inGravityWell[3].y)))) * massOne;
     
     // ---
     
@@ -63,15 +60,10 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionBFloat(inParticle[1].x, inParticle[1].y);
     
-    const float distB = fast::distance(particlePositionBFloat, float2(inGravityWell[0].x, inGravityWell[0].y));
-    const float distBTwo = fast::distance(particlePositionBFloat, float2(inGravityWell[1].x, inGravityWell[1].y));
-    const float distBThree = fast::distance(particlePositionBFloat, float2(inGravityWell[2].x, inGravityWell[2].y));
-    const float distBFour = fast::distance(particlePositionBFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
-    
-    const float factorB = (1 / distB) * massOne;
-    const float factorBTwo = (1 / distBTwo) * massOne;
-    const float factorBThree = (1 / distBThree) * massOne;
-    const float factorBFour = (1 / distBFour) * massOne;
+    const float factorB = (1 / (fast::distance(particlePositionBFloat, float2(inGravityWell[0].x, inGravityWell[0].y)))) * massOne;
+    const float factorBTwo = (1 / (fast::distance(particlePositionBFloat, float2(inGravityWell[1].x, inGravityWell[1].y)))) * massOne;
+    const float factorBThree = (1 / (fast::distance(particlePositionBFloat, float2(inGravityWell[2].x, inGravityWell[2].y)))) * massOne;
+    const float factorBFour = (1 / (fast::distance(particlePositionBFloat, float2(inGravityWell[3].x, inGravityWell[3].y)))) * massOne;
     
     // ---
     
@@ -85,15 +77,10 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionCFloat(inParticle[2].x, inParticle[2].y);
     
-    const float distC = fast::distance(particlePositionCFloat, float2(inGravityWell[0].x, inGravityWell[0].y));
-    const float distCTwo = fast::distance(particlePositionCFloat, float2(inGravityWell[1].x, inGravityWell[1].y));
-    const float distCThree = fast::distance(particlePositionCFloat, float2(inGravityWell[2].x, inGravityWell[2].y));
-    const float distCFour = fast::distance(particlePositionCFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
-    
-    const float factorC = (1 / distC) * massOne;
-    const float factorCTwo = (1 / distCTwo) * massOne;
-    const float factorCThree = (1 / distCThree) * massOne;
-    const float factorCFour = (1 / distCFour) * massOne;
+    const float factorC = (1 / (fast::distance(particlePositionCFloat, float2(inGravityWell[0].x, inGravityWell[0].y)))) * massOne;
+    const float factorCTwo = (1 / (fast::distance(particlePositionCFloat, float2(inGravityWell[1].x, inGravityWell[1].y)))) * massOne;
+    const float factorCThree = (1 / (fast::distance(particlePositionCFloat, float2(inGravityWell[2].x, inGravityWell[2].y)))) * massOne;
+    const float factorCFour = (1 / (fast::distance(particlePositionCFloat, float2(inGravityWell[3].x, inGravityWell[3].y)))) * massOne;
     
     // ---
     
@@ -107,15 +94,10 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionDFloat(inParticle[3].x, inParticle[3].y);
     
-    const float distD = fast::distance(particlePositionDFloat, float2(inGravityWell[0].x, inGravityWell[0].y));
-    const float distDTwo = fast::distance(particlePositionDFloat, float2(inGravityWell[1].x, inGravityWell[1].y));
-    const float distDThree = fast::distance(particlePositionDFloat, float2(inGravityWell[2].x, inGravityWell[2].y));
-    const float distDFour = fast::distance(particlePositionDFloat, float2(inGravityWell[3].x, inGravityWell[3].y));
-    
-    const float factorD = (1 / distD) * massOne;
-    const float factorDTwo = (1 / distDTwo) * massOne;
-    const float factorDThree = (1 / distDThree) * massOne;
-    const float factorDFour = (1 / distDFour) * massOne;
+    const float factorD = (1 / (fast::distance(particlePositionDFloat, float2(inGravityWell[0].x, inGravityWell[0].y)))) * massOne;
+    const float factorDTwo = (1 / (fast::distance(particlePositionDFloat, float2(inGravityWell[1].x, inGravityWell[1].y)))) * massOne;
+    const float factorDThree = (1 / (fast::distance(particlePositionDFloat, float2(inGravityWell[2].x, inGravityWell[2].y)))) * massOne;
+    const float factorDFour = (1 / (fast::distance(particlePositionDFloat, float2(inGravityWell[3].x, inGravityWell[3].y)))) * massOne;
     
     
     // ---

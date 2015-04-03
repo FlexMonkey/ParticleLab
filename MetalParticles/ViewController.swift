@@ -166,14 +166,15 @@ class ViewController: UIViewController
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             
-            run()
+            step()
         }
     }
     
     var frameStartTime: CFAbsoluteTime!
     var frameNumber = 0
+    let particleSize = sizeof(Particle)
     
-    final func run()
+    final func step()
     {
         frameNumber++
         
@@ -187,15 +188,6 @@ class ViewController: UIViewController
             frameNumber = 0
         }
         
-        self.applyShader()
-    }
-    
-    var imageBytes = [UInt8](count: Int(1280 * 1280 * 4), repeatedValue: 0)
-    
-    let particleSize = sizeof(Particle)
-    
-    final func applyShader()
-    {
         let commandBuffer = commandQueue.commandBuffer()
         let commandEncoder = commandBuffer.computeCommandEncoder()
         
@@ -255,7 +247,7 @@ class ViewController: UIViewController
         
         dispatch_async(dispatch_get_main_queue(),
         {
-                self.run();
+                self.step();
         })
     }
     

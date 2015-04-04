@@ -57,7 +57,7 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     func particleLabDidUpdate()
     {
-        gravityWellAngle = gravityWellAngle + 0.005
+        gravityWellAngle = gravityWellAngle + 0.01
         
         particleLab.setGravityWellProperties(gravityWell: .One,
             normalisedPositionX: 0.5 + 0.2 * sin(gravityWellAngle + floatPi * 0.5),

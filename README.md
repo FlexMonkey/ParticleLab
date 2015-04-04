@@ -35,3 +35,5 @@ particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.
 ```
 
 Gravity well positions can be displayed by setting the ```showGravityWellPositions``` property to _true_.
+
+Classes can implement ```ParticleLabDelegate``` interface which includes ```particleLabDidUpdate```. This method is invoked with each particle step and can be used, for example, for updating the position of gravity wells.

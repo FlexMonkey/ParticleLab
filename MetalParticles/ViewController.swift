@@ -44,6 +44,8 @@ class ViewController: UIViewController
         particleLab.setGravityWellProperties(gravityWell: .Three, normalisedPositionX: 0.3, normalisedPositionY: 0.7, mass: 7, spin: 3)
         
         particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.7, normalisedPositionY: 0.7, mass: 11, spin: -4)
+        
+        particleLab.showGravityWellPositions = true
 
     }
     

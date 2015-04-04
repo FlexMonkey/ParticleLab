@@ -56,6 +56,11 @@ class ParticleLab: CAMetalLayer
     var frameNumber = 0
     let particleSize = sizeof(Particle)
     
+    let markerA = CAShapeLayer()
+    let markerB = CAShapeLayer()
+    let markerC = CAShapeLayer()
+    let markerD = CAShapeLayer()
+    
     override init()
     {
         bytesPerRow = 4 * imageSide
@@ -72,6 +77,32 @@ class ParticleLab: CAMetalLayer
         setUpParticles()
         
         setUpMetal()
+ 
+        markerA.strokeColor = UIColor.whiteColor().CGColor
+        markerB.strokeColor = UIColor.whiteColor().CGColor
+        markerC.strokeColor = UIColor.whiteColor().CGColor
+        markerD.strokeColor = UIColor.whiteColor().CGColor
+    }
+    
+    var showGravityWellPositions: Bool = false
+    {
+        didSet
+        {
+            if showGravityWellPositions
+            {
+                addSublayer(markerA)
+                addSublayer(markerB)
+                addSublayer(markerC)
+                addSublayer(markerD)
+            }
+            else
+            {
+                markerA.removeFromSuperlayer()
+                markerB.removeFromSuperlayer()
+                markerC.removeFromSuperlayer()
+                markerD.removeFromSuperlayer()
+            }
+        }
     }
     
     required init(coder aDecoder: NSCoder)
@@ -205,6 +236,16 @@ class ParticleLab: CAMetalLayer
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
 
+        if showGravityWellPositions
+        {
+            let scale = frame.width / CGFloat(imageSide)
+            
+            markerA.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.A.x) * scale, y: CGFloat(gravityWellParticle.A.y) * scale, width: 10, height: 10), nil)
+            markerB.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.B.x) * scale, y: CGFloat(gravityWellParticle.B.y) * scale, width: 10, height: 10), nil)
+            markerC.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.C.x) * scale, y: CGFloat(gravityWellParticle.C.y) * scale, width: 10, height: 10), nil)
+            markerD.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.D.x) * scale, y: CGFloat(gravityWellParticle.D.y) * scale, width: 10, height: 10), nil)
+        }
+     
         if let drawable = nextDrawable()
         {
             drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))

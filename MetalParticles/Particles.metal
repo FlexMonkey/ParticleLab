@@ -10,7 +10,7 @@
 #include <metal_stdlib>
 using namespace metal;
 
-constant float4 colors[] = {float4(1.0, 0.0 , 0.0 , 1.0), float4(0.0, 1.0, 0.0, 1.0), float4(0.0, 0.0, 1.0, 1.0)};
+constant float4 colors[] = {float4(1.0, 1.0 , 0.2 , 1.0), float4(0.2, 1.0, 1.0, 1.0), float4(1.0, 0.2, 1.0, 1.0)};
 
 constant uint imageWidth = 1280;
 

@@ -61,6 +61,8 @@ class ParticleLab: CAMetalLayer
     let markerC = CAShapeLayer()
     let markerD = CAShapeLayer()
     
+    var particleLabDelegate: ParticleLabDelegate?
+    
     override init()
     {
         bytesPerRow = 4 * imageSide
@@ -271,6 +273,8 @@ class ParticleLab: CAMetalLayer
             println("metalLayer.nextDrawable() returned nil")
         }
         
+        particleLabDelegate?.particleLabDidUpdate()
+        
         dispatch_async(dispatch_get_main_queue(),
             {
                 self.step();
@@ -308,6 +312,11 @@ class ParticleLab: CAMetalLayer
             gravityWellParticle.D.w = spin
         }
     }
+}
+
+protocol ParticleLabDelegate
+{
+    func particleLabDidUpdate()
 }
 
 enum GravityWell

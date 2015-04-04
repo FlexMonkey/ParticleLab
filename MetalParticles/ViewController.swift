@@ -29,19 +29,23 @@ class ViewController: UIViewController
         
         particleLab.gravityWellParticle.A.x = 280
         particleLab.gravityWellParticle.A.y = 280
-        particleLab.gravityWellParticle.A.z = 0.5
+        particleLab.gravityWellParticle.A.z = 10
+        particleLab.gravityWellParticle.A.w = 4
         
         particleLab.gravityWellParticle.B.x = 280
         particleLab.gravityWellParticle.B.y = 1000
-        particleLab.gravityWellParticle.B.z = 0.75
+        particleLab.gravityWellParticle.B.z = 10
+        particleLab.gravityWellParticle.B.w = 4
         
         particleLab.gravityWellParticle.C.x = 1000
         particleLab.gravityWellParticle.C.y = 280
-        particleLab.gravityWellParticle.C.z = -0.2
+        particleLab.gravityWellParticle.C.z = 10
+        particleLab.gravityWellParticle.C.w = 4
         
         particleLab.gravityWellParticle.D.x = 1000
         particleLab.gravityWellParticle.D.y = 1000
-        particleLab.gravityWellParticle.D.z = 0.9
+        particleLab.gravityWellParticle.D.z = 10
+        particleLab.gravityWellParticle.D.w = 4
     }
     
     override func viewDidLayoutSubviews()

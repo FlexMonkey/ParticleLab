@@ -53,6 +53,11 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float factorATwo =    (inGravityWell[2].z / fast::pow(fast::distance(particlePositionAFloat, gravityWellTwoPosition),2));
     const float factorAThree =  (inGravityWell[3].z / fast::pow(fast::distance(particlePositionAFloat, gravityWellThreePosition),2));
     
+    const float spinAZero =   (inGravityWell[0].w / fast::pow(fast::distance(particlePositionAFloat, gravityWellZeroPosition),2));
+    const float spinAOne =    (inGravityWell[1].w / fast::pow(fast::distance(particlePositionAFloat, gravityWellOnePosition),2));
+    const float spinATwo =    (inGravityWell[2].w / fast::pow(fast::distance(particlePositionAFloat, gravityWellTwoPosition),2));
+    const float spinAThree =  (inGravityWell[3].w / fast::pow(fast::distance(particlePositionAFloat, gravityWellThreePosition),2));
+    
     // ---
     
     const uint2 particlePositionB(inParticle[1].x, inParticle[1].y);
@@ -68,6 +73,11 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float factorBOne =    (inGravityWell[1].z / fast::pow(fast::distance(particlePositionBFloat, gravityWellOnePosition),2));
     const float factorBTwo =    (inGravityWell[2].z / fast::pow(fast::distance(particlePositionBFloat, gravityWellTwoPosition),2));
     const float factorBThree =  (inGravityWell[3].z / fast::pow(fast::distance(particlePositionBFloat, gravityWellThreePosition),2));
+    
+    const float spinBZero =   (inGravityWell[0].w / fast::pow(fast::distance(particlePositionBFloat, gravityWellZeroPosition),2));
+    const float spinBOne =    (inGravityWell[1].w / fast::pow(fast::distance(particlePositionBFloat, gravityWellOnePosition),2));
+    const float spinBTwo =    (inGravityWell[2].w / fast::pow(fast::distance(particlePositionBFloat, gravityWellTwoPosition),2));
+    const float spinBThree =  (inGravityWell[3].w / fast::pow(fast::distance(particlePositionBFloat, gravityWellThreePosition),2));
     
     // ---
     
@@ -86,6 +96,11 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float factorCTwo =    (inGravityWell[2].z / fast::pow(fast::distance(particlePositionCFloat, gravityWellTwoPosition),2));
     const float factorCThree =  (inGravityWell[3].z / fast::pow(fast::distance(particlePositionCFloat, gravityWellThreePosition),2));
     
+    const float spinCZero =   (inGravityWell[0].w / fast::pow(fast::distance(particlePositionCFloat, gravityWellZeroPosition),2));
+    const float spinCOne =    (inGravityWell[1].w / fast::pow(fast::distance(particlePositionCFloat, gravityWellOnePosition),2));
+    const float spinCTwo =    (inGravityWell[2].w / fast::pow(fast::distance(particlePositionCFloat, gravityWellTwoPosition),2));
+    const float spinCThree =  (inGravityWell[3].w / fast::pow(fast::distance(particlePositionCFloat, gravityWellThreePosition),2));
+    
     // ---
     
     
@@ -103,72 +118,123 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float factorDTwo =    (inGravityWell[2].z / fast::pow(fast::distance(particlePositionDFloat, gravityWellTwoPosition),2));
     const float factorDThree =  (inGravityWell[3].z / fast::pow(fast::distance(particlePositionDFloat, gravityWellThreePosition),2));
     
-    
+    const float spinDZero =   (inGravityWell[0].w / fast::pow(fast::distance(particlePositionDFloat, gravityWellZeroPosition),2));
+    const float spinDOne =    (inGravityWell[1].w / fast::pow(fast::distance(particlePositionDFloat, gravityWellOnePosition),2));
+    const float spinDTwo =    (inGravityWell[2].w / fast::pow(fast::distance(particlePositionDFloat, gravityWellTwoPosition),2));
+    const float spinDThree =  (inGravityWell[3].w / fast::pow(fast::distance(particlePositionDFloat, gravityWellThreePosition),2));
     // ---
-    
+ 
     float4x4 outParticle;
     
     outParticle[0] = {
         inParticle[0].x + inParticle[0].z,
         inParticle[0].y + inParticle[0].w,
-        (inParticle[0].z * 0.999) +
+        
+        (inParticle[0].z * 0.997) +
             ((inGravityWell[0].x - inParticle[0].x) * factorAZero) +
             ((inGravityWell[1].x - inParticle[0].x) * factorAOne) +
             ((inGravityWell[2].x - inParticle[0].x) * factorATwo) +
-            ((inGravityWell[3].x - inParticle[0].x) * factorAThree),
-        (inParticle[0].w * 0.999) +
+            ((inGravityWell[3].x - inParticle[0].x) * factorAThree) +
+        
+            ((inGravityWell[0].y - inParticle[0].y) * spinAZero) +
+            ((inGravityWell[1].y - inParticle[0].y) * spinAOne) +
+            ((inGravityWell[2].y - inParticle[0].y) * spinATwo) +
+            ((inGravityWell[3].y - inParticle[0].y) * spinAThree),
+        
+        (inParticle[0].w * 0.997) +
             ((inGravityWell[0].y - inParticle[0].y) * factorAZero) +
             ((inGravityWell[1].y - inParticle[0].y) * factorAOne) +
             ((inGravityWell[2].y - inParticle[0].y) * factorATwo) +
-            ((inGravityWell[3].y - inParticle[0].y) * factorAThree),
+            ((inGravityWell[3].y - inParticle[0].y) * factorAThree)+
+        
+            ((inGravityWell[0].x - inParticle[0].x) * -spinAZero) +
+            ((inGravityWell[1].x - inParticle[0].x) * -spinAOne) +
+            ((inGravityWell[2].x - inParticle[0].x) * -spinATwo) +
+            ((inGravityWell[3].x - inParticle[0].x) * -spinAThree),
     };
     
     
     outParticle[1] = {
         inParticle[1].x + inParticle[1].z,
         inParticle[1].y + inParticle[1].w,
-        (inParticle[1].z * 0.999) +
+        
+        (inParticle[1].z * 0.997) +
             ((inGravityWell[0].x - inParticle[1].x) * factorBZero) +
             ((inGravityWell[1].x - inParticle[1].x) * factorBOne) +
             ((inGravityWell[2].x - inParticle[1].x) * factorBTwo) +
-            ((inGravityWell[3].x - inParticle[1].x) * factorBThree),
-        (inParticle[1].w * 0.999) +
+            ((inGravityWell[3].x - inParticle[1].x) * factorBThree) +
+        
+            ((inGravityWell[0].y - inParticle[1].y) * spinBZero) +
+            ((inGravityWell[1].y - inParticle[1].y) * spinBOne) +
+            ((inGravityWell[2].y - inParticle[1].y) * spinBTwo) +
+            ((inGravityWell[3].y - inParticle[1].y) * spinBThree),
+        
+        (inParticle[1].w * 0.997) +
             ((inGravityWell[0].y - inParticle[1].y) * factorBZero) +
             ((inGravityWell[1].y - inParticle[1].y) * factorBOne) +
             ((inGravityWell[2].y - inParticle[1].y) * factorBTwo) +
-            ((inGravityWell[3].y - inParticle[1].y) * factorBThree),
+            ((inGravityWell[3].y - inParticle[1].y) * factorBThree) +
+        
+            ((inGravityWell[0].x - inParticle[1].x) * -spinBZero) +
+            ((inGravityWell[1].x - inParticle[1].x) * -spinBOne) +
+            ((inGravityWell[2].x - inParticle[1].x) * -spinBTwo) +
+            ((inGravityWell[3].x - inParticle[1].x) * -spinBThree),
     };
     
     
     outParticle[2] = {
         inParticle[2].x + inParticle[2].z,
         inParticle[2].y + inParticle[2].w,
-        (inParticle[2].z * 0.999) +
+        
+        (inParticle[2].z * 0.997) +
             ((inGravityWell[0].x - inParticle[2].x) * factorCZero) +
             ((inGravityWell[1].x - inParticle[2].x) * factorCOne) +
             ((inGravityWell[2].x - inParticle[2].x) * factorCTwo) +
-            ((inGravityWell[3].x - inParticle[2].x) * factorCThree),
-        (inParticle[2].w * 0.999) +
+            ((inGravityWell[3].x - inParticle[2].x) * factorCThree) +
+        
+            ((inGravityWell[0].y - inParticle[2].y) * spinCZero) +
+            ((inGravityWell[1].y - inParticle[2].y) * spinCOne) +
+            ((inGravityWell[2].y - inParticle[2].y) * spinCTwo) +
+            ((inGravityWell[3].y - inParticle[2].y) * spinCThree),
+        
+        (inParticle[2].w * 0.997) +
             ((inGravityWell[0].y - inParticle[2].y) * factorCZero) +
             ((inGravityWell[1].y - inParticle[2].y) * factorCOne) +
             ((inGravityWell[2].y - inParticle[2].y) * factorCTwo) +
-            ((inGravityWell[3].y - inParticle[2].y) * factorCThree),
+            ((inGravityWell[3].y - inParticle[2].y) * factorCThree) +
+        
+            ((inGravityWell[0].x - inParticle[2].x) * -spinCZero) +
+            ((inGravityWell[1].x - inParticle[2].x) * -spinCOne) +
+            ((inGravityWell[2].x - inParticle[2].x) * -spinCTwo) +
+            ((inGravityWell[3].x - inParticle[2].x) * -spinCThree),
     };
     
     
     outParticle[3] = {
         inParticle[3].x + inParticle[3].z,
         inParticle[3].y + inParticle[3].w,
-        (inParticle[3].z * 0.999) +
+        
+        (inParticle[3].z * 0.997) +
             ((inGravityWell[0].x - inParticle[3].x) * factorDZero) +
             ((inGravityWell[1].x - inParticle[3].x) * factorDOne) +
             ((inGravityWell[2].x - inParticle[3].x) * factorDTwo) +
-            ((inGravityWell[3].x - inParticle[3].x) * factorDThree),
-        (inParticle[3].w * 0.999) +
+            ((inGravityWell[3].x - inParticle[3].x) * factorDThree) +
+        
+            ((inGravityWell[0].y - inParticle[3].y) * spinDZero) +
+            ((inGravityWell[1].y - inParticle[3].y) * spinDOne) +
+            ((inGravityWell[2].y - inParticle[3].y) * spinDTwo) +
+            ((inGravityWell[3].y - inParticle[3].y) * spinDThree),
+        
+        (inParticle[3].w * 0.997) +
             ((inGravityWell[0].y - inParticle[3].y) * factorDZero) +
             ((inGravityWell[1].y - inParticle[3].y) * factorDOne) +
             ((inGravityWell[2].y - inParticle[3].y) * factorDTwo) +
-            ((inGravityWell[3].y - inParticle[3].y) * factorDThree),
+            ((inGravityWell[3].y - inParticle[3].y) * factorDThree) +
+        
+            ((inGravityWell[0].x - inParticle[3].x) * -spinDZero) +
+            ((inGravityWell[1].x - inParticle[3].x) * -spinDOne) +
+            ((inGravityWell[2].x - inParticle[3].x) * -spinDTwo) +
+            ((inGravityWell[3].x - inParticle[3].x) * -spinDThree),
     };
     
     outParticles[id] = outParticle;

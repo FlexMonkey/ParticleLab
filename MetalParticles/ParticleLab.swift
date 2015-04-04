@@ -77,7 +77,7 @@ class ParticleLab: CAMetalLayer
         
         func rand() -> Float32
         {
-            return Float(drand48() - 0.5) * 0.2
+            return Float(drand48() - 0.5) * 2
         }
         
         for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex

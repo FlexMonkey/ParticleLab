@@ -38,15 +38,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         view.backgroundColor = UIColor.blackColor()
         
         view.layer.addSublayer(particleLab)
-        
-        particleLab.setGravityWellProperties(gravityWell: .One, normalisedPositionX: 0.3, normalisedPositionY: 0.3, mass: 11, spin: -4)
-        
-        particleLab.setGravityWellProperties(gravityWell: .Two, normalisedPositionX: 0.7, normalisedPositionY: 0.3, mass: 7, spin: 3)
-        
-        particleLab.setGravityWellProperties(gravityWell: .Three, normalisedPositionX: 0.3, normalisedPositionY: 0.7, mass: 7, spin: 3)
-        
-        particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.7, normalisedPositionY: 0.7, mass: 11, spin: -4)
-        
+ 
         particleLab.showGravityWellPositions = true
         
         particleLab.particleLabDelegate = self
@@ -60,20 +52,20 @@ class ViewController: UIViewController, ParticleLabDelegate
         gravityWellAngle = gravityWellAngle + 0.01
         
         particleLab.setGravityWellProperties(gravityWell: .One,
-            normalisedPositionX: 0.5 + 0.2 * sin(gravityWellAngle + floatPi * 0.5),
-            normalisedPositionY: 0.5 + 0.2 * cos(gravityWellAngle + floatPi * 0.5), mass: 11, spin: -4)
+            normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 0.5),
+            normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 0.5), mass: 15, spin: -7)
         
         particleLab.setGravityWellProperties(gravityWell: .Four,
-            normalisedPositionX: 0.5 + 0.2 * sin(gravityWellAngle + floatPi * 1.5),
-            normalisedPositionY: 0.5 + 0.2 * cos(gravityWellAngle + floatPi * 1.5), mass: 11, spin: -4)
+            normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 1.5),
+            normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 1.5), mass: 15, spin: -7)
         
         particleLab.setGravityWellProperties(gravityWell: .Two,
-            normalisedPositionX: 0.5 + 0.4 * sin(gravityWellAngle),
-            normalisedPositionY: 0.5 + 0.4 * cos(gravityWellAngle), mass: 7, spin: 3)
+            normalisedPositionX: 0.5 + 0.3 * sin(gravityWellAngle),
+            normalisedPositionY: 0.5 + 0.3 * cos(gravityWellAngle), mass: 7, spin: 4)
         
         particleLab.setGravityWellProperties(gravityWell: .Three,
-            normalisedPositionX: 0.5 + 0.4 * sin(gravityWellAngle + floatPi),
-            normalisedPositionY: 0.5 + 0.4 * cos(gravityWellAngle + floatPi), mass: 7, spin: 3)
+            normalisedPositionX: 0.5 + 0.3 * sin(gravityWellAngle + floatPi),
+            normalisedPositionY: 0.5 + 0.3 * cos(gravityWellAngle + floatPi), mass: 7, spin: 4)
     }
     
     override func viewDidLayoutSubviews()

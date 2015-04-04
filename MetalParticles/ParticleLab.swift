@@ -28,32 +28,32 @@ class ParticleLab: CAMetalLayer
     let region: MTLRegion
     let blankBitmapRawData : [UInt8]
     
-    var kernelFunction: MTLFunction!
-    var pipelineState: MTLComputePipelineState!
-    var defaultLibrary: MTLLibrary! = nil
-    var metalDevice: MTLDevice! = nil
-    var commandQueue: MTLCommandQueue! = nil
+    private var kernelFunction: MTLFunction!
+    private var pipelineState: MTLComputePipelineState!
+    private var defaultLibrary: MTLLibrary! = nil
+    private var metalDevice: MTLDevice! = nil
+    private var commandQueue: MTLCommandQueue! = nil
     
-    var errorFlag:Bool = false
+    private var errorFlag:Bool = false
     
-    var particle_threadGroupCount:MTLSize!
-    var particle_threadGroups:MTLSize!
+    private var particle_threadGroupCount:MTLSize!
+    private var particle_threadGroups:MTLSize!
     
     let particleCount: Int = 524288 // 4194304 2097152   1048576  524288
-    var particlesMemory:UnsafeMutablePointer<Void> = nil
+    private var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
     let particlesMemoryByteSize:UInt
-    var particlesVoidPtr: COpaquePointer!
-    var particlesParticlePtr: UnsafeMutablePointer<Particle>!
-    var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
+    private var particlesVoidPtr: COpaquePointer!
+    private var particlesParticlePtr: UnsafeMutablePointer<Particle>!
+    private var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
 
-    var gravityWellParticle = Particle(A: Vector4(x: 0, y: 0, z: 0, w: 0),
+    private var gravityWellParticle = Particle(A: Vector4(x: 0, y: 0, z: 0, w: 0),
         B: Vector4(x: 0, y: 0, z: 0, w: 0),
         C: Vector4(x: 0, y: 0, z: 0, w: 0),
         D: Vector4(x: 0, y: 0, z: 0, w: 0))
     
-    var frameStartTime: CFAbsoluteTime!
-    var frameNumber = 0
+    private var frameStartTime: CFAbsoluteTime!
+    private var frameNumber = 0
     let particleSize = sizeof(Particle)
     
     let markerA = CAShapeLayer()
@@ -112,7 +112,7 @@ class ParticleLab: CAMetalLayer
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setUpParticles()
+    private func setUpParticles()
     {
         posix_memalign(&particlesMemory, alignment, particlesMemoryByteSize)
         
@@ -181,7 +181,7 @@ class ParticleLab: CAMetalLayer
         }
     }
 
-    func setUpMetal()
+    private func setUpMetal()
     {
         metalDevice = MTLCreateSystemDefaultDevice()
         
@@ -210,7 +210,7 @@ class ParticleLab: CAMetalLayer
         }
     }
 
-    final func step()
+    final private func step()
     {
         frameNumber++
         
@@ -281,7 +281,7 @@ class ParticleLab: CAMetalLayer
         })
     }
 
-    func setGravityWellProperties(#gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
+    final func setGravityWellProperties(#gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
     {
         let imageSideFloat = Float(imageSide)
         

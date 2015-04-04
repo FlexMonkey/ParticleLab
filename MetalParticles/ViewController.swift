@@ -9,11 +9,21 @@
 //
 //  Thanks to https://twitter.com/atveit for tips - espewcially using float4x4!!!
 //  Thanks to https://twitter.com/warrenm for examples, especially implemnting matrix 4x4 in Swift
+//
+//  This program is free software: you can redistribute it and/or modify
+//  it under the terms of the GNU General Public License as published by
+//  the Free Software Foundation, either version 3 of the License, or
+//  (at your option) any later version.
+//
+//  This program is distributed in the hope that it will be useful,
+//  but WITHOUT ANY WARRANTY; without even the implied warranty of
+//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//  GNU General Public License for more details.
+
+//  You should have received a copy of the GNU General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>
 
 import UIKit
-import Metal
-import QuartzCore
-import CoreData
 
 class ViewController: UIViewController
 {
@@ -27,13 +37,13 @@ class ViewController: UIViewController
         
         view.layer.addSublayer(particleLab)
         
-        particleLab.setGravityWellProperties(gravityWell: .One, normalisedPositionX: 0.3, normalisedPositionY: 0.3, mass: 10, spin: -3)
+        particleLab.setGravityWellProperties(gravityWell: .One, normalisedPositionX: 0.3, normalisedPositionY: 0.3, mass: 11, spin: -4)
         
         particleLab.setGravityWellProperties(gravityWell: .Two, normalisedPositionX: 0.7, normalisedPositionY: 0.3, mass: 7, spin: 3)
         
         particleLab.setGravityWellProperties(gravityWell: .Three, normalisedPositionX: 0.3, normalisedPositionY: 0.7, mass: 7, spin: 3)
         
-        particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.7, normalisedPositionY: 0.7, mass: 10, spin: -3)
+        particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.7, normalisedPositionY: 0.7, mass: 11, spin: -4)
 
     }
     

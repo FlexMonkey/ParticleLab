@@ -1,4 +1,4 @@
-# MetalParticles
+# ParticleLab - High Performance Particles in Swift and Metal
 Particle system that's both calculated and rendered on the GPU using the Metal framework
 
 ![http://flexmonkey.co.uk/swift/IMG_0699.PNG](http://flexmonkey.co.uk/swift/IMG_0699.PNG)

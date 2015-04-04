@@ -26,9 +26,25 @@ class ViewController: UIViewController
         view.backgroundColor = UIColor.blackColor()
         
         view.layer.addSublayer(particleLab)
+        
+        particleLab.gravityWellParticle.A.x = 280
+        particleLab.gravityWellParticle.A.y = 280
+        particleLab.gravityWellParticle.A.z = 0.5
+        
+        particleLab.gravityWellParticle.B.x = 280
+        particleLab.gravityWellParticle.B.y = 1000
+        particleLab.gravityWellParticle.B.z = 0.75
+        
+        particleLab.gravityWellParticle.C.x = 1000
+        particleLab.gravityWellParticle.C.y = 280
+        particleLab.gravityWellParticle.C.z = -0.2
+        
+        particleLab.gravityWellParticle.D.x = 1000
+        particleLab.gravityWellParticle.D.y = 1000
+        particleLab.gravityWellParticle.D.z = 0.9
     }
     
-        override func viewDidLayoutSubviews()
+    override func viewDidLayoutSubviews()
     {
         if view.frame.height > view.frame.width
         {

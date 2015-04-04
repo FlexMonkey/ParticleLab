@@ -30,12 +30,11 @@ class ParticleLab: CAMetalLayer
     let particleCount: Int = 524288 // 4194304 2097152   1048576  524288
     var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(1048576) * UInt(sizeof(Particle))
+    let particlesMemoryByteSize:UInt
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
-    
-    var gravityWellAngle: Float = 0.0
+
     var gravityWellParticle = Particle(A: Vector4(x: 0, y: 0, z: 0, w: 0),
         B: Vector4(x: 0, y: 0, z: 0, w: 0),
         C: Vector4(x: 0, y: 0, z: 0, w: 0),
@@ -95,6 +94,7 @@ class ParticleLab: CAMetalLayer
             var positionDX = Float(drand48() * 1280)
             var positionDY = Float(drand48() * 1280)
             
+            /*
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -125,7 +125,7 @@ class ParticleLab: CAMetalLayer
                 positionCY = Float(imageSide)
                 positionDY = Float(imageSide)
             }
-            
+            */
             
             let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: rand(), w: rand()),
                 B: Vector4(x: positionBX, y: positionBY, z: rand(), w: rand()),
@@ -190,22 +190,6 @@ class ParticleLab: CAMetalLayer
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
-        gravityWellAngle += 0.5
-        
-        let gravityWellAngleTwo = gravityWellAngle / 9
-        
-        gravityWellParticle.A.x = (640 + 250 * sin(gravityWellAngleTwo)) + 150 * cos(gravityWellAngle)
-        gravityWellParticle.A.y = (640 + 250 * cos(gravityWellAngleTwo)) + 150 * sin(gravityWellAngle)
-        
-        gravityWellParticle.B.x = (640 + 250 * sin(gravityWellAngleTwo + Float(M_PI))) + 150 * cos(gravityWellAngle)
-        gravityWellParticle.B.y = (640 + 250 * cos(gravityWellAngleTwo + Float(M_PI))) + 150 * sin(gravityWellAngle)
-        
-        gravityWellParticle.C.x = (640 + 500 * sin(gravityWellAngleTwo / 0.3 + Float(M_PI * 0.5))) + 50 * cos(gravityWellAngle * 2.5)
-        gravityWellParticle.C.y = (640 + 500 * cos(gravityWellAngleTwo / 0.3 + Float(M_PI * 0.5))) + 50 * sin(gravityWellAngle * 2.5)
-        
-        gravityWellParticle.D.x = (640 + 500 * sin(gravityWellAngleTwo / 0.3 + Float(M_PI * 1.5))) + 50 * cos(gravityWellAngle * 2.5)
-        gravityWellParticle.D.y = (640 + 500 * cos(gravityWellAngleTwo / 0.3 + Float(M_PI * 1.5))) + 50 * sin(gravityWellAngle * 2.5)
-        
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
 
@@ -251,6 +235,8 @@ struct Particle // Matrix4x4
     var D: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
 }
 
+// regular particles use x and y for position and z and w for velocity
+// gravity wells use x and y for position and z for mass and w for spin
 struct Vector4
 {
     var x: Float32 = 0

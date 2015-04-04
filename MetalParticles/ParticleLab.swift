@@ -54,7 +54,7 @@ class ParticleLab: CAMetalLayer
         super.init()
         
         framebufferOnly = false
-        drawableSize = CGSize(width: 1280, height: 1280);
+        drawableSize = CGSize(width: CGFloat(imageSide), height: CGFloat(imageSide));
         drawsAsynchronously = true
         
         setUpParticles()
@@ -77,24 +77,25 @@ class ParticleLab: CAMetalLayer
         
         func rand() -> Float32
         {
-            return Float(drand48() - 0.5) * 2
+            return Float(drand48() - 0.5) * 0.02
         }
+        
+        let imageSideDouble = Double(imageSide)
         
         for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex
         {
-            var positionAX = Float(drand48() * 1280)
-            var positionAY = Float(drand48() * 1280)
+            var positionAX = Float(drand48() * imageSideDouble)
+            var positionAY = Float(drand48() * imageSideDouble)
             
-            var positionBX = Float(drand48() * 1280)
-            var positionBY = Float(drand48() * 1280)
+            var positionBX = Float(drand48() * imageSideDouble)
+            var positionBY = Float(drand48() * imageSideDouble)
             
-            var positionCX = Float(drand48() * 1280)
-            var positionCY = Float(drand48() * 1280)
+            var positionCX = Float(drand48() * imageSideDouble)
+            var positionCY = Float(drand48() * imageSideDouble)
             
-            var positionDX = Float(drand48() * 1280)
-            var positionDY = Float(drand48() * 1280)
-            
-            /*
+            var positionDX = Float(drand48() * imageSideDouble)
+            var positionDY = Float(drand48() * imageSideDouble)
+    
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -125,7 +126,6 @@ class ParticleLab: CAMetalLayer
                 positionCY = Float(imageSide)
                 positionDY = Float(imageSide)
             }
-            */
             
             let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: rand(), w: rand()),
                 B: Vector4(x: positionBX, y: positionBY, z: rand(), w: rand()),
@@ -224,8 +224,46 @@ class ParticleLab: CAMetalLayer
         })
     }
 
+    func setGravityWellProperties(#gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
+    {
+        let imageSideFloat = Float(imageSide)
+        
+        switch gravityWell
+        {
+        case .One:
+            gravityWellParticle.A.x = imageSideFloat * normalisedPositionX
+            gravityWellParticle.A.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.A.z = mass
+            gravityWellParticle.A.w = spin
+            
+        case .Two:
+            gravityWellParticle.B.x = imageSideFloat * normalisedPositionX
+            gravityWellParticle.B.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.B.z = mass
+            gravityWellParticle.B.w = spin
+            
+        case .Three:
+            gravityWellParticle.C.x = imageSideFloat * normalisedPositionX
+            gravityWellParticle.C.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.C.z = mass
+            gravityWellParticle.C.w = spin
+            
+        case .Four:
+            gravityWellParticle.D.x = imageSideFloat * normalisedPositionX
+            gravityWellParticle.D.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.D.z = mass
+            gravityWellParticle.D.w = spin
+        }
+    }
 }
 
+enum GravityWell
+{
+    case One
+    case Two
+    case Three
+    case Four
+}
 
 struct Particle // Matrix4x4
 {

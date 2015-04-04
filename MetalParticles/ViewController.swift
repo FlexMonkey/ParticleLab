@@ -27,25 +27,14 @@ class ViewController: UIViewController
         
         view.layer.addSublayer(particleLab)
         
-        particleLab.gravityWellParticle.A.x = 280
-        particleLab.gravityWellParticle.A.y = 280
-        particleLab.gravityWellParticle.A.z = 6
-        particleLab.gravityWellParticle.A.w = -2
+        particleLab.setGravityWellProperties(gravityWell: .One, normalisedPositionX: 0.3, normalisedPositionY: 0.3, mass: 10, spin: -3)
         
-        particleLab.gravityWellParticle.B.x = 280
-        particleLab.gravityWellParticle.B.y = 1000
-        particleLab.gravityWellParticle.B.z = 6
-        particleLab.gravityWellParticle.B.w = 2
+        particleLab.setGravityWellProperties(gravityWell: .Two, normalisedPositionX: 0.7, normalisedPositionY: 0.3, mass: 7, spin: 3)
         
-        particleLab.gravityWellParticle.C.x = 1000
-        particleLab.gravityWellParticle.C.y = 280
-        particleLab.gravityWellParticle.C.z = 6
-        particleLab.gravityWellParticle.C.w = 2
+        particleLab.setGravityWellProperties(gravityWell: .Three, normalisedPositionX: 0.3, normalisedPositionY: 0.7, mass: 7, spin: 3)
         
-        particleLab.gravityWellParticle.D.x = 1000
-        particleLab.gravityWellParticle.D.y = 1000
-        particleLab.gravityWellParticle.D.z = 6
-        particleLab.gravityWellParticle.D.w = -2
+        particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.7, normalisedPositionY: 0.7, mass: 10, spin: -3)
+
     }
     
     override func viewDidLayoutSubviews()

@@ -33,3 +33,5 @@ particleLab.setGravityWellProperties(gravityWell: .Three, normalisedPositionX: 0
         
 particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.7, normalisedPositionY: 0.7, mass: 11, spin: -4)
 ```
+
+Gravity well positions can be displayed by setting the ```showGravityWellPositions``` property to _true_.

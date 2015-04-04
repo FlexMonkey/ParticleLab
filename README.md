@@ -1,6 +1,8 @@
 # MetalParticles
 Particle system that's both calculated and rendered on the GPU using the Metal framework
 
+![http://flexmonkey.co.uk/swift/IMG_0699.PNG](http://flexmonkey.co.uk/swift/IMG_0699.PNG)
+
 This is the most highly optimised version of my Swift and Metal particles system; managing over 40 fps with four million particles and four gravity wells. It manages this by rendering to a CAMetalLayer rather than converting a texture to a UIImage and by passing in four particle definitions per step with a float4x4 rather than a particle struct.
 
 You can read about these recent changes at my blog:
@@ -20,7 +22,7 @@ let particleLab = ParticleLab()
 view.layer.addSublayer(particleLab)
 ```
 
-The class has four gravity wells with propeties such as position, mass and spin. These are set with the _setGravityWellProperties_ :
+The class has four gravity wells with propeties such as position, mass and spin. These are set with the _setGravityWellProperties_ method:
 
 ```
 particleLab.setGravityWellProperties(gravityWell: .One, normalisedPositionX: 0.3, normalisedPositionY: 0.3, mass: 11, spin: -4)

@@ -14,7 +14,7 @@
 //  but WITHOUT ANY WARRANTY; without even the implied warranty of
 //  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 //  GNU General Public License for more details.
-    
+
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>
 
@@ -23,7 +23,12 @@ import UIKit
 
 class ParticleLab: CAMetalLayer
 {
-    let imageSide: UInt = 1280
+    let imageWidth: UInt
+    let imageHeight: UInt
+    
+    private var imageWidthFloatBuffer: MTLBuffer!
+    private var imageHeightFloatBuffer: MTLBuffer!
+    
     let bytesPerRow: UInt
     let region: MTLRegion
     let blankBitmapRawData : [UInt8]
@@ -46,7 +51,7 @@ class ParticleLab: CAMetalLayer
     private var particlesVoidPtr: COpaquePointer!
     private var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     private var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
-
+    
     private var gravityWellParticle = Particle(A: Vector4(x: 0, y: 0, z: 0, w: 0),
         B: Vector4(x: 0, y: 0, z: 0, w: 0),
         C: Vector4(x: 0, y: 0, z: 0, w: 0),
@@ -63,23 +68,29 @@ class ParticleLab: CAMetalLayer
     
     var particleLabDelegate: ParticleLabDelegate?
     
-    override init()
+    var particleColor = ParticleColor(R: 1, G: 1, B: 0.2, A: 1)
+    
+    init(width: UInt, height: UInt)
     {
-        bytesPerRow = 4 * imageSide
-        region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
-        blankBitmapRawData = [UInt8](count: Int(imageSide * imageSide * 4), repeatedValue: 0)
+        imageWidth = width
+        imageHeight = height
+        
+        bytesPerRow = 4 * imageWidth
+        
+        region = MTLRegionMake2D(0, 0, Int(imageWidth), Int(imageHeight))
+        blankBitmapRawData = [UInt8](count: Int(imageWidth * imageHeight * 4), repeatedValue: 0)
         particlesMemoryByteSize = UInt(particleCount) * UInt(sizeof(Particle))
         
         super.init()
         
         framebufferOnly = false
-        drawableSize = CGSize(width: CGFloat(imageSide), height: CGFloat(imageSide));
+        drawableSize = CGSize(width: CGFloat(imageWidth), height: CGFloat(imageHeight));
         drawsAsynchronously = true
         
         setUpParticles()
         
         setUpMetal()
- 
+        
         markerA.strokeColor = UIColor.whiteColor().CGColor
         markerB.strokeColor = UIColor.whiteColor().CGColor
         markerC.strokeColor = UIColor.whiteColor().CGColor
@@ -87,7 +98,7 @@ class ParticleLab: CAMetalLayer
     }
     
     var showGravityWellPositions: Bool = false
-    {
+        {
         didSet
         {
             if showGravityWellPositions
@@ -125,22 +136,23 @@ class ParticleLab: CAMetalLayer
             return Float(drand48() - 0.5) * 0.005
         }
         
-        let imageSideDouble = Double(imageSide)
+        let imageWidthDouble = Double(imageWidth)
+        let imageHeightDouble = Double(imageHeight)
         
         for index in particlesParticleBufferPtr.startIndex ..< particlesParticleBufferPtr.endIndex
         {
-            var positionAX = Float(drand48() * imageSideDouble)
-            var positionAY = Float(drand48() * imageSideDouble)
+            var positionAX = Float(drand48() * imageWidthDouble)
+            var positionAY = Float(drand48() * imageHeightDouble)
             
-            var positionBX = Float(drand48() * imageSideDouble)
-            var positionBY = Float(drand48() * imageSideDouble)
+            var positionBX = Float(drand48() * imageWidthDouble)
+            var positionBY = Float(drand48() * imageHeightDouble)
             
-            var positionCX = Float(drand48() * imageSideDouble)
-            var positionCY = Float(drand48() * imageSideDouble)
+            var positionCX = Float(drand48() * imageWidthDouble)
+            var positionCY = Float(drand48() * imageHeightDouble)
             
-            var positionDX = Float(drand48() * imageSideDouble)
-            var positionDY = Float(drand48() * imageSideDouble)
-    
+            var positionDX = Float(drand48() * imageWidthDouble)
+            var positionDY = Float(drand48() * imageHeightDouble)
+            
             let positionRule = Int(arc4random() % 4)
             
             if positionRule == 0
@@ -152,10 +164,10 @@ class ParticleLab: CAMetalLayer
             }
             else if positionRule == 1
             {
-                positionAX = Float(imageSide)
-                positionBX = Float(imageSide)
-                positionCX = Float(imageSide)
-                positionDX = Float(imageSide)
+                positionAX = Float(imageWidth)
+                positionBX = Float(imageWidth)
+                positionCX = Float(imageWidth)
+                positionDX = Float(imageWidth)
             }
             else if positionRule == 2
             {
@@ -166,10 +178,10 @@ class ParticleLab: CAMetalLayer
             }
             else
             {
-                positionAY = Float(imageSide)
-                positionBY = Float(imageSide)
-                positionCY = Float(imageSide)
-                positionDY = Float(imageSide)
+                positionAY = Float(imageHeight)
+                positionBY = Float(imageHeight)
+                positionCY = Float(imageHeight)
+                positionDY = Float(imageHeight)
             }
             
             let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: rand(), w: rand()),
@@ -180,7 +192,7 @@ class ParticleLab: CAMetalLayer
             particlesParticleBufferPtr[index] = particle
         }
     }
-
+    
     private func setUpMetal()
     {
         metalDevice = MTLCreateSystemDefaultDevice()
@@ -206,10 +218,18 @@ class ParticleLab: CAMetalLayer
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             
+            var colorBuffer = device.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: nil)
+            
+            var imageWidthFloat = Float(imageWidth)
+            var imageHeightFloat = Float(imageHeight)
+            
+            imageWidthFloatBuffer =  device.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: nil)
+            imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: nil)
+            
             step()
         }
     }
-
+    
     final private func step()
     {
         frameNumber++
@@ -237,17 +257,23 @@ class ParticleLab: CAMetalLayer
         
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
-
+        
+        var colorBuffer = device.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: nil)
+        commandEncoder.setBuffer(colorBuffer, offset: 0, atIndex: 3)
+        
+        commandEncoder.setBuffer(imageWidthFloatBuffer, offset: 0, atIndex: 4)
+        commandEncoder.setBuffer(imageHeightFloatBuffer, offset: 0, atIndex: 5)
+        
         if showGravityWellPositions
         {
-            let scale = frame.width / CGFloat(imageSide)
+            let scale = frame.width / CGFloat(imageWidth)
             
             markerA.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.A.x) * scale, y: CGFloat(gravityWellParticle.A.y) * scale, width: 10, height: 10), nil)
             markerB.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.B.x) * scale, y: CGFloat(gravityWellParticle.B.y) * scale, width: 10, height: 10), nil)
             markerC.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.C.x) * scale, y: CGFloat(gravityWellParticle.C.y) * scale, width: 10, height: 10), nil)
             markerD.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.D.x) * scale, y: CGFloat(gravityWellParticle.D.y) * scale, width: 10, height: 10), nil)
         }
-     
+        
         if let drawable = nextDrawable()
         {
             drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
@@ -280,34 +306,35 @@ class ParticleLab: CAMetalLayer
                 self.step();
         })
     }
-
+    
     final func setGravityWellProperties(#gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
     {
-        let imageSideFloat = Float(imageSide)
+        let imageWidthFloat = Float(imageWidth)
+        let imageHeightFloat = Float(imageHeight)
         
         switch gravityWell
         {
         case .One:
-            gravityWellParticle.A.x = imageSideFloat * normalisedPositionX
-            gravityWellParticle.A.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.A.x = imageWidthFloat * normalisedPositionX
+            gravityWellParticle.A.y = imageHeightFloat * normalisedPositionY
             gravityWellParticle.A.z = mass
             gravityWellParticle.A.w = spin
             
         case .Two:
-            gravityWellParticle.B.x = imageSideFloat * normalisedPositionX
-            gravityWellParticle.B.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.B.x = imageWidthFloat * normalisedPositionX
+            gravityWellParticle.B.y = imageHeightFloat * normalisedPositionY
             gravityWellParticle.B.z = mass
             gravityWellParticle.B.w = spin
             
         case .Three:
-            gravityWellParticle.C.x = imageSideFloat * normalisedPositionX
-            gravityWellParticle.C.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.C.x = imageWidthFloat * normalisedPositionX
+            gravityWellParticle.C.y = imageHeightFloat * normalisedPositionY
             gravityWellParticle.C.z = mass
             gravityWellParticle.C.w = spin
             
         case .Four:
-            gravityWellParticle.D.x = imageSideFloat * normalisedPositionX
-            gravityWellParticle.D.y = imageSideFloat * normalisedPositionY
+            gravityWellParticle.D.x = imageWidthFloat * normalisedPositionX
+            gravityWellParticle.D.y = imageHeightFloat * normalisedPositionY
             gravityWellParticle.D.z = mass
             gravityWellParticle.D.w = spin
         }
@@ -325,6 +352,14 @@ enum GravityWell
     case Two
     case Three
     case Four
+}
+
+struct ParticleColor
+{
+    var R: Float32 = 0
+    var G: Float32 = 0
+    var B: Float32 = 0
+    var A: Float32 = 1
 }
 
 struct Particle // Matrix4x4

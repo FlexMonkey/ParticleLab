@@ -23,10 +23,6 @@
 #include <metal_stdlib>
 using namespace metal;
 
-constant float4 colors[] = {float4(1.0, 1.0 , 0.2 , 1.0), float4(0.2, 1.0, 1.0, 1.0), float4(1.0, 0.2, 1.0, 1.0)};
-
-constant uint imageWidth = 1280;
-
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
                                    // texture2d<float, access::read> inTexture [[texture(1)]],
                                    
@@ -35,11 +31,21 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    constant float4x4 &inGravityWell [[ buffer(2) ]],
                                    
+                                   constant float3 &particleColor [[ buffer(3) ]],
+                                   
+                                   constant float &imageWidth [[ buffer(4) ]],
+                                   constant float &imageHeight [[ buffer(5) ]],
+                                   
                                    uint id [[thread_position_in_grid]])
 {
     const float4x4 inParticle = inParticles[id];
     
     const uint type = id % 3;
+    
+    const float4 colors[] = {
+        float4(particleColor.r, particleColor.g , particleColor.b , 1.0),
+        float4(particleColor.b, particleColor.r, particleColor.g, 1.0),
+        float4(particleColor.g, particleColor.b, particleColor.r, 1.0)};
     
     const float4 outColor = colors[type];
     
@@ -64,7 +70,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionA(inParticle[0].x, inParticle[0].y);
     
-    if (particlePositionA.x > 0 && particlePositionA.y > 0 && particlePositionA.x < imageWidth && particlePositionA.y < imageWidth)
+    if (particlePositionA.x > 0 && particlePositionA.y > 0 && particlePositionA.x < imageWidth && particlePositionA.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionA);
     }
@@ -85,7 +91,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionB(inParticle[1].x, inParticle[1].y);
     
-    if (particlePositionB.x > 0 && particlePositionB.y > 0 && particlePositionB.x < imageWidth && particlePositionB.y < imageWidth)
+    if (particlePositionB.x > 0 && particlePositionB.y > 0 && particlePositionB.x < imageWidth && particlePositionB.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionB);
     }
@@ -107,7 +113,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionC(inParticle[2].x, inParticle[2].y);
     
-    if (particlePositionC.x > 0 && particlePositionC.y > 0 && particlePositionC.x < imageWidth && particlePositionC.y < imageWidth)
+    if (particlePositionC.x > 0 && particlePositionC.y > 0 && particlePositionC.x < imageWidth && particlePositionC.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionC);
     }
@@ -129,7 +135,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionD(inParticle[3].x, inParticle[3].y);
     
-    if (particlePositionD.x > 0 && particlePositionD.y > 0 && particlePositionD.x < imageWidth && particlePositionD.y < imageWidth)
+    if (particlePositionD.x > 0 && particlePositionD.y > 0 && particlePositionD.x < imageWidth && particlePositionD.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionD);
     }
@@ -146,7 +152,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float spinDTwo =    (gravityWellTwoSpin / fast::pow(fast::distance(particlePositionDFloat, gravityWellTwoPosition),2));
     const float spinDThree =  (gravityWellThreeSpin / fast::pow(fast::distance(particlePositionDFloat, gravityWellThreePosition),2));
     // ---
- 
+    
     float4x4 outParticle;
     
     outParticle[0] = {
@@ -154,26 +160,26 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         inParticle[0].y + inParticle[0].w,
         
         (inParticle[0].z * 0.97) +
-            ((inGravityWell[0].x - inParticle[0].x) * factorAZero) +
-            ((inGravityWell[1].x - inParticle[0].x) * factorAOne) +
-            ((inGravityWell[2].x - inParticle[0].x) * factorATwo) +
-            ((inGravityWell[3].x - inParticle[0].x) * factorAThree) +
+        ((inGravityWell[0].x - inParticle[0].x) * factorAZero) +
+        ((inGravityWell[1].x - inParticle[0].x) * factorAOne) +
+        ((inGravityWell[2].x - inParticle[0].x) * factorATwo) +
+        ((inGravityWell[3].x - inParticle[0].x) * factorAThree) +
         
-            ((inGravityWell[0].y - inParticle[0].y) * spinAZero) +
-            ((inGravityWell[1].y - inParticle[0].y) * spinAOne) +
-            ((inGravityWell[2].y - inParticle[0].y) * spinATwo) +
-            ((inGravityWell[3].y - inParticle[0].y) * spinAThree),
+        ((inGravityWell[0].y - inParticle[0].y) * spinAZero) +
+        ((inGravityWell[1].y - inParticle[0].y) * spinAOne) +
+        ((inGravityWell[2].y - inParticle[0].y) * spinATwo) +
+        ((inGravityWell[3].y - inParticle[0].y) * spinAThree),
         
         (inParticle[0].w * 0.97) +
-            ((inGravityWell[0].y - inParticle[0].y) * factorAZero) +
-            ((inGravityWell[1].y - inParticle[0].y) * factorAOne) +
-            ((inGravityWell[2].y - inParticle[0].y) * factorATwo) +
-            ((inGravityWell[3].y - inParticle[0].y) * factorAThree)+
+        ((inGravityWell[0].y - inParticle[0].y) * factorAZero) +
+        ((inGravityWell[1].y - inParticle[0].y) * factorAOne) +
+        ((inGravityWell[2].y - inParticle[0].y) * factorATwo) +
+        ((inGravityWell[3].y - inParticle[0].y) * factorAThree)+
         
-            ((inGravityWell[0].x - inParticle[0].x) * -spinAZero) +
-            ((inGravityWell[1].x - inParticle[0].x) * -spinAOne) +
-            ((inGravityWell[2].x - inParticle[0].x) * -spinATwo) +
-            ((inGravityWell[3].x - inParticle[0].x) * -spinAThree),
+        ((inGravityWell[0].x - inParticle[0].x) * -spinAZero) +
+        ((inGravityWell[1].x - inParticle[0].x) * -spinAOne) +
+        ((inGravityWell[2].x - inParticle[0].x) * -spinATwo) +
+        ((inGravityWell[3].x - inParticle[0].x) * -spinAThree),
     };
     
     
@@ -182,26 +188,26 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         inParticle[1].y + inParticle[1].w,
         
         (inParticle[1].z * 0.97) +
-            ((inGravityWell[0].x - inParticle[1].x) * factorBZero) +
-            ((inGravityWell[1].x - inParticle[1].x) * factorBOne) +
-            ((inGravityWell[2].x - inParticle[1].x) * factorBTwo) +
-            ((inGravityWell[3].x - inParticle[1].x) * factorBThree) +
+        ((inGravityWell[0].x - inParticle[1].x) * factorBZero) +
+        ((inGravityWell[1].x - inParticle[1].x) * factorBOne) +
+        ((inGravityWell[2].x - inParticle[1].x) * factorBTwo) +
+        ((inGravityWell[3].x - inParticle[1].x) * factorBThree) +
         
-            ((inGravityWell[0].y - inParticle[1].y) * spinBZero) +
-            ((inGravityWell[1].y - inParticle[1].y) * spinBOne) +
-            ((inGravityWell[2].y - inParticle[1].y) * spinBTwo) +
-            ((inGravityWell[3].y - inParticle[1].y) * spinBThree),
+        ((inGravityWell[0].y - inParticle[1].y) * spinBZero) +
+        ((inGravityWell[1].y - inParticle[1].y) * spinBOne) +
+        ((inGravityWell[2].y - inParticle[1].y) * spinBTwo) +
+        ((inGravityWell[3].y - inParticle[1].y) * spinBThree),
         
         (inParticle[1].w * 0.97) +
-            ((inGravityWell[0].y - inParticle[1].y) * factorBZero) +
-            ((inGravityWell[1].y - inParticle[1].y) * factorBOne) +
-            ((inGravityWell[2].y - inParticle[1].y) * factorBTwo) +
-            ((inGravityWell[3].y - inParticle[1].y) * factorBThree) +
+        ((inGravityWell[0].y - inParticle[1].y) * factorBZero) +
+        ((inGravityWell[1].y - inParticle[1].y) * factorBOne) +
+        ((inGravityWell[2].y - inParticle[1].y) * factorBTwo) +
+        ((inGravityWell[3].y - inParticle[1].y) * factorBThree) +
         
-            ((inGravityWell[0].x - inParticle[1].x) * -spinBZero) +
-            ((inGravityWell[1].x - inParticle[1].x) * -spinBOne) +
-            ((inGravityWell[2].x - inParticle[1].x) * -spinBTwo) +
-            ((inGravityWell[3].x - inParticle[1].x) * -spinBThree),
+        ((inGravityWell[0].x - inParticle[1].x) * -spinBZero) +
+        ((inGravityWell[1].x - inParticle[1].x) * -spinBOne) +
+        ((inGravityWell[2].x - inParticle[1].x) * -spinBTwo) +
+        ((inGravityWell[3].x - inParticle[1].x) * -spinBThree),
     };
     
     
@@ -210,26 +216,26 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         inParticle[2].y + inParticle[2].w,
         
         (inParticle[2].z * 0.97) +
-            ((inGravityWell[0].x - inParticle[2].x) * factorCZero) +
-            ((inGravityWell[1].x - inParticle[2].x) * factorCOne) +
-            ((inGravityWell[2].x - inParticle[2].x) * factorCTwo) +
-            ((inGravityWell[3].x - inParticle[2].x) * factorCThree) +
+        ((inGravityWell[0].x - inParticle[2].x) * factorCZero) +
+        ((inGravityWell[1].x - inParticle[2].x) * factorCOne) +
+        ((inGravityWell[2].x - inParticle[2].x) * factorCTwo) +
+        ((inGravityWell[3].x - inParticle[2].x) * factorCThree) +
         
-            ((inGravityWell[0].y - inParticle[2].y) * spinCZero) +
-            ((inGravityWell[1].y - inParticle[2].y) * spinCOne) +
-            ((inGravityWell[2].y - inParticle[2].y) * spinCTwo) +
-            ((inGravityWell[3].y - inParticle[2].y) * spinCThree),
+        ((inGravityWell[0].y - inParticle[2].y) * spinCZero) +
+        ((inGravityWell[1].y - inParticle[2].y) * spinCOne) +
+        ((inGravityWell[2].y - inParticle[2].y) * spinCTwo) +
+        ((inGravityWell[3].y - inParticle[2].y) * spinCThree),
         
         (inParticle[2].w * 0.97) +
-            ((inGravityWell[0].y - inParticle[2].y) * factorCZero) +
-            ((inGravityWell[1].y - inParticle[2].y) * factorCOne) +
-            ((inGravityWell[2].y - inParticle[2].y) * factorCTwo) +
-            ((inGravityWell[3].y - inParticle[2].y) * factorCThree) +
+        ((inGravityWell[0].y - inParticle[2].y) * factorCZero) +
+        ((inGravityWell[1].y - inParticle[2].y) * factorCOne) +
+        ((inGravityWell[2].y - inParticle[2].y) * factorCTwo) +
+        ((inGravityWell[3].y - inParticle[2].y) * factorCThree) +
         
-            ((inGravityWell[0].x - inParticle[2].x) * -spinCZero) +
-            ((inGravityWell[1].x - inParticle[2].x) * -spinCOne) +
-            ((inGravityWell[2].x - inParticle[2].x) * -spinCTwo) +
-            ((inGravityWell[3].x - inParticle[2].x) * -spinCThree),
+        ((inGravityWell[0].x - inParticle[2].x) * -spinCZero) +
+        ((inGravityWell[1].x - inParticle[2].x) * -spinCOne) +
+        ((inGravityWell[2].x - inParticle[2].x) * -spinCTwo) +
+        ((inGravityWell[3].x - inParticle[2].x) * -spinCThree),
     };
     
     
@@ -238,30 +244,30 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         inParticle[3].y + inParticle[3].w,
         
         (inParticle[3].z * 0.97) +
-            ((inGravityWell[0].x - inParticle[3].x) * factorDZero) +
-            ((inGravityWell[1].x - inParticle[3].x) * factorDOne) +
-            ((inGravityWell[2].x - inParticle[3].x) * factorDTwo) +
-            ((inGravityWell[3].x - inParticle[3].x) * factorDThree) +
+        ((inGravityWell[0].x - inParticle[3].x) * factorDZero) +
+        ((inGravityWell[1].x - inParticle[3].x) * factorDOne) +
+        ((inGravityWell[2].x - inParticle[3].x) * factorDTwo) +
+        ((inGravityWell[3].x - inParticle[3].x) * factorDThree) +
         
-            ((inGravityWell[0].y - inParticle[3].y) * spinDZero) +
-            ((inGravityWell[1].y - inParticle[3].y) * spinDOne) +
-            ((inGravityWell[2].y - inParticle[3].y) * spinDTwo) +
-            ((inGravityWell[3].y - inParticle[3].y) * spinDThree),
+        ((inGravityWell[0].y - inParticle[3].y) * spinDZero) +
+        ((inGravityWell[1].y - inParticle[3].y) * spinDOne) +
+        ((inGravityWell[2].y - inParticle[3].y) * spinDTwo) +
+        ((inGravityWell[3].y - inParticle[3].y) * spinDThree),
         
         (inParticle[3].w * 0.97) +
-            ((inGravityWell[0].y - inParticle[3].y) * factorDZero) +
-            ((inGravityWell[1].y - inParticle[3].y) * factorDOne) +
-            ((inGravityWell[2].y - inParticle[3].y) * factorDTwo) +
-            ((inGravityWell[3].y - inParticle[3].y) * factorDThree) +
+        ((inGravityWell[0].y - inParticle[3].y) * factorDZero) +
+        ((inGravityWell[1].y - inParticle[3].y) * factorDOne) +
+        ((inGravityWell[2].y - inParticle[3].y) * factorDTwo) +
+        ((inGravityWell[3].y - inParticle[3].y) * factorDThree) +
         
-            ((inGravityWell[0].x - inParticle[3].x) * -spinDZero) +
-            ((inGravityWell[1].x - inParticle[3].x) * -spinDOne) +
-            ((inGravityWell[2].x - inParticle[3].x) * -spinDTwo) +
-            ((inGravityWell[3].x - inParticle[3].x) * -spinDThree),
+        ((inGravityWell[0].x - inParticle[3].x) * -spinDZero) +
+        ((inGravityWell[1].x - inParticle[3].x) * -spinDOne) +
+        ((inGravityWell[2].x - inParticle[3].x) * -spinDTwo) +
+        ((inGravityWell[3].x - inParticle[3].x) * -spinDThree),
     };
     
     outParticles[id] = outParticle;
- 
+    
     
     // ----
     /*

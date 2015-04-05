@@ -27,7 +27,7 @@ import UIKit
 
 class ViewController: UIViewController, ParticleLabDelegate
 {
-    let particleLab = ParticleLab()
+    var particleLab: ParticleLab!
     
     var gravityWellAngle: Float = 0
     
@@ -36,6 +36,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.blackColor()
+         particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height))
         
         view.layer.addSublayer(particleLab)
  
@@ -70,18 +71,12 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     override func viewDidLayoutSubviews()
     {
-        if view.frame.height > view.frame.width
-        {
-            let imageSide = view.frame.width
-            
-            particleLab.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: 01)
-        }
-        else
-        {
-            let imageSide = view.frame.height
-            
-            particleLab.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
-        }
+        particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+    }
+    
+    override func supportedInterfaceOrientations() -> Int
+    {
+        return Int(UIInterfaceOrientationMask.Landscape.rawValue)
     }
     
     override func didReceiveMemoryWarning()

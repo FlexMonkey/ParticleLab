@@ -23,8 +23,6 @@
 #include <metal_stdlib>
 using namespace metal;
 
-constant uint imageWidth = 1280;
-
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
                                    // texture2d<float, access::read> inTexture [[texture(1)]],
                                    
@@ -34,6 +32,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    constant float4x4 &inGravityWell [[ buffer(2) ]],
                                    
                                    constant float3 &particleColor [[ buffer(3) ]],
+                                   
+                                   constant float &imageWidth [[ buffer(4) ]],
+                                   constant float &imageHeight [[ buffer(5) ]],
                                    
                                    uint id [[thread_position_in_grid]])
 {
@@ -69,7 +70,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionA(inParticle[0].x, inParticle[0].y);
     
-    if (particlePositionA.x > 0 && particlePositionA.y > 0 && particlePositionA.x < imageWidth && particlePositionA.y < imageWidth)
+    if (particlePositionA.x > 0 && particlePositionA.y > 0 && particlePositionA.x < imageWidth && particlePositionA.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionA);
     }
@@ -90,7 +91,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionB(inParticle[1].x, inParticle[1].y);
     
-    if (particlePositionB.x > 0 && particlePositionB.y > 0 && particlePositionB.x < imageWidth && particlePositionB.y < imageWidth)
+    if (particlePositionB.x > 0 && particlePositionB.y > 0 && particlePositionB.x < imageWidth && particlePositionB.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionB);
     }
@@ -112,7 +113,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionC(inParticle[2].x, inParticle[2].y);
     
-    if (particlePositionC.x > 0 && particlePositionC.y > 0 && particlePositionC.x < imageWidth && particlePositionC.y < imageWidth)
+    if (particlePositionC.x > 0 && particlePositionC.y > 0 && particlePositionC.x < imageWidth && particlePositionC.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionC);
     }
@@ -134,7 +135,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const uint2 particlePositionD(inParticle[3].x, inParticle[3].y);
     
-    if (particlePositionD.x > 0 && particlePositionD.y > 0 && particlePositionD.x < imageWidth && particlePositionD.y < imageWidth)
+    if (particlePositionD.x > 0 && particlePositionD.y > 0 && particlePositionD.x < imageWidth && particlePositionD.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionD);
     }

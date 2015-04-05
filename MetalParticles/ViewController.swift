@@ -27,7 +27,7 @@ import UIKit
 
 class ViewController: UIViewController, ParticleLabDelegate
 {
-    let particleLab = ParticleLab()
+    var particleLab: ParticleLab!
     
     var gravityWellAngle: Float = 0
     
@@ -59,6 +59,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         analyzer.start()
         
         view.backgroundColor = UIColor.blackColor()
+        particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height))
         
         view.layer.addSublayer(particleLab)
  
@@ -86,11 +87,11 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         let normalisedFrequency = CGFloat(frequency / 10000);
         let targetColors = UIColor(hue: normalisedFrequency, saturation: 1, brightness: 1, alpha: 1).getRGB()
-      particleLab.particleColor = ParticleColor(
-        R: (particleLab.particleColor.R * 19 + targetColors.redComponent) / 20,
-        G: (particleLab.particleColor.G * 19 + targetColors.greenComponent) / 20,
-        B: (particleLab.particleColor.B * 19 + targetColors.blueComponent) / 20,
-        A: 1.0)
+          particleLab.particleColor = ParticleColor(
+            R: (particleLab.particleColor.R * 19 + targetColors.redComponent) / 20,
+            G: (particleLab.particleColor.G * 19 + targetColors.greenComponent) / 20,
+            B: (particleLab.particleColor.B * 19 + targetColors.blueComponent) / 20,
+            A: 1.0)
   
         if amplitude > gravityWellRadius
         {
@@ -134,18 +135,12 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     override func viewDidLayoutSubviews()
     {
-        if view.frame.height > view.frame.width
-        {
-            let imageSide = view.frame.width
-            
-            particleLab.frame = CGRect(x: 0, y: view.frame.height / 2.0 - imageSide / 2, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: 01)
-        }
-        else
-        {
-            let imageSide = view.frame.height
-            
-            particleLab.frame = CGRect(x: view.frame.width / 2.0 - imageSide / 2 , y: 0, width: imageSide, height: imageSide).rectByInsetting(dx: -1, dy: -1)
-        }
+        particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+    }
+    
+    override func supportedInterfaceOrientations() -> Int
+    {
+        return Int(UIInterfaceOrientationMask.Landscape.rawValue)
     }
     
     override func didReceiveMemoryWarning()

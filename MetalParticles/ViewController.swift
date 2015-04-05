@@ -36,7 +36,8 @@ class ViewController: UIViewController, ParticleLabDelegate
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.blackColor()
-         particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height))
+        
+        particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height))
         
         view.layer.addSublayer(particleLab)
  
@@ -44,6 +45,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         particleLab.particleLabDelegate = self
 
+        particleLab.dragFactor = 0.85
     }
     
     let floatPi = Float(M_PI)

@@ -76,22 +76,26 @@ class ViewController: UIViewController, ParticleLabDelegate
         amplitude = analyzer.trackedAmplitude.value
         frequency = analyzer.trackedFrequency.value
         
+        let mass1 = frequency / 40
+        let spin1 = frequency / 40
+        let mass2 = frequency / 20
+        let spin2 = -frequency / 30
+        
         particleLab.setGravityWellProperties(gravityWell: .One,
-            normalisedPositionX: 0.25 + amplitude,
-            normalisedPositionY: 0.25 + amplitude, mass: frequency / 44, spin: frequency / 44)
-        /*
+            normalisedPositionX: 0.5 + amplitude * sin(gravityWellAngle + floatPi * 0.5),
+            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 0.5), mass: mass1, spin: spin1)
+        
         particleLab.setGravityWellProperties(gravityWell: .Four,
-        normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 1.5),
-        normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 1.5), mass: 11, spin: 13)
+            normalisedPositionX: 0.5 + amplitude * sin(gravityWellAngle + floatPi * 1.5),
+            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 1.5), mass: mass1, spin: spin1)
         
         particleLab.setGravityWellProperties(gravityWell: .Two,
-        normalisedPositionX: 0.5 + (0.35 + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3),
-        normalisedPositionY: 0.5 + (0.35 + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3), mass: 26, spin: -16)
+            normalisedPositionX: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3),
+            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3), mass: mass2, spin: spin2)
         
         particleLab.setGravityWellProperties(gravityWell: .Three,
-        normalisedPositionX: 0.5 + (0.35 + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3 + floatPi),
-        normalisedPositionY: 0.5 + (0.35 + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3 + floatPi), mass: 26, spin: -16)
-        */
+            normalisedPositionX: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3 + floatPi),
+            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3 + floatPi), mass: mass2, spin: spin2)
     }
     
     override func viewDidLayoutSubviews()

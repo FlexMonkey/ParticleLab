@@ -236,7 +236,7 @@ class ParticleLab: CAMetalLayer
         if frameNumber == 100
         {
             let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-            println(NSString(format: "%.1f", 1 / frametime) + "fps" )
+            // println(NSString(format: "%.1f", 1 / frametime) + "fps" )
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             

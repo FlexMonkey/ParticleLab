@@ -59,7 +59,17 @@ class ViewController: UIViewController, ParticleLabDelegate
         analyzer.start()
         
         view.backgroundColor = UIColor.blackColor()
-        particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height))
+
+        if view.frame.height < view.frame.width
+        {
+            particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height))
+            particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+        }
+        else
+        {
+            particleLab = ParticleLab(width: UInt(view.frame.height), height: UInt(view.frame.width))
+            particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.height, height: view.frame.width)
+        }
         
         view.layer.addSublayer(particleLab)
  
@@ -132,12 +142,7 @@ class ViewController: UIViewController, ParticleLabDelegate
             spin:spin2
         )
     }
-    
-    override func viewDidLayoutSubviews()
-    {
-        particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
-    }
-    
+
     override func supportedInterfaceOrientations() -> Int
     {
         return Int(UIInterfaceOrientationMask.Landscape.rawValue)

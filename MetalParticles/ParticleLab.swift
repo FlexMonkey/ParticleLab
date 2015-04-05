@@ -68,7 +68,8 @@ class ParticleLab: CAMetalLayer
     
     var particleLabDelegate: ParticleLabDelegate?
     
-    var particleColor = ParticleColor(R: 1, G: 1, B: 0.2, A: 1)
+    var particleColor = ParticleColor(R: 1, G: 0.5, B: 0.2, A: 1)
+    var dragFactor: Float = 0.97
     
     init(width: UInt, height: UInt)
     {
@@ -217,9 +218,7 @@ class ParticleLab: CAMetalLayer
             particle_threadGroups = MTLSize(width:(particleCount + threadExecutionWidth - 1) / threadExecutionWidth, height:1, depth:1)
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
-            
-            var colorBuffer = device.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: nil)
-            
+    
             var imageWidthFloat = Float(imageWidth)
             var imageHeightFloat = Float(imageHeight)
             
@@ -263,6 +262,9 @@ class ParticleLab: CAMetalLayer
         
         commandEncoder.setBuffer(imageWidthFloatBuffer, offset: 0, atIndex: 4)
         commandEncoder.setBuffer(imageHeightFloatBuffer, offset: 0, atIndex: 5)
+        
+        var dragFactorBuffer = device.newBufferWithBytes(&dragFactor, length: sizeof(Float), options: nil)
+        commandEncoder.setBuffer(dragFactorBuffer, offset: 0, atIndex: 6)
         
         if showGravityWellPositions
         {

@@ -86,11 +86,11 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         let normalisedFrequency = CGFloat(frequency / 10000);
         let targetColors = UIColor(hue: normalisedFrequency, saturation: 1, brightness: 1, alpha: 1).getRGB()
-        particleLab.particleColor = ParticleColor(
-            R: (particleLab.particleColor.R + targetColors.redComponent) / 2,
-            G: (particleLab.particleColor.G + targetColors.greenComponent) / 2,
-            B: (particleLab.particleColor.B + targetColors.blueComponent) / 2,
-            A: 1.0)
+      particleLab.particleColor = ParticleColor(
+        R: (particleLab.particleColor.R * 19 + targetColors.redComponent) / 20,
+        G: (particleLab.particleColor.G * 19 + targetColors.greenComponent) / 20,
+        B: (particleLab.particleColor.B * 19 + targetColors.blueComponent) / 20,
+        A: 1.0)
   
         if amplitude > gravityWellRadius
         {

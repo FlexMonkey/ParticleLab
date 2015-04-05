@@ -63,6 +63,8 @@ class ParticleLab: CAMetalLayer
     
     var particleLabDelegate: ParticleLabDelegate?
     
+    var particleColor = ParticleColor(R: 1, G: 1, B: 0.2, A: 1)
+    
     override init()
     {
         bytesPerRow = 4 * imageSide
@@ -217,7 +219,7 @@ class ParticleLab: CAMetalLayer
         if frameNumber == 100
         {
             let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-            println(NSString(format: "%.1f", 1 / frametime) + "fps" )
+            // println(NSString(format: "%.1f", 1 / frametime) + "fps" )
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             
@@ -238,6 +240,9 @@ class ParticleLab: CAMetalLayer
         var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
 
+        var colorBuffer = device.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: nil)
+        commandEncoder.setBuffer(colorBuffer, offset: 0, atIndex: 3)
+        
         if showGravityWellPositions
         {
             let scale = frame.width / CGFloat(imageSide)
@@ -325,6 +330,14 @@ enum GravityWell
     case Two
     case Three
     case Four
+}
+
+struct ParticleColor
+{
+    var R: Float32 = 0
+    var G: Float32 = 0
+    var B: Float32 = 0
+    var A: Float32 = 1
 }
 
 struct Particle // Matrix4x4

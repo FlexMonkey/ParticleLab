@@ -23,8 +23,6 @@
 #include <metal_stdlib>
 using namespace metal;
 
-constant float4 colors[] = {float4(1.0, 1.0 , 0.2 , 1.0), float4(0.2, 1.0, 1.0, 1.0), float4(1.0, 0.2, 1.0, 1.0)};
-
 constant uint imageWidth = 1280;
 
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
@@ -35,11 +33,18 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    constant float4x4 &inGravityWell [[ buffer(2) ]],
                                    
+                                   constant float3 &particleColor [[ buffer(3) ]],
+                                   
                                    uint id [[thread_position_in_grid]])
 {
     const float4x4 inParticle = inParticles[id];
     
     const uint type = id % 3;
+    
+    const float4 colors[] = {
+        float4(particleColor.r, particleColor.g , particleColor.b , 1.0),
+        float4(particleColor.b, particleColor.r, particleColor.g, 1.0),
+        float4(particleColor.g, particleColor.b, particleColor.r, 1.0)};
     
     const float4 outColor = colors[type];
     

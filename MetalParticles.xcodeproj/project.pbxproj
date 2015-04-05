@@ -14,8 +14,8 @@
 		BE75EE9C1A6A2CC000B20D49 /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = BE75EE9A1A6A2CC000B20D49 /* LaunchScreen.xib */; };
 		BE75EEA81A6A2CC000B20D49 /* MetalParticlesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */; };
 		BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB21A6A327F00B20D49 /* Particles.metal */; };
-		BE75EEB91A6A82C800B20D49 /* MarkerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */; };
 		BEEBCABB1ACFAB41002865B3 /* ParticleLab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEBCABA1ACFAB41002865B3 /* ParticleLab.swift */; };
+		BEEBCABE1AD109BA002865B3 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEBCABD1AD109BA002865B3 /* Extensions.swift */; };
 		C437D7EC1AD0ED2E000E828E /* AKManager.m in Sources */ = {isa = PBXBuildFile; fileRef = C437D63F1AD0ED2D000E828E /* AKManager.m */; };
 		C437D7ED1AD0ED2E000E828E /* AKOrchestra.m in Sources */ = {isa = PBXBuildFile; fileRef = C437D6411AD0ED2D000E828E /* AKOrchestra.m */; };
 		C437D7EE1AD0ED2E000E828E /* AudioKit.plist in Resources */ = {isa = PBXBuildFile; fileRef = C437D6421AD0ED2D000E828E /* AudioKit.plist */; };
@@ -222,8 +222,8 @@
 		BE75EEA61A6A2CC000B20D49 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalParticlesTests.swift; sourceTree = "<group>"; };
 		BE75EEB21A6A327F00B20D49 /* Particles.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Particles.metal; sourceTree = "<group>"; };
-		BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerWidget.swift; sourceTree = "<group>"; };
 		BEEBCABA1ACFAB41002865B3 /* ParticleLab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticleLab.swift; sourceTree = "<group>"; };
+		BEEBCABD1AD109BA002865B3 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		C437D63D1AD0ED2D000E828E /* AKFoundation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKFoundation.h; sourceTree = "<group>"; };
 		C437D63E1AD0ED2D000E828E /* AKManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AKManager.h; sourceTree = "<group>"; };
 		C437D63F1AD0ED2D000E828E /* AKManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = AKManager.m; sourceTree = "<group>"; };
@@ -649,8 +649,8 @@
 		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
 			isa = PBXGroup;
 			children = (
+				BEEBCABC1AD109AB002865B3 /* extensions */,
 				BEEBCAB91ACFAB1A002865B3 /* particleLab */,
-				BE75EEB71A6A82A400B20D49 /* marker */,
 				BE75EEB11A6A326400B20D49 /* shaders */,
 				BE75EE911A6A2CC000B20D49 /* AppDelegate.swift */,
 				BE75EE931A6A2CC000B20D49 /* ViewController.swift */,
@@ -696,20 +696,20 @@
 			name = shaders;
 			sourceTree = "<group>";
 		};
-		BE75EEB71A6A82A400B20D49 /* marker */ = {
-			isa = PBXGroup;
-			children = (
-				BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */,
-			);
-			name = marker;
-			sourceTree = "<group>";
-		};
 		BEEBCAB91ACFAB1A002865B3 /* particleLab */ = {
 			isa = PBXGroup;
 			children = (
 				BEEBCABA1ACFAB41002865B3 /* ParticleLab.swift */,
 			);
 			name = particleLab;
+			sourceTree = "<group>";
+		};
+		BEEBCABC1AD109AB002865B3 /* extensions */ = {
+			isa = PBXGroup;
+			children = (
+				BEEBCABD1AD109BA002865B3 /* Extensions.swift */,
+			);
+			name = extensions;
 			sourceTree = "<group>";
 		};
 		C437D63B1AD0ED2D000E828E /* AudioKitV2.0 */ = {
@@ -1700,6 +1700,7 @@
 				C437D7F21AD0ED2E000E828E /* AKNote.m in Sources */,
 				C437D8371AD0ED2E000E828E /* AKAdditiveCosines.m in Sources */,
 				C437D8851AD0ED2E000E828E /* Microphone.m in Sources */,
+				BEEBCABE1AD109BA002865B3 /* Extensions.swift in Sources */,
 				C437D85E1AD0ED2E000E828E /* AKPanner.m in Sources */,
 				C437D8A11AD0ED2E000E828E /* LevelMeter.m in Sources */,
 				C437D8911AD0ED2E000E828E /* AKPlotView.m in Sources */,
@@ -1735,7 +1736,6 @@
 				C437D8401AD0ED2E000E828E /* AKDelay.m in Sources */,
 				C437D8921AD0ED2E000E828E /* AKStereoOutputPlot.m in Sources */,
 				C437D8A01AD0ED2E000E828E /* AKPropertySlider.m in Sources */,
-				BE75EEB91A6A82C800B20D49 /* MarkerWidget.swift in Sources */,
 				C437D83D1AD0ED2E000E828E /* AKMP3FileInput.m in Sources */,
 				C437D8161AD0ED2E000E828E /* AKPortamento.m in Sources */,
 				C437D8111AD0ED2E000E828E /* AKGranularSynthesizer.m in Sources */,

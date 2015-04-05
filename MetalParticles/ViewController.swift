@@ -70,43 +70,65 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     let floatPi = Float(M_PI)
     
+    var gravityWellRadius: Float = 0
+
     func particleLabDidUpdate()
     {
-        gravityWellAngle = gravityWellAngle + 0.01
-        amplitude = analyzer.trackedAmplitude.value
+        amplitude = analyzer.trackedAmplitude.value;
         frequency = analyzer.trackedFrequency.value
         
-        let mass1 = frequency / 40
-        let spin1 = frequency / 40
-        let mass2 = frequency / 20
-        let spin2 = -frequency / 30
+        let mass1 = amplitude + (frequency / 30)
+        let spin1 = amplitude + (frequency / 40)
+        let mass2 = -mass1 / 2
+        let spin2 = -spin1 * 2
+     
+        gravityWellAngle = gravityWellAngle + 0.01 + amplitude
+        
+        let normalisedFrequency = CGFloat(frequency / 10000);
+        let targetColors = UIColor(hue: normalisedFrequency, saturation: 1, brightness: 1, alpha: 1).getRGB()
+        particleLab.particleColor = ParticleColor(
+            R: (particleLab.particleColor.R + targetColors.redComponent) / 2,
+            G: (particleLab.particleColor.G + targetColors.greenComponent) / 2,
+            B: (particleLab.particleColor.B + targetColors.blueComponent) / 2,
+            A: 1.0)
+  
+        if amplitude > gravityWellRadius
+        {
+            gravityWellRadius = amplitude
+        }
+        else
+        {
+            gravityWellRadius *= 0.9
+        }
+        
+        let adjustedRadius = 0.05 + gravityWellRadius
         
         particleLab.setGravityWellProperties(gravityWell: .One,
-            normalisedPositionX: 0.5 + amplitude * sin(gravityWellAngle + floatPi * 0.5),
-            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 0.5),
-            mass: mass1,
-            spin:spin1
-        )
-        
-        particleLab.setGravityWellProperties(gravityWell: .Four,
-            normalisedPositionX: 0.5 + amplitude * sin(gravityWellAngle + floatPi * 1.5),
-            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 1.5),
+            normalisedPositionX: 0.5 + adjustedRadius * 2 * sin(gravityWellAngle),
+            normalisedPositionY: 0.5 + adjustedRadius * 2 * cos(gravityWellAngle),
             mass: mass1,
             spin: spin1
         )
         
         particleLab.setGravityWellProperties(gravityWell: .Two,
-            normalisedPositionX: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3),
-            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3),
+            normalisedPositionX: 0.5 + adjustedRadius * sin(gravityWellAngle + floatPi * 0.5),
+            normalisedPositionY: 0.5 + adjustedRadius * cos(gravityWellAngle + floatPi * 0.5),
             mass: mass2,
             spin: spin2
         )
         
         particleLab.setGravityWellProperties(gravityWell: .Three,
-            normalisedPositionX: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3 + floatPi),
-            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3 + floatPi),
+            normalisedPositionX: 0.5 + adjustedRadius * 2 * sin(gravityWellAngle + floatPi),
+            normalisedPositionY: 0.5 + adjustedRadius * 2 * cos(gravityWellAngle + floatPi),
+            mass: mass1,
+            spin: spin1
+        )
+        
+        particleLab.setGravityWellProperties(gravityWell: .Four,
+            normalisedPositionX: 0.5 + adjustedRadius * sin(gravityWellAngle + floatPi * 1.5),
+            normalisedPositionY: 0.5 + adjustedRadius * cos(gravityWellAngle + floatPi * 1.5),
             mass: mass2,
-            spin: spin2
+            spin:spin2
         )
     }
     

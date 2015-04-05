@@ -83,19 +83,31 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         particleLab.setGravityWellProperties(gravityWell: .One,
             normalisedPositionX: 0.5 + amplitude * sin(gravityWellAngle + floatPi * 0.5),
-            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 0.5), mass: mass1, spin: spin1)
+            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 0.5),
+            mass: mass1,
+            spin:spin1
+        )
         
         particleLab.setGravityWellProperties(gravityWell: .Four,
             normalisedPositionX: 0.5 + amplitude * sin(gravityWellAngle + floatPi * 1.5),
-            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 1.5), mass: mass1, spin: spin1)
+            normalisedPositionY: 0.5 + amplitude * cos(gravityWellAngle + floatPi * 1.5),
+            mass: mass1,
+            spin: spin1
+        )
         
         particleLab.setGravityWellProperties(gravityWell: .Two,
             normalisedPositionX: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3),
-            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3), mass: mass2, spin: spin2)
+            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3),
+            mass: mass2,
+            spin: spin2
+        )
         
         particleLab.setGravityWellProperties(gravityWell: .Three,
             normalisedPositionX: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * cos(gravityWellAngle / 1.3 + floatPi),
-            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3 + floatPi), mass: mass2, spin: spin2)
+            normalisedPositionY: 0.5 + (4*amplitude + sin(gravityWellAngle * 1.7)) * sin(gravityWellAngle / 1.3 + floatPi),
+            mass: mass2,
+            spin: spin2
+        )
     }
     
     override func viewDidLayoutSubviews()

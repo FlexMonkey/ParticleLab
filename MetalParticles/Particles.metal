@@ -79,15 +79,15 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionAFloat(inParticle[0].x, inParticle[0].y);
     
-    const float factorAZero =   (gravityWellZeroMass / fast::pow(fast::distance(particlePositionAFloat, gravityWellZeroPosition),2));
-    const float factorAOne =    (gravityWellOneMass / fast::pow(fast::distance(particlePositionAFloat, gravityWellOnePosition),2));
-    const float factorATwo =    (gravityWellTwoMass / fast::pow(fast::distance(particlePositionAFloat, gravityWellTwoPosition),2));
-    const float factorAThree =  (gravityWellThreeMass / fast::pow(fast::distance(particlePositionAFloat, gravityWellThreePosition),2));
+    const float factorAZero =   (gravityWellZeroMass / max(distance_squared(particlePositionAFloat, gravityWellZeroPosition), 0.0001));
+    const float factorAOne =    (gravityWellOneMass / max(distance_squared(particlePositionAFloat, gravityWellOnePosition), 0.0001));
+    const float factorATwo =    (gravityWellTwoMass / max(distance_squared(particlePositionAFloat, gravityWellTwoPosition), 0.0001));
+    const float factorAThree =  (gravityWellThreeMass / max(distance_squared(particlePositionAFloat, gravityWellThreePosition),0.0001));
     
-    const float spinAZero =   (gravityWellZeroSpin / fast::pow(fast::distance(particlePositionAFloat, gravityWellZeroPosition),2));
-    const float spinAOne =    (gravityWellOneSpin / fast::pow(fast::distance(particlePositionAFloat, gravityWellOnePosition),2));
-    const float spinATwo =    (gravityWellTwoSpin / fast::pow(fast::distance(particlePositionAFloat, gravityWellTwoPosition),2));
-    const float spinAThree =  (gravityWellThreeSpin / fast::pow(fast::distance(particlePositionAFloat, gravityWellThreePosition),2));
+    const float spinAZero =   (gravityWellZeroSpin / max(distance_squared(particlePositionAFloat, gravityWellZeroPosition), 0.0001));
+    const float spinAOne =    (gravityWellOneSpin / max(distance_squared(particlePositionAFloat, gravityWellOnePosition), 0.0001));
+    const float spinATwo =    (gravityWellTwoSpin / max(distance_squared(particlePositionAFloat, gravityWellTwoPosition), 0.0001));
+    const float spinAThree =  (gravityWellThreeSpin / max(distance_squared(particlePositionAFloat, gravityWellThreePosition), 0.0001));
     
     // ---
     
@@ -100,15 +100,15 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionBFloat(inParticle[1].x, inParticle[1].y);
     
-    const float factorBZero =   (gravityWellZeroMass / fast::pow(fast::distance(particlePositionBFloat, gravityWellZeroPosition),2));
-    const float factorBOne =    (gravityWellOneMass / fast::pow(fast::distance(particlePositionBFloat, gravityWellOnePosition),2));
-    const float factorBTwo =    (gravityWellTwoMass / fast::pow(fast::distance(particlePositionBFloat, gravityWellTwoPosition),2));
-    const float factorBThree =  (gravityWellThreeMass / fast::pow(fast::distance(particlePositionBFloat, gravityWellThreePosition),2));
+    const float factorBZero =   (gravityWellZeroMass / max(distance_squared(particlePositionBFloat, gravityWellZeroPosition), 0.0001));
+    const float factorBOne =    (gravityWellOneMass / max(distance_squared(particlePositionBFloat, gravityWellOnePosition), 0.0001));
+    const float factorBTwo =    (gravityWellTwoMass / max(distance_squared(particlePositionBFloat, gravityWellTwoPosition), 0.0001));
+    const float factorBThree =  (gravityWellThreeMass / max(distance_squared(particlePositionBFloat, gravityWellThreePosition), 0.0001));
     
-    const float spinBZero =   (gravityWellZeroSpin / fast::pow(fast::distance(particlePositionBFloat, gravityWellZeroPosition),2));
-    const float spinBOne =    (gravityWellOneSpin / fast::pow(fast::distance(particlePositionBFloat, gravityWellOnePosition),2));
-    const float spinBTwo =    (gravityWellTwoSpin / fast::pow(fast::distance(particlePositionBFloat, gravityWellTwoPosition),2));
-    const float spinBThree =  (gravityWellThreeSpin / fast::pow(fast::distance(particlePositionBFloat, gravityWellThreePosition),2));
+    const float spinBZero =   (gravityWellZeroSpin / max(distance_squared(particlePositionBFloat, gravityWellZeroPosition), 0.0001));
+    const float spinBOne =    (gravityWellOneSpin / max(distance_squared(particlePositionBFloat, gravityWellOnePosition), 0.0001));
+    const float spinBTwo =    (gravityWellTwoSpin / max(distance_squared(particlePositionBFloat, gravityWellTwoPosition), 0.0001));
+    const float spinBThree =  (gravityWellThreeSpin / max(distance_squared(particlePositionBFloat, gravityWellThreePosition), 0.0001));
     
     // ---
     
@@ -122,15 +122,15 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionCFloat(inParticle[2].x, inParticle[2].y);
     
-    const float factorCZero =   (gravityWellZeroMass / fast::pow(fast::distance(particlePositionCFloat, gravityWellZeroPosition),2));
-    const float factorCOne =    (gravityWellOneMass / fast::pow(fast::distance(particlePositionCFloat, gravityWellOnePosition),2));
-    const float factorCTwo =    (gravityWellTwoMass / fast::pow(fast::distance(particlePositionCFloat, gravityWellTwoPosition),2));
-    const float factorCThree =  (gravityWellThreeMass / fast::pow(fast::distance(particlePositionCFloat, gravityWellThreePosition),2));
+    const float factorCZero =   (gravityWellZeroMass / max(distance_squared(particlePositionCFloat, gravityWellZeroPosition), 0.0001));
+    const float factorCOne =    (gravityWellOneMass / max(distance_squared(particlePositionCFloat, gravityWellOnePosition), 0.0001));
+    const float factorCTwo =    (gravityWellTwoMass / max(distance_squared(particlePositionCFloat, gravityWellTwoPosition), 0.0001));
+    const float factorCThree =  (gravityWellThreeMass / max(distance_squared(particlePositionCFloat, gravityWellThreePosition), 0.0001));
     
-    const float spinCZero =   (gravityWellZeroSpin / fast::pow(fast::distance(particlePositionCFloat, gravityWellZeroPosition),2));
-    const float spinCOne =    (gravityWellOneSpin / fast::pow(fast::distance(particlePositionCFloat, gravityWellOnePosition),2));
-    const float spinCTwo =    (gravityWellTwoSpin / fast::pow(fast::distance(particlePositionCFloat, gravityWellTwoPosition),2));
-    const float spinCThree =  (gravityWellThreeSpin / fast::pow(fast::distance(particlePositionCFloat, gravityWellThreePosition),2));
+    const float spinCZero =   (gravityWellZeroSpin / max(distance_squared(particlePositionCFloat, gravityWellZeroPosition), 0.0001));
+    const float spinCOne =    (gravityWellOneSpin / max(distance_squared(particlePositionCFloat, gravityWellOnePosition), 0.0001));
+    const float spinCTwo =    (gravityWellTwoSpin / max(distance_squared(particlePositionCFloat, gravityWellTwoPosition), 0.0001));
+    const float spinCThree =  (gravityWellThreeSpin / max(distance_squared(particlePositionCFloat, gravityWellThreePosition), 0.0001));
     
     // ---
     
@@ -144,15 +144,15 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     
     const float2 particlePositionDFloat(inParticle[3].x, inParticle[3].y);
     
-    const float factorDZero =   (gravityWellZeroMass / fast::pow(fast::distance(particlePositionDFloat, gravityWellZeroPosition),2));
-    const float factorDOne =    (gravityWellOneMass / fast::pow(fast::distance(particlePositionDFloat, gravityWellOnePosition),2));
-    const float factorDTwo =    (gravityWellTwoMass / fast::pow(fast::distance(particlePositionDFloat, gravityWellTwoPosition),2));
-    const float factorDThree =  (gravityWellThreeMass / fast::pow(fast::distance(particlePositionDFloat, gravityWellThreePosition),2));
+    const float factorDZero =   (gravityWellZeroMass / max(distance_squared(particlePositionDFloat, gravityWellZeroPosition), 0.0001));
+    const float factorDOne =    (gravityWellOneMass / max(distance_squared(particlePositionDFloat, gravityWellOnePosition), 0.0001));
+    const float factorDTwo =    (gravityWellTwoMass / max(distance_squared(particlePositionDFloat, gravityWellTwoPosition), 0.0001));
+    const float factorDThree =  (gravityWellThreeMass / max(distance_squared(particlePositionDFloat, gravityWellThreePosition), 0.0001));
     
-    const float spinDZero =   (gravityWellZeroSpin / fast::pow(fast::distance(particlePositionDFloat, gravityWellZeroPosition),2));
-    const float spinDOne =    (gravityWellOneSpin / fast::pow(fast::distance(particlePositionDFloat, gravityWellOnePosition),2));
-    const float spinDTwo =    (gravityWellTwoSpin / fast::pow(fast::distance(particlePositionDFloat, gravityWellTwoPosition),2));
-    const float spinDThree =  (gravityWellThreeSpin / fast::pow(fast::distance(particlePositionDFloat, gravityWellThreePosition),2));
+    const float spinDZero =   (gravityWellZeroSpin / max(distance_squared(particlePositionDFloat, gravityWellZeroPosition), 0.0001));
+    const float spinDOne =    (gravityWellOneSpin / max(distance_squared(particlePositionDFloat, gravityWellOnePosition), 0.0001));
+    const float spinDTwo =    (gravityWellTwoSpin / max(distance_squared(particlePositionDFloat, gravityWellTwoPosition), 0.0001));
+    const float spinDThree =  (gravityWellThreeSpin / max(distance_squared(particlePositionDFloat, gravityWellThreePosition), 0.0001));
     // ---
     
     float4x4 outParticle;

@@ -44,7 +44,7 @@ class ParticleLab: CAMetalLayer
     private var particle_threadGroupCount:MTLSize!
     private var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 524288 // 4194304 2097152   1048576  524288
+    let particleCount: Int = 1048576 // 4194304 2097152   1048576  524288
     private var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:UInt = 0x4000
     let particlesMemoryByteSize:UInt
@@ -236,7 +236,7 @@ class ParticleLab: CAMetalLayer
         if frameNumber == 100
         {
             let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-            // println(NSString(format: "%.1f", 1 / frametime) + "fps" )
+            println(NSString(format: "%.1f", 1 / frametime) + "fps" )
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             

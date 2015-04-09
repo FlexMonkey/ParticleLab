@@ -44,10 +44,11 @@ class ParticleLab: CAMetalLayer
     private var particle_threadGroupCount:MTLSize!
     private var particle_threadGroups:MTLSize!
     
-    let particleCount: Int = 524288 // 4194304 2097152   1048576  524288
-    private var particlesMemory:UnsafeMutablePointer<Void> = nil
+    let particleCount: Int
     let alignment:Int = 0x4000
     let particlesMemoryByteSize:Int
+    
+    private var particlesMemory:UnsafeMutablePointer<Void> = nil
     private var particlesVoidPtr: COpaquePointer!
     private var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     private var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
@@ -66,13 +67,15 @@ class ParticleLab: CAMetalLayer
     let markerC = CAShapeLayer()
     let markerD = CAShapeLayer()
     
-    var particleLabDelegate: ParticleLabDelegate?
+    weak var particleLabDelegate: ParticleLabDelegate?
     
     var particleColor = ParticleColor(R: 1, G: 0.5, B: 0.2, A: 1)
     var dragFactor: Float = 0.97
     
-    init(width: UInt, height: UInt)
+    init(width: UInt, height: UInt, numParticles: ParticleCount)
     {
+        particleCount = numParticles.rawValue
+        
         imageWidth = width
         imageHeight = height
         
@@ -98,6 +101,16 @@ class ParticleLab: CAMetalLayer
         markerD.strokeColor = UIColor.whiteColor().CGColor
     }
     
+    required init(coder aDecoder: NSCoder)
+    {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit
+    {
+        free(particlesMemory)
+    }
+    
     var showGravityWellPositions: Bool = false
         {
         didSet
@@ -117,11 +130,6 @@ class ParticleLab: CAMetalLayer
                 markerD.removeFromSuperlayer()
             }
         }
-    }
-    
-    required init(coder aDecoder: NSCoder)
-    {
-        fatalError("init(coder:) has not been implemented")
     }
     
     private func setUpParticles()
@@ -203,6 +211,8 @@ class ParticleLab: CAMetalLayer
         if device == nil
         {
             errorFlag = true
+            
+            particleLabDelegate?.particleLabMetalUnavailable()
         }
         else
         {
@@ -343,9 +353,10 @@ class ParticleLab: CAMetalLayer
     }
 }
 
-protocol ParticleLabDelegate
+protocol ParticleLabDelegate: NSObjectProtocol
 {
     func particleLabDidUpdate()
+    func particleLabMetalUnavailable()
 }
 
 enum GravityWell
@@ -356,6 +367,18 @@ enum GravityWell
     case Four
 }
 
+//  Since each Particle instance defines four particles, the visible particle count
+//  in the API is four times the number we need to create.
+enum ParticleCount: Int
+{
+    case OneMillion =  262144
+    case TwoMillion =  524288
+    case FourMillion = 1048576
+}
+
+//  Paticles are split into three classes. The supplied particle color defines one
+//  third of the rendererd particles, the other two thirds use the supplied particle
+//  color components but shifted to BRG and GBR
 struct ParticleColor
 {
     var R: Float32 = 0
@@ -372,7 +395,7 @@ struct Particle // Matrix4x4
     var D: Vector4 = Vector4(x: 0, y: 0, z: 0, w: 0)
 }
 
-// regular particles use x and y for position and z and w for velocity
+// Regular particles use x and y for position and z and w for velocity
 // gravity wells use x and y for position and z for mass and w for spin
 struct Vector4
 {

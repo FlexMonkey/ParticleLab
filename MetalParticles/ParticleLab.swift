@@ -100,6 +100,16 @@ class ParticleLab: CAMetalLayer
         markerD.strokeColor = UIColor.whiteColor().CGColor
     }
     
+    required init(coder aDecoder: NSCoder)
+    {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    deinit
+    {
+        free(particlesMemory)
+    }
+    
     var showGravityWellPositions: Bool = false
         {
         didSet
@@ -119,11 +129,6 @@ class ParticleLab: CAMetalLayer
                 markerD.removeFromSuperlayer()
             }
         }
-    }
-    
-    required init(coder aDecoder: NSCoder)
-    {
-        fatalError("init(coder:) has not been implemented")
     }
     
     private func setUpParticles()

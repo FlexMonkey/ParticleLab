@@ -45,9 +45,10 @@ class ParticleLab: CAMetalLayer
     private var particle_threadGroups:MTLSize!
     
     let particleCount: Int
-    private var particlesMemory:UnsafeMutablePointer<Void> = nil
     let alignment:Int = 0x4000
     let particlesMemoryByteSize:Int
+    
+    private var particlesMemory:UnsafeMutablePointer<Void> = nil
     private var particlesVoidPtr: COpaquePointer!
     private var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     private var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
@@ -66,7 +67,7 @@ class ParticleLab: CAMetalLayer
     let markerC = CAShapeLayer()
     let markerD = CAShapeLayer()
     
-    var particleLabDelegate: ParticleLabDelegate?
+    weak var particleLabDelegate: ParticleLabDelegate?
     
     var particleColor = ParticleColor(R: 1, G: 0.5, B: 0.2, A: 1)
     var dragFactor: Float = 0.97
@@ -350,7 +351,7 @@ class ParticleLab: CAMetalLayer
     }
 }
 
-protocol ParticleLabDelegate
+protocol ParticleLabDelegate: NSObjectProtocol
 {
     func particleLabDidUpdate()
 }

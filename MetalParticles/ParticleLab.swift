@@ -211,6 +211,8 @@ class ParticleLab: CAMetalLayer
         if device == nil
         {
             errorFlag = true
+            
+            particleLabDelegate?.particleLabMetalUnavailable()
         }
         else
         {
@@ -354,6 +356,7 @@ class ParticleLab: CAMetalLayer
 protocol ParticleLabDelegate: NSObjectProtocol
 {
     func particleLabDidUpdate()
+    func particleLabMetalUnavailable()
 }
 
 enum GravityWell

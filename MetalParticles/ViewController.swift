@@ -27,6 +27,8 @@ import UIKit
 
 class ViewController: UIViewController, ParticleLabDelegate
 {
+    let floatPi = Float(M_PI)
+    
     var particleLab: ParticleLab!
     
     var gravityWellAngle: Float = 0
@@ -59,7 +61,10 @@ class ViewController: UIViewController, ParticleLabDelegate
         particleLab.dragFactor = 0.85
     }
     
-    let floatPi = Float(M_PI)
+    func particleLabMetalUnavailable()
+    {
+        // handle metal unavailable here
+    }
     
     func particleLabDidUpdate()
     {

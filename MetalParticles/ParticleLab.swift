@@ -46,8 +46,8 @@ class ParticleLab: CAMetalLayer
     
     let particleCount: Int = 524288 // 4194304 2097152   1048576  524288
     private var particlesMemory:UnsafeMutablePointer<Void> = nil
-    let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt
+    let alignment:Int = 0x4000
+    let particlesMemoryByteSize:Int
     private var particlesVoidPtr: COpaquePointer!
     private var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     private var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
@@ -80,7 +80,7 @@ class ParticleLab: CAMetalLayer
         
         region = MTLRegionMake2D(0, 0, Int(imageWidth), Int(imageHeight))
         blankBitmapRawData = [UInt8](count: Int(imageWidth * imageHeight * 4), repeatedValue: 0)
-        particlesMemoryByteSize = UInt(particleCount) * UInt(sizeof(Particle))
+        particlesMemoryByteSize = particleCount * sizeof(Particle)
         
         super.init()
         
@@ -236,7 +236,7 @@ class ParticleLab: CAMetalLayer
         if frameNumber == 100
         {
             let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-            println(NSString(format: "%.1f", 1 / frametime) + "fps" )
+            println((NSString(format: "%.1f", 1 / frametime) as String) + "fps" )
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             

@@ -36,7 +36,6 @@ class ParticleLab: CAMetalLayer
     private var kernelFunction: MTLFunction!
     private var pipelineState: MTLComputePipelineState!
     private var defaultLibrary: MTLLibrary! = nil
-    private var metalDevice: MTLDevice! = nil
     private var commandQueue: MTLCommandQueue! = nil
     
     private var errorFlag:Bool = false
@@ -204,9 +203,7 @@ class ParticleLab: CAMetalLayer
     
     private func setUpMetal()
     {
-        metalDevice = MTLCreateSystemDefaultDevice()
-        
-        device = device
+        device = MTLCreateSystemDefaultDevice()
         
         if device == nil
         {
@@ -371,6 +368,7 @@ enum GravityWell
 //  in the API is four times the number we need to create.
 enum ParticleCount: Int
 {
+    case HalfMillion = 131072
     case OneMillion =  262144
     case TwoMillion =  524288
     case FourMillion = 1048576

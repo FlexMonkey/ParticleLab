@@ -42,21 +42,9 @@ struct NeighbourDistance
     float y;
 };
 
-kernel void glowShader(texture2d<float, access::read> inTexture [[texture(0)]],
-                       texture2d<float, access::write> outTexture [[texture(1)]],
-                       texture2d<float, access::read> inTextureB [[texture(2)]],
-                       uint2 gid [[thread_position_in_grid]])
-{
-    float4 accumColor(0,0,0,0);
-    
-    accumColor.rgb = (inTexture.read(gid).rgb * 0.9) + inTextureB.read(gid).rgb;
-    accumColor.a = 1.0f;
-    
-    outTexture.write(accumColor, gid);
-}
 
 kernel void particleRendererShader(texture2d<float, access::write> outTexture [[texture(0)]],
-                                   texture2d<float, access::read> inTexture [[texture(1)]],
+                                  
                                    const device Particle *inParticles [[ buffer(0) ]],
                                    device Particle *outParticles [[ buffer(1) ]],
                                    
@@ -195,17 +183,11 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
         outParticles[id].positionY = 0;
     }
  
-    const float4 inColor = inTexture.read(particlePosition).rgba;
-    outTexture.write(inColor + outColor, particlePosition);
-    
-    const float4 inColor2 = inTexture.read(particlePosition - uint2(1, 1)).rgba;
-    outTexture.write(inColor2 + outColor, particlePosition - uint2(1, 1));
-    
-    const float4 inColor3 = inTexture.read(particlePosition - uint2(0, 1)).rgba;
-    outTexture.write(inColor3 + outColor, particlePosition - uint2(0, 1));
-    
-    const float4 inColor4 = inTexture.read(particlePosition - uint2(1, 0)).rgba;
-    outTexture.write(inColor4 + outColor, particlePosition - uint2(1, 0));
+    outTexture.write(outColor, particlePosition);
  
+    outTexture.write(outColor, particlePosition);
+    outTexture.write(outColor, particlePosition - uint2(1, 1));
+    outTexture.write(outColor, particlePosition - uint2(0, 1));
+    outTexture.write(outColor, particlePosition - uint2(1, 0));
 
 }

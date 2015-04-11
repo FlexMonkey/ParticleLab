@@ -59,7 +59,7 @@ func resizeToBoundingSquare(sourceImage: UIImage, #boundingSquareSideLength : CG
         let gammaFilter = CIFilter(name: "CIGammaAdjust")
         gammaFilter.setValue(CIImage(image: resizedImage), forKey: "inputImage")
         gammaFilter.setValue(0.33, forKey: "inputPower")
-        let outputImageData = gammaFilter.valueForKey("outputImage") as CIImage!
+        let outputImageData = gammaFilter.valueForKey("outputImage") as! CIImage!
         
         let filteredImageRef: CGImage = ciContext.createCGImage(outputImageData, fromRect: outputImageData.extent())
         

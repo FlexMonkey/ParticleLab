@@ -41,13 +41,10 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     var device: MTLDevice! = nil
     var commandQueue: MTLCommandQueue! = nil
     
-    let imageView =  UIImageView(frame: CGRectZero)
+    let metalLayer = CAMetalLayer()
     
     var region: MTLRegion!
-    
-    var textureA: MTLTexture!
-    var textureB: MTLTexture!
-
+  
     var errorFlag:Bool = false
  
     var particle_threadGroupCount:MTLSize!
@@ -58,15 +55,15 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     
     let particleCount: Int = 4096
     var particlesMemory:UnsafeMutablePointer<Void> = nil
-    let alignment:UInt = 0x4000
-    let particlesMemoryByteSize:UInt = UInt(4096) * UInt(sizeof(Particle))
+    let alignment:Int = 0x4000
+    let particlesMemoryByteSize:Int = 4096 * sizeof(Particle)
     var particlesVoidPtr: COpaquePointer!
     var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
 
     var frameStartTime = CFAbsoluteTimeGetCurrent()
     
-    var useGlowAndTrails = false
+
     var particleBrightness: Float = 0.8
     
     var saveButtonItem: UIBarButtonItem!
@@ -77,7 +74,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     var speciesSegmentedControl = UISegmentedControl(items: ["Red", "Green", "Blue"])
     let fieldNames = ["Radius", "Cohesion", "Alignment", "Seperation", "Steering", "Pace Keeping", "Normal Speed"]
 
-    let infoButton: UIButton = UIButton.buttonWithType(UIButtonType.InfoLight) as UIButton
+    let infoButton: UIButton = UIButton.buttonWithType(UIButtonType.InfoLight) as! UIButton
     
     var redGenome = SwarmGenome(radius: 0.6, c1_cohesion: 0.83, c2_alignment: 0.39, c3_seperation: 0.4, c4_steering: 0.93, c5_paceKeeping: 0.1, normalSpeed: 0.83)
     var greenGenome = SwarmGenome(radius: 0.29, c1_cohesion: 0.92, c2_alignment: 0.24, c3_seperation: 0.1, c4_steering: 0.32, c5_paceKeeping: 0.9, normalSpeed: 0.73)
@@ -104,9 +101,6 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         
         view.backgroundColor = UIColor.darkGrayColor()
 
-        imageView.contentMode = UIViewContentMode.ScaleAspectFill
-        imageView.backgroundColor = UIColor.blackColor()
-
         speciesSegmentedControl.tintColor = UIColor.whiteColor()
         
         speciesSegmentedControl.addTarget(self, action: "speciesChangeHandler", forControlEvents: UIControlEvents.ValueChanged)
@@ -122,7 +116,11 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
             view.addSubview(parameterWidget)
         }
         
-        view.addSubview(imageView)
+        view.layer.addSublayer(metalLayer)
+        
+        metalLayer.framebufferOnly = false
+        metalLayer.drawableSize = CGSize(width: 800, height: 800)
+        metalLayer.drawsAsynchronously = true
         
         let resetBarButtonItem = UIBarButtonItem(barButtonSystemItem: UIBarButtonSystemItem.Refresh, target: self, action: "resetParticles")
         
@@ -184,27 +182,21 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         }
     }
     
-    override func touchesBegan(touches: NSSet, withEvent event: UIEvent)
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
     {
-        let location = event.allTouches()?.anyObject()?.locationInView(imageView)
+        let location = (event.allTouches()?.first as! UITouch).locationInView(self.view)
         
-        if let _location = location
-        {
-            positionGravityWell(_location)
-        }
+        positionGravityWell(location)
     }
     
-    override func touchesMoved(touches: NSSet, withEvent event: UIEvent)
+    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent)
     {
-        let location = event.allTouches()?.anyObject()?.locationInView(imageView)
+        let location = (event.allTouches()?.first as! UITouch).locationInView(self.view)
         
-        if let _location = location
-        {
-            positionGravityWell(_location)
-        }
+        positionGravityWell(location)
     }
     
-    override func touchesEnded(touches: NSSet, withEvent event: UIEvent)
+    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent)
     {
         gravityWell.x = -1
         gravityWell.y = -1
@@ -212,7 +204,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     
     func positionGravityWell(location: CGPoint)
     {
-        let imageScale = imageView.frame.width / CGFloat(imageSide)
+        let imageScale = metalLayer.frame.width / CGFloat(imageSide)
         
         gravityWell.x = location.x / imageScale
         gravityWell.y = location.y / imageScale
@@ -253,15 +245,15 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     {
         let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
         
-        mailDelegate.mailRecipe(recipeURL: recipeURL, image: imageView.image)
+        // mailDelegate.mailRecipe(recipeURL: recipeURL, image: imageView.image)
     }
     
     func saveRecipe()
     {
         let recipeURL = URLUtils.createUrlFromGenomes(redGenome: redGenome, greenGenome: greenGenome, blueGenome: blueGenome)
-        let thumbnailImage = resizeToBoundingSquare(imageView.image!, boundingSquareSideLength: 480)
+        // let thumbnailImage = resizeToBoundingSquare(imageView.image!, boundingSquareSideLength: 480)
 
-        coreDataDelegate.save(recipeURL.absoluteString!, thumbnailImage: thumbnailImage)
+        // coreDataDelegate.save(recipeURL.absoluteString!, thumbnailImage: thumbnailImage)
         
         saveEnabled = false
     }
@@ -339,6 +331,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     func setUpMetal()
     {
         device = MTLCreateSystemDefaultDevice()
+        metalLayer.device = device
  
         if device == nil
         {
@@ -356,7 +349,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
             glow_threadGroups = MTLSizeMake(Int(imageSide) / glow_threadGroupCount.width, Int(imageSide) / glow_threadGroupCount.height, 1)
 
             
-            setUpTexture()
+            region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
             
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
             pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
@@ -369,16 +362,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
     {
         resetParticlesFlag = true
     }
-    
-    final func toggleTrails()
-    {
-        useGlowAndTrails = !useGlowAndTrails
-        
-        particleBrightness = useGlowAndTrails ? 0.3 : 0.8
-        
-        textureA.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
-    }
-    
+
     var isRunning: Bool = false
     {
         didSet
@@ -404,7 +388,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         }
         
         let frametime = CFAbsoluteTimeGetCurrent() - frameStartTime
-        // println("frametime: " + NSString(format: "%.6f", frametime) + " = " + NSString(format: "%.1f", 1 / frametime) + "fps" )
+        println("frametime: " + (NSString(format: "%.1f", 1 / frametime) as String) + "fps" )
         
         frameStartTime = CFAbsoluteTimeGetCurrent()
         
@@ -423,36 +407,11 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
             self.run();
         }
     }
-    
-    final func glowTexture()
-    {
-        commandQueue = device.newCommandQueue()
-        
-        kernelFunction = defaultLibrary.newFunctionWithName("glowShader")
-        pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
-        
-        let commandBuffer = commandQueue.commandBuffer()
-        let commandEncoder = commandBuffer.computeCommandEncoder()
-        
-        commandEncoder.setComputePipelineState(pipelineState)
-        
-        commandEncoder.setTexture(textureA, atIndex: 0)
-        commandEncoder.setTexture(textureA, atIndex: 1)
-        commandEncoder.setTexture(textureB, atIndex: 2)
-        
-        commandEncoder.dispatchThreadgroups(glow_threadGroups, threadsPerThreadgroup: glow_threadGroupCount)
-        
-        commandEncoder.endEncoding()
-        commandBuffer.commit()
-        commandBuffer.waitUntilCompleted()
-        
-    }
-    
-    
+
     
     final func applyShader()
     {
-        textureB.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+        // textureB.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
 
         kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
         pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
@@ -488,49 +447,25 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         var inGravityWellYBuffer: MTLBuffer = device.newBufferWithBytes(&gravityWellY, length: sizeof(Float), options: nil)
         commandEncoder.setBuffer(inGravityWellYBuffer, offset: 0, atIndex: 7)
 
-        commandEncoder.setTexture(textureB, atIndex: 0)
-        commandEncoder.setTexture(textureB, atIndex: 1)
+
+        let drawable = metalLayer.nextDrawable()
+        
+        drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
+        
+        commandEncoder.setTexture(drawable.texture, atIndex: 0)
         
         commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
         
         commandEncoder.endEncoding()
+        
+        commandBuffer.presentDrawable(drawable)
+        
         commandBuffer.commit()
         commandBuffer.waitUntilCompleted()
-        
-        if useGlowAndTrails
-        {
-            glowTexture()
-            textureA.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
-        }
-        else
-        {
-            textureB.getBytes(&imageBytes, bytesPerRow: bytesPerRowInt, fromRegion: region, mipmapLevel: 0)
-        }
-        
-        var imageRef: CGImage?
-        
-        Async.background()
-        {
-            let providerRef = CGDataProviderCreateWithCFData(NSData(bytes: &self.imageBytes, length: self.providerLength))
-            
-            imageRef = CGImageCreate(self.imageSide, self.imageSide, self.bitsPerComponent, self.bitsPerPixel, self.bytesPerRow, self.rgbColorSpace, self.bitmapInfo, providerRef, nil, false, self.renderingIntent)
-        }
-        .main
-        {
-            self.imageView.image = UIImage(CGImage: imageRef)!
-        }
+   
   
     }
     
-    func setUpTexture()
-    {
-        let textureDescriptor = MTLTextureDescriptor.texture2DDescriptorWithPixelFormat(MTLPixelFormat.RGBA8Unorm, width: Int(imageSide), height: Int(imageSide), mipmapped: false)
-        
-        textureA = device.newTextureWithDescriptor(textureDescriptor)
-        textureB = device.newTextureWithDescriptor(textureDescriptor)
-        
-       region = MTLRegionMake2D(0, 0, Int(imageSide), Int(imageSide))
-    }
 
 
     override func viewDidLayoutSubviews()
@@ -546,7 +481,7 @@ class ViewController: UIViewController, BrowseAndLoadDelegate
         
         let imageSide = Int(view.frame.height - topLayoutGuide.length)
         
-        imageView.frame = CGRect(x: 0 , y: Int(topLayoutGuide.length), width: imageSide, height: imageSide)
+        metalLayer.frame = CGRect(x: 0 , y: Int(topLayoutGuide.length), width: imageSide, height: imageSide)
  
         let dialOriginY = Int(topLayoutGuide.length) + 5
         let dialWidth = Int(view.frame.width) - imageSide

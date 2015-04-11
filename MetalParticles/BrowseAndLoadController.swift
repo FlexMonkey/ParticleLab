@@ -180,7 +180,7 @@ class BrowseAndLoadController: UIViewController, UICollectionViewDataSource, UIC
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell
     {
-        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as ReactionDiffusionEntityRenderer
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("Cell", forIndexPath: indexPath) as! ReactionDiffusionEntityRenderer
         
         cell.reactionDiffusionEntity = dataprovider[indexPath.item]
         

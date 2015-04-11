@@ -26,7 +26,7 @@ class CoreDataDelegate: NSObject,  UIPopoverControllerDelegate
     {
         self.viewController = viewController
         
-        appDelegate = UIApplication.sharedApplication().delegate as AppDelegate
+        appDelegate = UIApplication.sharedApplication().delegate as! AppDelegate
         managedObjectContext = appDelegate.managedObjectContext!
         
         browseAndLoadController = BrowseAndLoadController()

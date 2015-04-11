@@ -49,7 +49,7 @@ class ParameterWidget: UIControl, UIPopoverControllerDelegate
     {
         if let fieldName = fieldName
         {
-            label.text = fieldName + " = " + NSString(format: "%.2f", value)
+            label.text = fieldName + " = " + (NSString(format: "%.2f", value) as String)
         }
     }
     

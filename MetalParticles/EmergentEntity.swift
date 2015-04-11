@@ -20,7 +20,7 @@ class EmergentEntity: NSManagedObject
     
     class func createInManagedObjectContext(moc: NSManagedObjectContext, swarmChemistryRecipe: String, thumbnailImage: UIImage) -> EmergentEntity
     {
-        let newItem = NSEntityDescription.insertNewObjectForEntityForName("EmergentEntity", inManagedObjectContext: moc) as EmergentEntity
+        let newItem = NSEntityDescription.insertNewObjectForEntityForName("EmergentEntity", inManagedObjectContext: moc) as! EmergentEntity
 
         newItem.thumbnailImage = UIImagePNGRepresentation(thumbnailImage)
         newItem.swarmChemistryRecipe = swarmChemistryRecipe

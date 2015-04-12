@@ -43,6 +43,7 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float4x4 inParticle = inParticles[id];
     
     const uint type = id % 3;
+    const float typeTweak = 1 + type;
     
     const float4 colors[] = {
         float4(particleColor.r, particleColor.g , particleColor.b , 1.0),
@@ -58,15 +59,15 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const float2 gravityWellTwoPosition =   float2(inGravityWell[2].x, inGravityWell[2].y);
     const float2 gravityWellThreePosition = float2(inGravityWell[3].x, inGravityWell[3].y);
     
-    const float gravityWellZeroMass = inGravityWell[0].z + type;
-    const float gravityWellOneMass = inGravityWell[1].z + type;
-    const float gravityWellTwoMass = inGravityWell[2].z + type;
-    const float gravityWellThreeMass = inGravityWell[3].z + type;
+    const float gravityWellZeroMass = inGravityWell[0].z * typeTweak;
+    const float gravityWellOneMass = inGravityWell[1].z * typeTweak;
+    const float gravityWellTwoMass = inGravityWell[2].z * typeTweak;
+    const float gravityWellThreeMass = inGravityWell[3].z * typeTweak;
     
-    const float gravityWellZeroSpin = inGravityWell[0].w + type;
-    const float gravityWellOneSpin = inGravityWell[1].w + type;
-    const float gravityWellTwoSpin = inGravityWell[2].w + type;
-    const float gravityWellThreeSpin = inGravityWell[3].w + type;
+    const float gravityWellZeroSpin = inGravityWell[0].w * typeTweak;
+    const float gravityWellOneSpin = inGravityWell[1].w * typeTweak;
+    const float gravityWellTwoSpin = inGravityWell[2].w * typeTweak;
+    const float gravityWellThreeSpin = inGravityWell[3].w * typeTweak;
     
     // ---
     

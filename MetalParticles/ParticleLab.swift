@@ -139,6 +139,11 @@ class ParticleLab: CAMetalLayer
         particlesParticlePtr = UnsafeMutablePointer<Particle>(particlesVoidPtr)
         particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
         
+        resetParticles()
+    }
+    
+    func resetParticles(edgesOnly: Bool = true)
+    {
         func rand() -> Float32
         {
             return Float(drand48() - 0.5) * 0.005
@@ -161,35 +166,38 @@ class ParticleLab: CAMetalLayer
             var positionDX = Float(drand48() * imageWidthDouble)
             var positionDY = Float(drand48() * imageHeightDouble)
             
-            let positionRule = Int(arc4random() % 4)
-            
-            if positionRule == 0
+            if edgesOnly
             {
-                positionAX = 0
-                positionBX = 0
-                positionCX = 0
-                positionDX = 0
-            }
-            else if positionRule == 1
-            {
-                positionAX = Float(imageWidth)
-                positionBX = Float(imageWidth)
-                positionCX = Float(imageWidth)
-                positionDX = Float(imageWidth)
-            }
-            else if positionRule == 2
-            {
-                positionAY = 0
-                positionBY = 0
-                positionCY = 0
-                positionDY = 0
-            }
-            else
-            {
-                positionAY = Float(imageHeight)
-                positionBY = Float(imageHeight)
-                positionCY = Float(imageHeight)
-                positionDY = Float(imageHeight)
+                let positionRule = Int(arc4random() % 4)
+                
+                if positionRule == 0
+                {
+                    positionAX = 0
+                    positionBX = 0
+                    positionCX = 0
+                    positionDX = 0
+                }
+                else if positionRule == 1
+                {
+                    positionAX = Float(imageWidth)
+                    positionBX = Float(imageWidth)
+                    positionCX = Float(imageWidth)
+                    positionDX = Float(imageWidth)
+                }
+                else if positionRule == 2
+                {
+                    positionAY = 0
+                    positionBY = 0
+                    positionCY = 0
+                    positionDY = 0
+                }
+                else
+                {
+                    positionAY = Float(imageHeight)
+                    positionBY = Float(imageHeight)
+                    positionCY = Float(imageHeight)
+                    positionDY = Float(imageHeight)
+                }
             }
             
             let particle = Particle(A: Vector4(x: positionAX, y: positionAY, z: rand(), w: rand()),
@@ -277,10 +285,10 @@ class ParticleLab: CAMetalLayer
         {
             let scale = frame.width / CGFloat(imageWidth)
             
-            markerA.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.A.x) * scale, y: CGFloat(gravityWellParticle.A.y) * scale, width: 10, height: 10), nil)
-            markerB.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.B.x) * scale, y: CGFloat(gravityWellParticle.B.y) * scale, width: 10, height: 10), nil)
-            markerC.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.C.x) * scale, y: CGFloat(gravityWellParticle.C.y) * scale, width: 10, height: 10), nil)
-            markerD.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.D.x) * scale, y: CGFloat(gravityWellParticle.D.y) * scale, width: 10, height: 10), nil)
+            markerA.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.A.x) * scale - 5, y: CGFloat(gravityWellParticle.A.y - 5) * scale, width: 10, height: 10), nil)
+            markerB.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.B.x) * scale - 5, y: CGFloat(gravityWellParticle.B.y - 5) * scale, width: 10, height: 10), nil)
+            markerC.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.C.x) * scale - 5, y: CGFloat(gravityWellParticle.C.y - 5) * scale, width: 10, height: 10), nil)
+            markerD.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.D.x) * scale - 5, y: CGFloat(gravityWellParticle.D.y - 5) * scale, width: 10, height: 10), nil)
         }
         
         if let drawable = nextDrawable()
@@ -314,6 +322,33 @@ class ParticleLab: CAMetalLayer
             {
                 self.step();
         })
+    }
+    
+    final func getGravityWellNormalisedPosition(#gravityWell: GravityWell) -> (x: Float, y: Float)
+    {
+        let returnPoint: (x: Float, y: Float)
+        
+        let imageWidthFloat = Float(imageWidth)
+        let imageHeightFloat = Float(imageHeight)
+
+        switch gravityWell
+        {
+        case .One:
+            returnPoint = (x: gravityWellParticle.A.x / imageWidthFloat, y: gravityWellParticle.A.y / imageHeightFloat)
+            
+        case .Two:
+            returnPoint = (x: gravityWellParticle.B.x / imageWidthFloat, y: gravityWellParticle.B.y / imageHeightFloat)
+            
+        case .Three:
+            returnPoint = (x: gravityWellParticle.C.x / imageWidthFloat, y: gravityWellParticle.C.y / imageHeightFloat)
+            
+        case .Four:
+            returnPoint = (x: gravityWellParticle.D.x / imageWidthFloat, y: gravityWellParticle.D.y / imageHeightFloat)
+        }
+        
+
+        
+        return returnPoint
     }
     
     final func setGravityWellProperties(#gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
@@ -402,3 +437,4 @@ struct Vector4
     var z: Float32 = 0
     var w: Float32 = 0
 }
+

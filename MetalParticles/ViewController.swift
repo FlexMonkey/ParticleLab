@@ -27,11 +27,15 @@ import UIKit
 
 class ViewController: UIViewController, ParticleLabDelegate
 {
+    let menuButton = UIButton(frame: CGRect(x: 10, y: 20, width: 30, height: 30))
+    
     let floatPi = Float(M_PI)
     
     var particleLab: ParticleLab!
     
     var gravityWellAngle: Float = 0
+    
+    var demoMode = DemoModes.cloudChamber
     
     override func viewDidLoad()
     {
@@ -52,13 +56,21 @@ class ViewController: UIViewController, ParticleLabDelegate
             particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.height, height: view.frame.width)
         }
         
-        view.layer.addSublayer(particleLab)
- 
-        particleLab.showGravityWellPositions = false
-        
         particleLab.particleLabDelegate = self
-
         particleLab.dragFactor = 0.85
+        
+        view.layer.addSublayer(particleLab)
+        
+        menuButton.layer.borderColor = UIColor.lightGrayColor().CGColor
+        menuButton.layer.borderWidth = 1
+        menuButton.layer.cornerRadius = 5
+        menuButton.layer.backgroundColor = UIColor.darkGrayColor().CGColor
+        menuButton.showsTouchWhenHighlighted = true
+        menuButton.imageView?.contentMode = UIViewContentMode.ScaleAspectFit
+        menuButton.setImage(UIImage(named: "hamburger.png"), forState: UIControlState.Normal)
+        menuButton.addTarget(self, action: "displayCallout", forControlEvents: UIControlEvents.TouchDown)
+        
+        view.addSubview(menuButton)
     }
     
     func particleLabMetalUnavailable()
@@ -66,7 +78,95 @@ class ViewController: UIViewController, ParticleLabDelegate
         // handle metal unavailable here
     }
     
+    func displayCallout()
+    {
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
+        
+        let cloudChamberAction = UIAlertAction(title: DemoModes.cloudChamber.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
+        let orbitsAction = UIAlertAction(title: DemoModes.orbits.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
+        
+        alertController.addAction(cloudChamberAction)
+        alertController.addAction(orbitsAction)
+        
+        if let popoverPresentationController = alertController.popoverPresentationController
+        {
+            let xx = menuButton.frame.origin.x
+            let yy = menuButton.frame.origin.y
+            
+            popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Right
+            
+            popoverPresentationController.sourceRect = CGRect(x: xx, y: yy, width: menuButton.frame.width, height: menuButton.frame.height)
+            popoverPresentationController.sourceView = view
+            
+            presentViewController(alertController, animated: true, completion: nil)
+        }
+        
+    }
+ 
+    func calloutActionHandler(value: UIAlertAction!) -> Void
+    {
+        demoMode = DemoModes(rawValue: value.title) ?? DemoModes.cloudChamber
+        
+        switch demoMode
+        {
+        case .orbits:
+            particleLab.showGravityWellPositions = true
+            particleLab.dragFactor = 0.8
+            particleLab.resetParticles(edgesOnly: false)
+        case .cloudChamber:
+            particleLab.showGravityWellPositions = false
+            particleLab.dragFactor = 0.75
+            particleLab.resetParticles(edgesOnly: true)
+        }
+    }
+    
     func particleLabDidUpdate()
+    {
+        switch demoMode
+        {
+        case .orbits:
+            orbitsStep()
+        case .cloudChamber:
+            cloudChamberStep()
+        }
+    }
+    
+    func orbitsStep()
+    {
+        gravityWellAngle = gravityWellAngle + 0.0015
+        
+        particleLab.setGravityWellProperties(gravityWell: .One,
+            normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle * 3),
+            normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle * 3),
+            mass: 2,
+            spin: 20)
+        
+        let particleOnePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .One)
+        
+        particleLab.setGravityWellProperties(gravityWell: .Two,
+            normalisedPositionX: particleOnePosition.x + 0.3 * sin(gravityWellAngle * 5),
+            normalisedPositionY: particleOnePosition.y + 0.3 * cos(gravityWellAngle * 5),
+            mass: 4,
+            spin: 18)
+        
+        let particleTwoPosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Two)
+        
+        particleLab.setGravityWellProperties(gravityWell: .Three,
+            normalisedPositionX: particleTwoPosition.x + 0.1 * sin(gravityWellAngle * 23),
+            normalisedPositionY: particleTwoPosition.y + 0.1 * cos(gravityWellAngle * 23),
+            mass: 6,
+            spin: 16)
+        
+        let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Three)
+        
+        particleLab.setGravityWellProperties(gravityWell: .Four,
+            normalisedPositionX: particleThreePosition.x + 0.03 * sin(gravityWellAngle * 37),
+            normalisedPositionY: particleThreePosition.y + 0.03 * cos(gravityWellAngle * 37),
+            mass: 8,
+            spin: 14)
+    }
+    
+    func cloudChamberStep()
     {
         gravityWellAngle = gravityWellAngle + 0.02
         
@@ -112,7 +212,11 @@ class ViewController: UIViewController, ParticleLabDelegate
 }
 
 
-
+enum DemoModes: String
+{
+    case cloudChamber = "Cloud Chamber"
+    case orbits = "Orbits"
+}
 
 
 

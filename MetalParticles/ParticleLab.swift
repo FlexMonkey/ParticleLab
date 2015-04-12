@@ -142,6 +142,14 @@ class ParticleLab: CAMetalLayer
         resetParticles()
     }
     
+    func resetGravityWells()
+    {
+        setGravityWellProperties(gravityWell: .One, normalisedPositionX: 0.5, normalisedPositionY: 0.5, mass: 0, spin: 0)
+        setGravityWellProperties(gravityWell: .Two, normalisedPositionX: 0.5, normalisedPositionY: 0.5, mass: 0, spin: 0)
+        setGravityWellProperties(gravityWell: .Three, normalisedPositionX: 0.5, normalisedPositionY: 0.5, mass: 0, spin: 0)
+        setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.5, normalisedPositionY: 0.5, mass: 0, spin: 0)
+    }
+    
     func resetParticles(edgesOnly: Bool = true)
     {
         func rand() -> Float32
@@ -251,7 +259,7 @@ class ParticleLab: CAMetalLayer
         if frameNumber == 100
         {
             let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-            println((NSString(format: "%.1f", 1 / frametime) as String) + "fps" )
+            // println((NSString(format: "%.1f", 1 / frametime) as String) + "fps" )
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             
@@ -345,9 +353,7 @@ class ParticleLab: CAMetalLayer
         case .Four:
             returnPoint = (x: gravityWellParticle.D.x / imageWidthFloat, y: gravityWellParticle.D.y / imageHeightFloat)
         }
-        
 
-        
         return returnPoint
     }
     

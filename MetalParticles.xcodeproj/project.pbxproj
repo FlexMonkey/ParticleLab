@@ -15,6 +15,7 @@
 		BE75EEA81A6A2CC000B20D49 /* MetalParticlesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */; };
 		BE75EEB31A6A327F00B20D49 /* Particles.metal in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB21A6A327F00B20D49 /* Particles.metal */; };
 		BE75EEB91A6A82C800B20D49 /* MarkerWidget.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */; };
+		BE947C681ADA382C00614CD9 /* hamburger.png in Resources */ = {isa = PBXBuildFile; fileRef = BE947C671ADA382C00614CD9 /* hamburger.png */; };
 		BEEBCABB1ACFAB41002865B3 /* ParticleLab.swift in Sources */ = {isa = PBXBuildFile; fileRef = BEEBCABA1ACFAB41002865B3 /* ParticleLab.swift */; };
 /* End PBXBuildFile section */
 
@@ -41,6 +42,7 @@
 		BE75EEA71A6A2CC000B20D49 /* MetalParticlesTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetalParticlesTests.swift; sourceTree = "<group>"; };
 		BE75EEB21A6A327F00B20D49 /* Particles.metal */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.metal; path = Particles.metal; sourceTree = "<group>"; };
 		BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MarkerWidget.swift; sourceTree = "<group>"; };
+		BE947C671ADA382C00614CD9 /* hamburger.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = hamburger.png; sourceTree = "<group>"; };
 		BEEBCABA1ACFAB41002865B3 /* ParticleLab.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParticleLab.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -83,6 +85,7 @@
 		BE75EE8E1A6A2CC000B20D49 /* MetalParticles */ = {
 			isa = PBXGroup;
 			children = (
+				BE947C661ADA380A00614CD9 /* assets */,
 				BEEBCAB91ACFAB1A002865B3 /* particleLab */,
 				BE75EEB71A6A82A400B20D49 /* marker */,
 				BE75EEB11A6A326400B20D49 /* shaders */,
@@ -135,6 +138,14 @@
 				BE75EEB81A6A82C800B20D49 /* MarkerWidget.swift */,
 			);
 			name = marker;
+			sourceTree = "<group>";
+		};
+		BE947C661ADA380A00614CD9 /* assets */ = {
+			isa = PBXGroup;
+			children = (
+				BE947C671ADA382C00614CD9 /* hamburger.png */,
+			);
+			name = assets;
 			sourceTree = "<group>";
 		};
 		BEEBCAB91ACFAB1A002865B3 /* particleLab */ = {
@@ -226,6 +237,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				BE75EE971A6A2CC000B20D49 /* Main.storyboard in Resources */,
+				BE947C681ADA382C00614CD9 /* hamburger.png in Resources */,
 				BE75EE9C1A6A2CC000B20D49 /* LaunchScreen.xib in Resources */,
 				BE75EE991A6A2CC000B20D49 /* Images.xcassets in Resources */,
 			);

@@ -37,12 +37,15 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     var demoMode = DemoModes.cloudChamber
     
+    var currentTouches = [UITouch]()
+    
     override func viewDidLoad()
     {
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.blackColor()
-
+        view.multipleTouchEnabled = true
+        
         if view.frame.height < view.frame.width
         {
             particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height),
@@ -77,6 +80,42 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         // handle metal unavailable here
     }
+
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
+    {
+        for touch: NSObject in touches
+        {
+            if let touch = touch as? UITouch
+            {
+                if find(currentTouches, touch) == nil
+                {
+                    currentTouches.append(touch)
+                }
+            }
+        }
+    }
+    
+    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent)
+    {
+        for touch: NSObject in touches
+        {
+            if let touch = touch as? UITouch, touchIndex = find(currentTouches, touch)
+            {
+                currentTouches[touchIndex] = touch
+            }
+        }
+    }
+    
+    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent)
+    {
+        for touch: NSObject in touches
+        {
+            if let touch = touch as? UITouch, touchIndex = find(currentTouches, touch)
+            {
+                currentTouches.removeAtIndex(touchIndex)
+            }
+        }
+    }
     
     func displayCallout()
     {
@@ -84,9 +123,11 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         let cloudChamberAction = UIAlertAction(title: DemoModes.cloudChamber.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         let orbitsAction = UIAlertAction(title: DemoModes.orbits.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
+        let multiTouchAction = UIAlertAction(title: DemoModes.multiTouch.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         
         alertController.addAction(cloudChamberAction)
         alertController.addAction(orbitsAction)
+        alertController.addAction(multiTouchAction)
         
         if let popoverPresentationController = alertController.popoverPresentationController
         {
@@ -100,7 +141,6 @@ class ViewController: UIViewController, ParticleLabDelegate
             
             presentViewController(alertController, animated: true, completion: nil)
         }
-        
     }
  
     func calloutActionHandler(value: UIAlertAction!) -> Void
@@ -113,10 +153,16 @@ class ViewController: UIViewController, ParticleLabDelegate
             particleLab.showGravityWellPositions = true
             particleLab.dragFactor = 0.8
             particleLab.resetParticles(edgesOnly: false)
+            
         case .cloudChamber:
             particleLab.showGravityWellPositions = false
             particleLab.dragFactor = 0.75
             particleLab.resetParticles(edgesOnly: true)
+            
+        case .multiTouch:
+            particleLab.showGravityWellPositions = true
+            particleLab.dragFactor = 0.95
+            particleLab.resetParticles(edgesOnly: false)
         }
     }
     
@@ -126,8 +172,53 @@ class ViewController: UIViewController, ParticleLabDelegate
         {
         case .orbits:
             orbitsStep()
+            
         case .cloudChamber:
             cloudChamberStep()
+            
+        case .multiTouch:
+            multiTouchStep()
+        }
+    }
+    
+    func multiTouchStep()
+    {
+        particleLab.resetGravityWells()
+        
+        if currentTouches.count > 0
+        {
+            particleLab.setGravityWellProperties(gravityWell: .One,
+                normalisedPositionX: Float(currentTouches[0].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouches[0].locationInView(view).y / view.frame.height),
+                mass: 10,
+                spin: Float(currentTouches[0].majorRadius / 5))
+        }
+        
+        if currentTouches.count > 1
+        {
+            particleLab.setGravityWellProperties(gravityWell: .Two,
+                normalisedPositionX: Float(currentTouches[1].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouches[1].locationInView(view).y / view.frame.height),
+                mass: 10,
+                spin: Float(currentTouches[1].majorRadius / 5))
+        }
+        
+        if currentTouches.count > 2
+        {
+            particleLab.setGravityWellProperties(gravityWell: .Three,
+                normalisedPositionX: Float(currentTouches[2].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouches[2].locationInView(view).y / view.frame.height),
+                mass: 10,
+                spin: Float(currentTouches[2].majorRadius / 5))
+        }
+        
+        if currentTouches.count > 3
+        {
+            particleLab.setGravityWellProperties(gravityWell: .Four,
+                normalisedPositionX: Float(currentTouches[3].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouches[3].locationInView(view).y / view.frame.height),
+                mass: 10,
+                spin: Float(currentTouches[3].majorRadius / 5))
         }
     }
     
@@ -216,6 +307,7 @@ enum DemoModes: String
 {
     case cloudChamber = "Cloud Chamber"
     case orbits = "Orbits"
+    case multiTouch = "Multiple Touch"
 }
 
 

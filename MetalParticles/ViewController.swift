@@ -148,6 +148,8 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     func particleLabDidUpdate()
     {
+        particleLab.resetGravityWells()
+        
         switch demoMode
         {
         case .orbits:
@@ -163,45 +165,26 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     func multiTouchStep()
     {
-        particleLab.resetGravityWells()
-        
         let currentTouchesArray = Array(currentTouches)
         
-        if currentTouchesArray.count > 0
+        for var i:Int = 0; i < currentTouchesArray.count; i++
         {
-            particleLab.setGravityWellProperties(gravityWell: .One,
-                normalisedPositionX: Float(currentTouchesArray[0].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouchesArray[0].locationInView(view).y / view.frame.height),
+            particleLab.setGravityWellProperties(gravityWellIndex: i,
+                normalisedPositionX: Float(currentTouchesArray[i].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouchesArray[i].locationInView(view).y / view.frame.height),
                 mass: 10,
-                spin: Float(currentTouchesArray[0].majorRadius / 5))
+                spin: Float(currentTouchesArray[i].majorRadius / 5))
         }
         
-        if currentTouchesArray.count > 1
+        for var i = currentTouchesArray.count; i < 4; i++
         {
-            particleLab.setGravityWellProperties(gravityWell: .Two,
-                normalisedPositionX: Float(currentTouchesArray[1].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouchesArray[1].locationInView(view).y / view.frame.height),
-                mass: 10,
-                spin: Float(currentTouchesArray[1].majorRadius / 5))
+            particleLab.setGravityWellProperties(gravityWellIndex: i,
+                normalisedPositionX: 0.5,
+                normalisedPositionY: 0.5,
+                mass: 0,
+                spin: 0)
         }
         
-        if currentTouchesArray.count > 2
-        {
-            particleLab.setGravityWellProperties(gravityWell: .Three,
-                normalisedPositionX: Float(currentTouchesArray[2].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouchesArray[2].locationInView(view).y / view.frame.height),
-                mass: 10,
-                spin: Float(currentTouchesArray[2].majorRadius / 5))
-        }
-        
-        if currentTouchesArray.count > 3
-        {
-            particleLab.setGravityWellProperties(gravityWell: .Four,
-                normalisedPositionX: Float(currentTouchesArray[3].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouchesArray[3].locationInView(view).y / view.frame.height),
-                mass: 10,
-                spin: Float(currentTouchesArray[3].majorRadius / 5))
-        }
     }
     
     func orbitsStep()

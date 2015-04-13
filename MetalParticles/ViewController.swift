@@ -37,7 +37,7 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     var demoMode = DemoModes.cloudChamber
     
-    var currentTouches = [UITouch]()
+    var currentTouches = Set<UITouch>()
     
     override func viewDidLoad()
     {
@@ -83,37 +83,17 @@ class ViewController: UIViewController, ParticleLabDelegate
 
     override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
     {
-        for touch: NSObject in touches
+        if let touches = touches as? Set<UITouch>
         {
-            if let touch = touch as? UITouch
-            {
-                if find(currentTouches, touch) == nil
-                {
-                    currentTouches.append(touch)
-                }
-            }
+            currentTouches = currentTouches.union(touches)
         }
     }
-    
-    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent)
-    {
-        for touch: NSObject in touches
-        {
-            if let touch = touch as? UITouch, touchIndex = find(currentTouches, touch)
-            {
-                currentTouches[touchIndex] = touch
-            }
-        }
-    }
-    
+
     override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent)
     {
-        for touch: NSObject in touches
+        if let touches = touches as? Set<UITouch>
         {
-            if let touch = touch as? UITouch, touchIndex = find(currentTouches, touch)
-            {
-                currentTouches.removeAtIndex(touchIndex)
-            }
+            currentTouches = currentTouches.subtract(touches)
         }
     }
     
@@ -185,40 +165,42 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         particleLab.resetGravityWells()
         
-        if currentTouches.count > 0
+        let currentTouchesArray = Array(currentTouches)
+        
+        if currentTouchesArray.count > 0
         {
             particleLab.setGravityWellProperties(gravityWell: .One,
-                normalisedPositionX: Float(currentTouches[0].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouches[0].locationInView(view).y / view.frame.height),
+                normalisedPositionX: Float(currentTouchesArray[0].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouchesArray[0].locationInView(view).y / view.frame.height),
                 mass: 10,
-                spin: Float(currentTouches[0].majorRadius / 5))
+                spin: Float(currentTouchesArray[0].majorRadius / 5))
         }
         
-        if currentTouches.count > 1
+        if currentTouchesArray.count > 1
         {
             particleLab.setGravityWellProperties(gravityWell: .Two,
-                normalisedPositionX: Float(currentTouches[1].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouches[1].locationInView(view).y / view.frame.height),
+                normalisedPositionX: Float(currentTouchesArray[1].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouchesArray[1].locationInView(view).y / view.frame.height),
                 mass: 10,
-                spin: Float(currentTouches[1].majorRadius / 5))
+                spin: Float(currentTouchesArray[1].majorRadius / 5))
         }
         
-        if currentTouches.count > 2
+        if currentTouchesArray.count > 2
         {
             particleLab.setGravityWellProperties(gravityWell: .Three,
-                normalisedPositionX: Float(currentTouches[2].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouches[2].locationInView(view).y / view.frame.height),
+                normalisedPositionX: Float(currentTouchesArray[2].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouchesArray[2].locationInView(view).y / view.frame.height),
                 mass: 10,
-                spin: Float(currentTouches[2].majorRadius / 5))
+                spin: Float(currentTouchesArray[2].majorRadius / 5))
         }
         
-        if currentTouches.count > 3
+        if currentTouchesArray.count > 3
         {
             particleLab.setGravityWellProperties(gravityWell: .Four,
-                normalisedPositionX: Float(currentTouches[3].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouches[3].locationInView(view).y / view.frame.height),
+                normalisedPositionX: Float(currentTouchesArray[3].locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouchesArray[3].locationInView(view).y / view.frame.height),
                 mass: 10,
-                spin: Float(currentTouches[3].majorRadius / 5))
+                spin: Float(currentTouchesArray[3].majorRadius / 5))
         }
     }
     

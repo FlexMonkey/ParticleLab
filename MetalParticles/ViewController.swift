@@ -104,10 +104,12 @@ class ViewController: UIViewController, ParticleLabDelegate
         let cloudChamberAction = UIAlertAction(title: DemoModes.cloudChamber.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         let orbitsAction = UIAlertAction(title: DemoModes.orbits.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         let multiTouchAction = UIAlertAction(title: DemoModes.multiTouch.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
+        let respawnAction = UIAlertAction(title: DemoModes.respawn.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         
         alertController.addAction(cloudChamberAction)
         alertController.addAction(orbitsAction)
         alertController.addAction(multiTouchAction)
+        alertController.addAction(respawnAction)
         
         if let popoverPresentationController = alertController.popoverPresentationController
         {
@@ -132,17 +134,26 @@ class ViewController: UIViewController, ParticleLabDelegate
         case .orbits:
             particleLab.showGravityWellPositions = true
             particleLab.dragFactor = 0.8
+            particleLab.respawnOutOfBoundsParticles = false
             particleLab.resetParticles(edgesOnly: false)
             
         case .cloudChamber:
             particleLab.showGravityWellPositions = false
             particleLab.dragFactor = 0.75
+            particleLab.respawnOutOfBoundsParticles = false
             particleLab.resetParticles(edgesOnly: true)
             
         case .multiTouch:
             particleLab.showGravityWellPositions = true
             particleLab.dragFactor = 0.95
+            particleLab.respawnOutOfBoundsParticles = false
             particleLab.resetParticles(edgesOnly: false)
+            
+        case .respawn:
+            particleLab.showGravityWellPositions = false
+            particleLab.dragFactor = 0.98
+            particleLab.respawnOutOfBoundsParticles = true
+            particleLab.resetParticles(edgesOnly: true)
         }
     }
     
@@ -160,7 +171,28 @@ class ViewController: UIViewController, ParticleLabDelegate
             
         case .multiTouch:
             multiTouchStep()
+            
+        case .respawn:
+            respawnStep()
         }
+    }
+    
+    func respawnStep()
+    {
+        gravityWellAngle = gravityWellAngle + 0.02
+        
+        particleLab.setGravityWellProperties(gravityWell: .One,
+            normalisedPositionX: 0.5 + 0.45 * sin(gravityWellAngle),
+            normalisedPositionY: 0.5 + 0.15 * cos(gravityWellAngle),
+            mass: 14,
+            spin: 16)
+        
+        particleLab.setGravityWellProperties(gravityWell: .Two,
+            normalisedPositionX: 0.5 + 0.25 * cos(gravityWellAngle * 1.3),
+            normalisedPositionY: 0.5 + 0.6 * sin(gravityWellAngle * 1.3),
+            mass: 8,
+            spin: 10)
+     
     }
     
     func multiTouchStep()
@@ -273,6 +305,7 @@ enum DemoModes: String
     case cloudChamber = "Cloud Chamber"
     case orbits = "Orbits"
     case multiTouch = "Multiple Touch"
+    case respawn = "Respawning"
 }
 
 

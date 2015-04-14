@@ -38,9 +38,13 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
                                    
                                    constant float &dragFactor [[ buffer(6) ]],
                                    
+                                   constant bool &respawnOutOfBoundsParticles [[ buffer(7) ]],
+                                   
                                    uint id [[thread_position_in_grid]])
 {
     const float4x4 inParticle = inParticles[id];
+    
+    const float spawnSpeedMultipler = 2.0;
     
     const uint type = id % 3;
     const float typeTweak = 1 + type;
@@ -77,6 +81,14 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     {
         outTexture.write(outColor, particlePositionA);
     }
+    else if (respawnOutOfBoundsParticles)
+    {
+        inParticle[0].z = spawnSpeedMultipler * fast::sin(inParticle[0].x + inParticle[0].y);
+        inParticle[0].w = spawnSpeedMultipler * fast::cos(inParticle[0].x + inParticle[0].y);
+        
+        inParticle[0].x = imageWidth / 2;
+        inParticle[0].y = imageHeight / 2;
+    }
     
     const float2 particlePositionAFloat(inParticle[0].x, inParticle[0].y);
     
@@ -97,6 +109,14 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     if (particlePositionB.x > 0 && particlePositionB.y > 0 && particlePositionB.x < imageWidth && particlePositionB.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionB);
+    }
+    else if (respawnOutOfBoundsParticles)
+    {
+        inParticle[1].z = spawnSpeedMultipler * fast::sin(inParticle[1].x + inParticle[1].y);
+        inParticle[1].w = spawnSpeedMultipler * fast::cos(inParticle[1].x + inParticle[1].y);
+        
+        inParticle[1].x = imageWidth / 2;
+        inParticle[1].y = imageHeight / 2;
     }
     
     const float2 particlePositionBFloat(inParticle[1].x, inParticle[1].y);
@@ -120,6 +140,14 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     {
         outTexture.write(outColor, particlePositionC);
     }
+    else if (respawnOutOfBoundsParticles)
+    {
+        inParticle[2].z = spawnSpeedMultipler * fast::sin(inParticle[2].x + inParticle[2].y);
+        inParticle[2].w = spawnSpeedMultipler * fast::cos(inParticle[2].x + inParticle[2].y);
+        
+        inParticle[2].x = imageWidth / 2;
+        inParticle[2].y = imageHeight / 2;
+    }
     
     const float2 particlePositionCFloat(inParticle[2].x, inParticle[2].y);
     
@@ -141,6 +169,14 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     if (particlePositionD.x > 0 && particlePositionD.y > 0 && particlePositionD.x < imageWidth && particlePositionD.y < imageHeight)
     {
         outTexture.write(outColor, particlePositionD);
+    }
+    else if (respawnOutOfBoundsParticles)
+    {
+        inParticle[3].z = spawnSpeedMultipler * fast::sin(inParticle[3].x + inParticle[3].y);
+        inParticle[3].w = spawnSpeedMultipler * fast::cos(inParticle[3].x + inParticle[3].y);
+        
+        inParticle[3].x = imageWidth / 2;
+        inParticle[3].y = imageHeight / 2;
     }
     
     const float2 particlePositionDFloat(inParticle[3].x, inParticle[3].y);

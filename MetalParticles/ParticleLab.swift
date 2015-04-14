@@ -70,6 +70,7 @@ class ParticleLab: CAMetalLayer
     
     var particleColor = ParticleColor(R: 1, G: 0.5, B: 0.2, A: 1)
     var dragFactor: Float = 0.97
+    var respawnOutOfBoundsParticles = false
     
     init(width: UInt, height: UInt, numParticles: ParticleCount)
     {
@@ -288,6 +289,9 @@ class ParticleLab: CAMetalLayer
         
         var dragFactorBuffer = device.newBufferWithBytes(&dragFactor, length: sizeof(Float), options: nil)
         commandEncoder.setBuffer(dragFactorBuffer, offset: 0, atIndex: 6)
+        
+        var respawnOutOfBoundsParticlesBuffer = device.newBufferWithBytes(&respawnOutOfBoundsParticles, length: sizeof(Bool), options: nil)
+        commandEncoder.setBuffer(respawnOutOfBoundsParticlesBuffer, offset: 0, atIndex: 7)
         
         if showGravityWellPositions
         {

@@ -133,8 +133,8 @@ class ViewController: UIViewController, ParticleLabDelegate
         {
         case .orbits:
             particleLab.showGravityWellPositions = true
-            particleLab.dragFactor = 0.8
-            particleLab.respawnOutOfBoundsParticles = false
+            particleLab.dragFactor = 0.82
+            particleLab.respawnOutOfBoundsParticles = true
             particleLab.resetParticles(edgesOnly: false)
             
         case .cloudChamber:
@@ -224,10 +224,10 @@ class ViewController: UIViewController, ParticleLabDelegate
         gravityWellAngle = gravityWellAngle + 0.0015
         
         particleLab.setGravityWellProperties(gravityWell: .One,
-            normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle * 3),
-            normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle * 3),
-            mass: 2,
-            spin: 20)
+            normalisedPositionX: 0.5 + 0.002 * sin(gravityWellAngle * 43),
+            normalisedPositionY: 0.5 + 0.002 * cos(gravityWellAngle * 43),
+            mass: 10,
+            spin: 24)
         
         let particleOnePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .One)
         
@@ -243,7 +243,7 @@ class ViewController: UIViewController, ParticleLabDelegate
             normalisedPositionX: particleTwoPosition.x + 0.1 * sin(gravityWellAngle * 23),
             normalisedPositionY: particleTwoPosition.y + 0.1 * cos(gravityWellAngle * 23),
             mass: 6,
-            spin: 16)
+            spin: 17)
         
         let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Three)
         
@@ -251,7 +251,7 @@ class ViewController: UIViewController, ParticleLabDelegate
             normalisedPositionX: particleThreePosition.x + 0.03 * sin(gravityWellAngle * 37),
             normalisedPositionY: particleThreePosition.y + 0.03 * cos(gravityWellAngle * 37),
             mass: 8,
-            spin: 14)
+            spin: 15)
     }
     
     func cloudChamberStep()

@@ -61,6 +61,8 @@ class ParticleLab: CAMetalLayer
     private var frameNumber = 0
     let particleSize = sizeof(Particle)
     
+    var timer: CADisplayLink! = nil
+
     let markerA = CAShapeLayer()
     let markerB = CAShapeLayer()
     let markerC = CAShapeLayer()
@@ -234,8 +236,13 @@ class ParticleLab: CAMetalLayer
             commandQueue = device.newCommandQueue()
             
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
-            pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
             
+            var pipelineError : NSError?
+            pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: &pipelineError)
+            if pipelineState == nil {
+                println("Failed to create pipeline state, error \(pipelineError)")
+            }
+
             let threadExecutionWidth = pipelineState.threadExecutionWidth
             
             particle_threadGroupCount = MTLSize(width:threadExecutionWidth,height:1,depth:1)
@@ -248,12 +255,13 @@ class ParticleLab: CAMetalLayer
             
             imageWidthFloatBuffer =  device.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: nil)
             imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: nil)
-            
-            step()
+
+            timer = CADisplayLink(target: self, selector: Selector("step"))
+            timer.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         }
     }
     
-    final private func step()
+    func step()
     {
         frameNumber++
         
@@ -327,14 +335,9 @@ class ParticleLab: CAMetalLayer
             
             println("metalLayer.nextDrawable() returned nil")
         }
-        
+
         particleLabDelegate?.particleLabDidUpdate()
-        
-        dispatch_async(dispatch_get_main_queue(),
-            {
-                self.step();
-        })
-    }
+}
     
     final func getGravityWellNormalisedPosition(#gravityWell: GravityWell) -> (x: Float, y: Float)
     {

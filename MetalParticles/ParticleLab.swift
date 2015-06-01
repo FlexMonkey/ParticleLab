@@ -236,8 +236,13 @@ class ParticleLab: CAMetalLayer
             commandQueue = device.newCommandQueue()
             
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
-            pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: nil)
             
+            var pipelineError : NSError?
+            pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: &pipelineError)
+            if pipelineState == nil {
+                println("Failed to create pipeline state, error \(pipelineError)")
+            }
+
             let threadExecutionWidth = pipelineState.threadExecutionWidth
             
             particle_threadGroupCount = MTLSize(width:threadExecutionWidth,height:1,depth:1)

@@ -121,8 +121,9 @@ class ViewController: UIViewController, ParticleLabDelegate
             popoverPresentationController.sourceRect = CGRect(x: xx, y: yy, width: menuButton.frame.width, height: menuButton.frame.height)
             popoverPresentationController.sourceView = view
             
-            presentViewController(alertController, animated: true, completion: nil)
         }
+
+        presentViewController(alertController, animated: true, completion: nil)
     }
  
     func calloutActionHandler(value: UIAlertAction!) -> Void

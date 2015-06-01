@@ -287,6 +287,11 @@ class ViewController: UIViewController, ParticleLabDelegate
         
     }
     
+    override func preferredStatusBarStyle() -> UIStatusBarStyle
+    {
+        return UIStatusBarStyle.LightContent
+    }
+    
     override func supportedInterfaceOrientations() -> Int
     {
         return Int(UIInterfaceOrientationMask.Landscape.rawValue)

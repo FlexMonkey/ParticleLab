@@ -40,8 +40,8 @@ class ParticleLab: CAMetalLayer
     
     private var errorFlag:Bool = false
     
-    private var particle_threadGroupCount:MTLSize!
-    private var particle_threadGroups:MTLSize!
+    private var threadsPerThreadgroup:MTLSize!
+    private var threadgroupsPerGrid:MTLSize!
     
     let particleCount: Int
     let alignment:Int = 0x4000
@@ -245,8 +245,8 @@ class ParticleLab: CAMetalLayer
 
             let threadExecutionWidth = pipelineState.threadExecutionWidth
             
-            particle_threadGroupCount = MTLSize(width:threadExecutionWidth,height:1,depth:1)
-            particle_threadGroups = MTLSize(width:(particleCount + threadExecutionWidth - 1) / threadExecutionWidth, height:1, depth:1)
+            threadsPerThreadgroup = MTLSize(width:threadExecutionWidth,height:1,depth:1)
+            threadgroupsPerGrid = MTLSize(width:particleCount / threadExecutionWidth, height:1, depth:1)
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
     
@@ -316,7 +316,7 @@ class ParticleLab: CAMetalLayer
             drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
             commandEncoder.setTexture(drawable.texture, atIndex: 0)
             
-            commandEncoder.dispatchThreadgroups(particle_threadGroups, threadsPerThreadgroup: particle_threadGroupCount)
+            commandEncoder.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
             
             commandEncoder.endEncoding()
             

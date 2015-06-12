@@ -103,7 +103,7 @@ class ParticleLab: CAMetalLayer
         markerD.strokeColor = UIColor.whiteColor().CGColor
     }
     
-    required init(coder aDecoder: NSCoder)
+    required init?(coder aDecoder: NSCoder)
     {
         fatalError("init(coder:) has not been implemented")
     }
@@ -232,15 +232,18 @@ class ParticleLab: CAMetalLayer
         }
         else
         {
-            defaultLibrary = device.newDefaultLibrary()
-            commandQueue = device.newCommandQueue()
+            defaultLibrary = device!.newDefaultLibrary()
+            commandQueue = device!.newCommandQueue()
             
             kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
             
-            var pipelineError : NSError?
-            pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!, error: &pipelineError)
-            if pipelineState == nil {
-                println("Failed to create pipeline state, error \(pipelineError)")
+            do
+            {
+                try pipelineState = device!.newComputePipelineStateWithFunction(kernelFunction!)
+            }
+            catch
+            {
+                fatalError("newComputePipelineStateWithFunction failed ")
             }
 
             let threadExecutionWidth = pipelineState.threadExecutionWidth
@@ -253,9 +256,11 @@ class ParticleLab: CAMetalLayer
             var imageWidthFloat = Float(imageWidth)
             var imageHeightFloat = Float(imageHeight)
             
-            imageWidthFloatBuffer =  device.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: nil)
-            imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: nil)
+            imageWidthFloatBuffer =  device!.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+            
+            imageHeightFloatBuffer = device!.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
 
+            
             timer = CADisplayLink(target: self, selector: Selector("step"))
             timer.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
         }
@@ -268,7 +273,7 @@ class ParticleLab: CAMetalLayer
         if frameNumber == 100
         {
             let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-            println((NSString(format: "%.1f", 1 / frametime) as String) + "fps" )
+            print((NSString(format: "%.1f", 1 / frametime) as String) + "fps" )
             
             frameStartTime = CFAbsoluteTimeGetCurrent()
             
@@ -280,25 +285,25 @@ class ParticleLab: CAMetalLayer
         
         commandEncoder.setComputePipelineState(pipelineState)
         
-        let particlesBufferNoCopy = device.newBufferWithBytesNoCopy(particlesMemory, length: Int(particlesMemoryByteSize),
-            options: nil, deallocator: nil)
+        let particlesBufferNoCopy = device!.newBufferWithBytesNoCopy(particlesMemory, length: Int(particlesMemoryByteSize),
+            options: MTLResourceOptions.CPUCacheModeDefaultCache, deallocator: nil)
         
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
-        var inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: nil)
+        let inGravityWell = device!.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
         
-        var colorBuffer = device.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: nil)
+        let colorBuffer = device!.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(colorBuffer, offset: 0, atIndex: 3)
         
         commandEncoder.setBuffer(imageWidthFloatBuffer, offset: 0, atIndex: 4)
         commandEncoder.setBuffer(imageHeightFloatBuffer, offset: 0, atIndex: 5)
         
-        var dragFactorBuffer = device.newBufferWithBytes(&dragFactor, length: sizeof(Float), options: nil)
+        let dragFactorBuffer = device!.newBufferWithBytes(&dragFactor, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(dragFactorBuffer, offset: 0, atIndex: 6)
         
-        var respawnOutOfBoundsParticlesBuffer = device.newBufferWithBytes(&respawnOutOfBoundsParticles, length: sizeof(Bool), options: nil)
+        let respawnOutOfBoundsParticlesBuffer = device!.newBufferWithBytes(&respawnOutOfBoundsParticles, length: sizeof(Bool), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(respawnOutOfBoundsParticlesBuffer, offset: 0, atIndex: 7)
         
         if showGravityWellPositions
@@ -333,13 +338,13 @@ class ParticleLab: CAMetalLayer
         {
             commandEncoder.endEncoding()
             
-            println("metalLayer.nextDrawable() returned nil")
+            print("metalLayer.nextDrawable() returned nil")
         }
 
         particleLabDelegate?.particleLabDidUpdate()
 }
     
-    final func getGravityWellNormalisedPosition(#gravityWell: GravityWell) -> (x: Float, y: Float)
+    final func getGravityWellNormalisedPosition(gravityWell gravityWell: GravityWell) -> (x: Float, y: Float)
     {
         let returnPoint: (x: Float, y: Float)
         
@@ -364,7 +369,7 @@ class ParticleLab: CAMetalLayer
         return returnPoint
     }
     
-    final func setGravityWellProperties(#gravityWellIndex: Int, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
+    final func setGravityWellProperties(gravityWellIndex gravityWellIndex: Int, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
     {
         switch gravityWellIndex
         {
@@ -382,7 +387,7 @@ class ParticleLab: CAMetalLayer
         }
     }
     
-    final func setGravityWellProperties(#gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
+    final func setGravityWellProperties(gravityWell gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
     {
         let imageWidthFloat = Float(imageWidth)
         let imageHeightFloat = Float(imageHeight)

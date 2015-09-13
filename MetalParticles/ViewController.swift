@@ -110,8 +110,6 @@ class ViewController: UIViewController, ParticleLabDelegate
             let xx = menuButton.frame.origin.x
             let yy = menuButton.frame.origin.y
             
-            popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Right
-            
             popoverPresentationController.sourceRect = CGRect(x: xx, y: yy, width: menuButton.frame.width, height: menuButton.frame.height)
             popoverPresentationController.sourceView = view
             

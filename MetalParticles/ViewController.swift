@@ -81,20 +81,14 @@ class ViewController: UIViewController, ParticleLabDelegate
         // handle metal unavailable here
     }
 
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent)
+    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?)
     {
-        if let touches = touches as? Set<UITouch>
-        {
-            currentTouches = currentTouches.union(touches)
-        }
+        currentTouches = currentTouches.union(touches)
     }
 
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent)
+    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?)
     {
-        if let touches = touches as? Set<UITouch>
-        {
-            currentTouches = currentTouches.subtract(touches)
-        }
+        currentTouches = currentTouches.subtract(touches)
     }
     
     func displayCallout()
@@ -116,8 +110,6 @@ class ViewController: UIViewController, ParticleLabDelegate
             let xx = menuButton.frame.origin.x
             let yy = menuButton.frame.origin.y
             
-            popoverPresentationController.permittedArrowDirections = UIPopoverArrowDirection.Right
-            
             popoverPresentationController.sourceRect = CGRect(x: xx, y: yy, width: menuButton.frame.width, height: menuButton.frame.height)
             popoverPresentationController.sourceView = view
             
@@ -128,7 +120,7 @@ class ViewController: UIViewController, ParticleLabDelegate
  
     func calloutActionHandler(value: UIAlertAction!) -> Void
     {
-        demoMode = DemoModes(rawValue: value.title) ?? DemoModes.cloudChamber
+        demoMode = DemoModes(rawValue: value.title!) ?? DemoModes.cloudChamber
         
         switch demoMode
         {
@@ -136,25 +128,25 @@ class ViewController: UIViewController, ParticleLabDelegate
             particleLab.showGravityWellPositions = true
             particleLab.dragFactor = 0.82
             particleLab.respawnOutOfBoundsParticles = true
-            particleLab.resetParticles(edgesOnly: false)
+            particleLab.resetParticles(false)
             
         case .cloudChamber:
             particleLab.showGravityWellPositions = false
             particleLab.dragFactor = 0.75
             particleLab.respawnOutOfBoundsParticles = false
-            particleLab.resetParticles(edgesOnly: true)
+            particleLab.resetParticles(true)
             
         case .multiTouch:
             particleLab.showGravityWellPositions = true
             particleLab.dragFactor = 0.95
             particleLab.respawnOutOfBoundsParticles = false
-            particleLab.resetParticles(edgesOnly: false)
+            particleLab.resetParticles(false)
             
         case .respawn:
             particleLab.showGravityWellPositions = false
             particleLab.dragFactor = 0.98
             particleLab.respawnOutOfBoundsParticles = true
-            particleLab.resetParticles(edgesOnly: true)
+            particleLab.resetParticles(true)
         }
     }
     
@@ -282,19 +274,16 @@ class ViewController: UIViewController, ParticleLabDelegate
             mass: 26, spin: -19 * sin(gravityWellAngle * 1.5))
     }
     
-    override func viewDidLayoutSubviews()
+    
+    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask
     {
-        
+        return UIInterfaceOrientationMask.Landscape
     }
+    
     
     override func preferredStatusBarStyle() -> UIStatusBarStyle
     {
         return UIStatusBarStyle.LightContent
-    }
-    
-    override func supportedInterfaceOrientations() -> Int
-    {
-        return Int(UIInterfaceOrientationMask.Landscape.rawValue)
     }
     
     override func didReceiveMemoryWarning()

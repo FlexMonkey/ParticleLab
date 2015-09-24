@@ -46,17 +46,29 @@ class ViewController: UIViewController, ParticleLabDelegate
         view.backgroundColor = UIColor.blackColor()
         view.multipleTouchEnabled = true
         
+        let numParticles = ParticleCount.QtrMillion
+        
         if view.frame.height < view.frame.width
         {
-            particleLab = ParticleLab(width: UInt(view.frame.width), height: UInt(view.frame.height),
-                numParticles: ParticleCount.TwoMillion)
-            particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height)
+            particleLab = ParticleLab(width: UInt(view.frame.width),
+                height: UInt(view.frame.height),
+                numParticles: numParticles)
+            
+            particleLab.frame = CGRect(x: 0,
+                y: 0,
+                width: view.frame.width,
+                height: view.frame.height)
         }
         else
         {
-            particleLab = ParticleLab(width: UInt(view.frame.height), height: UInt(view.frame.width),
-                numParticles: ParticleCount.TwoMillion)
-            particleLab.frame = CGRect(x: 0, y: 0, width: view.frame.height, height: view.frame.width)
+            particleLab = ParticleLab(width: UInt(view.frame.height),
+                height: UInt(view.frame.width),
+                numParticles: numParticles)
+            
+            particleLab.frame = CGRect(x: 0,
+                y: 0,
+                width: view.frame.height,
+                height: view.frame.width)
         }
         
         particleLab.particleLabDelegate = self

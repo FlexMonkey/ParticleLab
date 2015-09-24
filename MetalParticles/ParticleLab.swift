@@ -20,6 +20,7 @@
 
 import Metal
 import UIKit
+import MetalPerformanceShaders
 
 class ParticleLab: CAMetalLayer
 {
@@ -37,8 +38,6 @@ class ParticleLab: CAMetalLayer
     private var pipelineState: MTLComputePipelineState!
     private var defaultLibrary: MTLLibrary! = nil
     private var commandQueue: MTLCommandQueue! = nil
-    
-    private var errorFlag:Bool = false
     
     private var threadsPerThreadgroup:MTLSize!
     private var threadgroupsPerGrid:MTLSize!
@@ -73,6 +72,10 @@ class ParticleLab: CAMetalLayer
     var particleColor = ParticleColor(R: 1, G: 0.5, B: 0.2, A: 1)
     var dragFactor: Float = 0.97
     var respawnOutOfBoundsParticles = false
+    
+    var blur: MPSImageGaussianBlur?
+    
+    var clearOnStep = true
     
     init(width: UInt, height: UInt, numParticles: ParticleCount)
     {
@@ -114,7 +117,7 @@ class ParticleLab: CAMetalLayer
     }
     
     var showGravityWellPositions: Bool = false
-        {
+    {
         didSet
         {
             if showGravityWellPositions
@@ -224,50 +227,56 @@ class ParticleLab: CAMetalLayer
     {
         device = MTLCreateSystemDefaultDevice()
         
-        if device == nil
+        guard let device = device else
         {
-            errorFlag = true
-            
             particleLabDelegate?.particleLabMetalUnavailable()
+            
+            return
         }
-        else
+        
+        defaultLibrary = device.newDefaultLibrary()
+        commandQueue = device.newCommandQueue()
+        
+        kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
+        
+        do
         {
-            defaultLibrary = device!.newDefaultLibrary()
-            commandQueue = device!.newCommandQueue()
-            
-            kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
-            
-            do
-            {
-                try pipelineState = device!.newComputePipelineStateWithFunction(kernelFunction!)
-            }
-            catch
-            {
-                fatalError("newComputePipelineStateWithFunction failed ")
-            }
-
-            let threadExecutionWidth = pipelineState.threadExecutionWidth
-            
-            threadsPerThreadgroup = MTLSize(width:threadExecutionWidth,height:1,depth:1)
-            threadgroupsPerGrid = MTLSize(width:particleCount / threadExecutionWidth, height:1, depth:1)
-            
-            frameStartTime = CFAbsoluteTimeGetCurrent()
-    
-            var imageWidthFloat = Float(imageWidth)
-            var imageHeightFloat = Float(imageHeight)
-            
-            imageWidthFloatBuffer =  device!.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
-            
-            imageHeightFloatBuffer = device!.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
-
-            
-            timer = CADisplayLink(target: self, selector: Selector("step"))
-            timer.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
+            try pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!)
         }
+        catch
+        {
+            fatalError("newComputePipelineStateWithFunction failed ")
+        }
+
+        let threadExecutionWidth = pipelineState.threadExecutionWidth
+        
+        threadsPerThreadgroup = MTLSize(width:threadExecutionWidth,height:1,depth:1)
+        threadgroupsPerGrid = MTLSize(width:particleCount / threadExecutionWidth, height:1, depth:1)
+        
+        frameStartTime = CFAbsoluteTimeGetCurrent()
+
+        var imageWidthFloat = Float(imageWidth)
+        var imageHeightFloat = Float(imageHeight)
+        
+        imageWidthFloatBuffer =  device.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+        
+        imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+
+        blur = MPSImageGaussianBlur(device: device, sigma: 5)
+        
+        timer = CADisplayLink(target: self, selector: Selector("step"))
+        timer.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
     }
     
     func step()
     {
+        guard let device = device else
+        {
+            particleLabDelegate?.particleLabMetalUnavailable()
+            
+            return
+        }
+        
         frameNumber++
         
         if frameNumber == 100
@@ -285,25 +294,25 @@ class ParticleLab: CAMetalLayer
         
         commandEncoder.setComputePipelineState(pipelineState)
         
-        let particlesBufferNoCopy = device!.newBufferWithBytesNoCopy(particlesMemory, length: Int(particlesMemoryByteSize),
+        let particlesBufferNoCopy = device.newBufferWithBytesNoCopy(particlesMemory, length: Int(particlesMemoryByteSize),
             options: MTLResourceOptions.CPUCacheModeDefaultCache, deallocator: nil)
         
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
         commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
         
-        let inGravityWell = device!.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: MTLResourceOptions.CPUCacheModeDefaultCache)
+        let inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
         
-        let colorBuffer = device!.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+        let colorBuffer = device.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(colorBuffer, offset: 0, atIndex: 3)
         
         commandEncoder.setBuffer(imageWidthFloatBuffer, offset: 0, atIndex: 4)
         commandEncoder.setBuffer(imageHeightFloatBuffer, offset: 0, atIndex: 5)
         
-        let dragFactorBuffer = device!.newBufferWithBytes(&dragFactor, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+        let dragFactorBuffer = device.newBufferWithBytes(&dragFactor, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(dragFactorBuffer, offset: 0, atIndex: 6)
         
-        let respawnOutOfBoundsParticlesBuffer = device!.newBufferWithBytes(&respawnOutOfBoundsParticles, length: sizeof(Bool), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+        let respawnOutOfBoundsParticlesBuffer = device.newBufferWithBytes(&respawnOutOfBoundsParticles, length: sizeof(Bool), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(respawnOutOfBoundsParticlesBuffer, offset: 0, atIndex: 7)
         
         if showGravityWellPositions
@@ -316,33 +325,46 @@ class ParticleLab: CAMetalLayer
             markerD.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.D.x) * scale - 5, y: CGFloat(gravityWellParticle.D.y - 5) * scale, width: 10, height: 10), nil)
         }
         
-        if let drawable = nextDrawable()
-        {
-            drawable.texture.replaceRegion(self.region, mipmapLevel: 0, withBytes: blankBitmapRawData, bytesPerRow: Int(bytesPerRow))
-            commandEncoder.setTexture(drawable.texture, atIndex: 0)
-            
-            commandEncoder.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
-            
-            commandEncoder.endEncoding()
-            
-            //commandBuffer.presentDrawable(drawable)
-            
-            commandBuffer.commit()
-            
-            // commandBuffer.waitUntilScheduled()
-            
-            drawable.present()
-            
-        }
-        else
+        guard let drawable = nextDrawable() else
         {
             commandEncoder.endEncoding()
             
             print("metalLayer.nextDrawable() returned nil")
+            
+            return
         }
 
+        if clearOnStep
+        {
+            drawable.texture.replaceRegion(self.region,
+                mipmapLevel: 0,
+                withBytes: blankBitmapRawData,
+                bytesPerRow: Int(bytesPerRow))
+        }
+        
+            
+        commandEncoder.setTexture(drawable.texture, atIndex: 0)
+        
+        commandEncoder.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
+        
+        commandEncoder.endEncoding()
+        
+        if !clearOnStep
+        {
+            let inPlaceTexture = UnsafeMutablePointer<MTLTexture?>.alloc(1)
+            inPlaceTexture.initialize(drawable.texture)
+            
+            blur?.encodeToCommandBuffer(commandBuffer,
+                inPlaceTexture: inPlaceTexture,
+                fallbackCopyAllocator: nil)
+        }
+        
+        commandBuffer.commit()
+        
+        drawable.present()
+
         particleLabDelegate?.particleLabDidUpdate()
-}
+    }
     
     final func getGravityWellNormalisedPosition(gravityWell gravityWell: GravityWell) -> (x: Float, y: Float)
     {
@@ -439,10 +461,12 @@ enum GravityWell
 //  in the API is four times the number we need to create.
 enum ParticleCount: Int
 {
-    case HalfMillion = 131072
-    case OneMillion =  262144
-    case TwoMillion =  524288
-    case FourMillion = 1048576
+    case QtrMillion = 65_536
+    case HalfMillion = 131_072
+    case OneMillion =  262_144
+    case TwoMillion =  524_288
+    case FourMillion = 1_048_576
+    case EightMillion = 2_097_152
 }
 
 //  Paticles are split into three classes. The supplied particle color defines one

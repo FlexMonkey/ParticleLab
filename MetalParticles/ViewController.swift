@@ -228,7 +228,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         for (i, currentTouch) in currentTouches.enumerate()
         {
-            let touchMultiplier = currentTouch.force == 0
+            let touchMultiplier = currentTouch.force == 0 && currentTouch.maximumPossibleForce == 0
                 ? 1
                 : Float(currentTouch.force / currentTouch.maximumPossibleForce)
             

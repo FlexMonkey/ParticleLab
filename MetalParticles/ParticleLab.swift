@@ -165,7 +165,7 @@ class ParticleLab: CAMetalLayer
         setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.5, normalisedPositionY: 0.5, mass: 0, spin: 0)
     }
     
-    func resetParticles(edgesOnly: Bool = true)
+    func resetParticles(edgesOnly: Bool = false)
     {
         func rand() -> Float32
         {

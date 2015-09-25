@@ -36,7 +36,7 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     var gravityWellAngle: Float = 0
     
-    var demoMode = DemoModes.cloudChamber
+    var demoMode = DemoModes.multiTouch
     
     var currentTouches = Set<UITouch>()
     
@@ -47,7 +47,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         view.backgroundColor = UIColor.blackColor()
         view.multipleTouchEnabled = true
         
-        let numParticles = ParticleCount.TwoMillion
+        let numParticles = ParticleCount.FourMillion
         
         if view.frame.height < view.frame.width
         {
@@ -226,15 +226,19 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         let currentTouchesArray = Array(currentTouches)
         
-        for var i:Int = 0; i < currentTouchesArray.count; i++
+        for (i, currentTouch) in currentTouches.enumerate()
         {
+            let touchMultiplier = currentTouch.force == 0
+                ? 1
+                : Float(currentTouch.force / currentTouch.maximumPossibleForce)
+            
             particleLab.setGravityWellProperties(gravityWellIndex: i,
-                normalisedPositionX: Float(currentTouchesArray[i].locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouchesArray[i].locationInView(view).y / view.frame.height),
-                mass: 10,
-                spin: Float(currentTouchesArray[i].majorRadius / 5))
+                normalisedPositionX: Float(currentTouch.locationInView(view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouch.locationInView(view).y / view.frame.height),
+                mass: 40 * touchMultiplier,
+                spin: 20 * touchMultiplier)
         }
-        
+
         for var i = currentTouchesArray.count; i < 4; i++
         {
             particleLab.setGravityWellProperties(gravityWellIndex: i,

@@ -226,7 +226,7 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         let currentTouchesArray = Array(currentTouches)
         
-        for (i, currentTouch) in currentTouches.enumerate()
+        for (i, currentTouch) in currentTouchesArray.enumerate() where i < 4
         {
             let touchMultiplier = currentTouch.force == 0 && currentTouch.maximumPossibleForce == 0
                 ? 1

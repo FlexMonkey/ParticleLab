@@ -27,7 +27,8 @@ import UIKit
 
 class ViewController: UIViewController, ParticleLabDelegate
 {
-    let menuButton = UIButton(frame: CGRect(x: 10, y: 20, width: 30, height: 30))
+    let menuButton = UIButton()
+    let statusLabel = UILabel()
     
     let floatPi = Float(M_PI)
     
@@ -46,14 +47,14 @@ class ViewController: UIViewController, ParticleLabDelegate
         view.backgroundColor = UIColor.blackColor()
         view.multipleTouchEnabled = true
         
-        let numParticles = ParticleCount.QtrMillion
+        let numParticles = ParticleCount.TwoMillion
         
         if view.frame.height < view.frame.width
         {
             particleLab = ParticleLab(width: UInt(view.frame.width),
                 height: UInt(view.frame.height),
                 numParticles: numParticles)
-            
+       
             particleLab.frame = CGRect(x: 0,
                 y: 0,
                 width: view.frame.width,
@@ -86,6 +87,26 @@ class ViewController: UIViewController, ParticleLabDelegate
         menuButton.addTarget(self, action: "displayCallout", forControlEvents: UIControlEvents.TouchDown)
         
         view.addSubview(menuButton)
+        
+        statusLabel.text = "http://flexmonkey.blogspot.co.uk"
+        statusLabel.textColor = UIColor.whiteColor()
+        
+        view.addSubview(statusLabel)
+    }
+    
+    override func viewDidLayoutSubviews()
+    {
+        statusLabel.frame = CGRect(x: 5,
+            y: view.frame.height - statusLabel.intrinsicContentSize().height,
+            width: view.frame.width,
+            height: statusLabel.intrinsicContentSize().height)
+        
+        // frame: CGRect(x: 5, y: 5, width: 30, height: 30)
+        
+        menuButton.frame = CGRect(x: view.frame.width - 35,
+            y: view.frame.height - 35,
+            width: 30,
+            height: 30)
     }
     
     func particleLabMetalUnavailable()
@@ -124,9 +145,8 @@ class ViewController: UIViewController, ParticleLabDelegate
             
             popoverPresentationController.sourceRect = CGRect(x: xx, y: yy, width: menuButton.frame.width, height: menuButton.frame.height)
             popoverPresentationController.sourceView = view
-            
         }
-
+        
         presentViewController(alertController, animated: true, completion: nil)
     }
  
@@ -162,8 +182,10 @@ class ViewController: UIViewController, ParticleLabDelegate
         }
     }
     
-    func particleLabDidUpdate()
+    func particleLabDidUpdate(status: String)
     {
+        statusLabel.text = "http://flexmonkey.blogspot.co.uk  |  " + status
+        
         particleLab.resetGravityWells()
         
         switch demoMode

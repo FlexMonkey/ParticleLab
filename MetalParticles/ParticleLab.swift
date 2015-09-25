@@ -77,6 +77,9 @@ class ParticleLab: CAMetalLayer
     
     var clearOnStep = true
     
+    let statusPrefix: String
+    var statusPostix: String = ""
+    
     init(width: UInt, height: UInt, numParticles: ParticleCount)
     {
         particleCount = numParticles.rawValue
@@ -89,7 +92,13 @@ class ParticleLab: CAMetalLayer
         region = MTLRegionMake2D(0, 0, Int(imageWidth), Int(imageHeight))
         blankBitmapRawData = [UInt8](count: Int(imageWidth * imageHeight * 4), repeatedValue: 0)
         particlesMemoryByteSize = particleCount * sizeof(Particle)
+    
+        let formatter = NSNumberFormatter()
+        formatter.usesGroupingSeparator = true
+        formatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
         
+        statusPrefix = formatter.stringFromNumber(numParticles.rawValue * 4)! + " Particles"
+ 
         super.init()
         
         framebufferOnly = false
@@ -105,7 +114,7 @@ class ParticleLab: CAMetalLayer
         markerC.strokeColor = UIColor.whiteColor().CGColor
         markerD.strokeColor = UIColor.whiteColor().CGColor
     }
-    
+
     required init?(coder aDecoder: NSCoder)
     {
         fatalError("init(coder:) has not been implemented")
@@ -282,8 +291,9 @@ class ParticleLab: CAMetalLayer
         if frameNumber == 100
         {
             let frametime = (CFAbsoluteTimeGetCurrent() - frameStartTime) / 100
-            print((NSString(format: "%.1f", 1 / frametime) as String) + "fps" )
-            
+           
+            statusPostix = String(format: " at %.1f fps", 1 / frametime)
+   
             frameStartTime = CFAbsoluteTimeGetCurrent()
             
             frameNumber = 0
@@ -363,7 +373,7 @@ class ParticleLab: CAMetalLayer
         
         drawable.present()
 
-        particleLabDelegate?.particleLabDidUpdate()
+        particleLabDelegate?.particleLabDidUpdate(statusPrefix + statusPostix)
     }
     
     final func getGravityWellNormalisedPosition(gravityWell gravityWell: GravityWell) -> (x: Float, y: Float)
@@ -445,7 +455,7 @@ class ParticleLab: CAMetalLayer
 
 protocol ParticleLabDelegate: NSObjectProtocol
 {
-    func particleLabDidUpdate()
+    func particleLabDidUpdate(status: String)
     func particleLabMetalUnavailable()
 }
 

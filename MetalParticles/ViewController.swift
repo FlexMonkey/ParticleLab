@@ -36,7 +36,7 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     var gravityWellAngle: Float = 0
     
-    var demoMode = DemoModes.multiTouch
+    var demoMode = DemoModes.cloudChamber
     
     var currentTouches = Set<UITouch>()
     

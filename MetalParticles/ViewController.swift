@@ -75,7 +75,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         particleLab.particleLabDelegate = self
         particleLab.dragFactor = 0.85
         
-        view.layer.addSublayer(particleLab)
+        view.addSubview(particleLab)
         
         menuButton.layer.borderColor = UIColor.lightGrayColor().CGColor
         menuButton.layer.borderWidth = 1
@@ -157,25 +157,21 @@ class ViewController: UIViewController, ParticleLabDelegate
         switch demoMode
         {
         case .orbits:
-            particleLab.showGravityWellPositions = true
             particleLab.dragFactor = 0.82
             particleLab.respawnOutOfBoundsParticles = true
             particleLab.resetParticles(false)
             
         case .cloudChamber:
-            particleLab.showGravityWellPositions = false
             particleLab.dragFactor = 0.75
             particleLab.respawnOutOfBoundsParticles = false
             particleLab.resetParticles(true)
             
         case .multiTouch:
-            particleLab.showGravityWellPositions = true
             particleLab.dragFactor = 0.95
             particleLab.respawnOutOfBoundsParticles = false
             particleLab.resetParticles(false)
             
         case .respawn:
-            particleLab.showGravityWellPositions = false
             particleLab.dragFactor = 0.98
             particleLab.respawnOutOfBoundsParticles = true
             particleLab.resetParticles(true)

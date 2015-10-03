@@ -3,10 +3,11 @@ Particle system that's both calculated and rendered on the GPU using the Metal f
 
 ![http://flexmonkey.co.uk/swift/IMG_0699.PNG](http://flexmonkey.co.uk/swift/IMG_0699.PNG)
 
-This is the most highly optimised version of my Swift and Metal particles system; managing over 40 fps with four million particles and four gravity wells. It manages this by rendering to a CAMetalLayer rather than converting a texture to a UIImage and by passing in four particle definitions per step with a float4x4 rather than a particle struct.
+This is the most highly optimised version of my Swift and Metal particles system; managing over 40 fps with four million particles and four gravity wells. It manages this by rendering to a MetalKit MTKView rather than converting a texture to a UIImage and by passing in four particle definitions per step with a float4x4 rather than a particle struct.
 
 You can read about these recent changes at my blog:
 
+* A First Look at Metal for OS X: http://flexmonkey.blogspot.co.uk/2015/06/a-first-look-at-metal-for-os-x-el.html
 * CAMetalLayer work: http://flexmonkey.blogspot.co.uk/2015/03/swift-metal-four-million-particles-on.html
 * Use of float4x4: http://flexmonkey.blogspot.co.uk/2015/03/mind-blowing-metal-four-million.html
 
@@ -19,7 +20,7 @@ particleLab = ParticleLab(width: 1024, height: 768, numParticles: ParticleCount.
 ...and when ready, add it  as a sublayer to your view:
 
 ```
-view.layer.addSublayer(particleLab)
+view.addView(particleLab)
 ```
 
 The class has four gravity wells with propeties such as position, mass and spin. These are set with the _setGravityWellProperties_ method:
@@ -33,8 +34,6 @@ particleLab.setGravityWellProperties(gravityWell: .Three, normalisedPositionX: 0
         
 particleLab.setGravityWellProperties(gravityWell: .Four, normalisedPositionX: 0.7, normalisedPositionY: 0.7, mass: 11, spin: -4)
 ```
-
-Gravity well positions can be displayed by setting the ```showGravityWellPositions``` property to _true_.
 
 Classes can implement ```ParticleLabDelegate``` interface which includes ```particleLabDidUpdate```. This method is invoked with each particle step and can be used, for example, for updating the position of gravity wells.
 

@@ -21,8 +21,9 @@
 import Metal
 import UIKit
 import MetalPerformanceShaders
+import MetalKit
 
-class ParticleLab: CAMetalLayer
+class ParticleLab: MTKView
 {
     let imageWidth: UInt
     let imageHeight: UInt
@@ -59,14 +60,7 @@ class ParticleLab: CAMetalLayer
     private var frameStartTime: CFAbsoluteTime!
     private var frameNumber = 0
     let particleSize = sizeof(Particle)
-    
-    var timer: CADisplayLink! = nil
 
-    let markerA = CAShapeLayer()
-    let markerB = CAShapeLayer()
-    let markerC = CAShapeLayer()
-    let markerD = CAShapeLayer()
-    
     weak var particleLabDelegate: ParticleLabDelegate?
     
     var particleColor = ParticleColor(R: 1, G: 0.5, B: 0.2, A: 1)
@@ -99,53 +93,27 @@ class ParticleLab: CAMetalLayer
         
         statusPrefix = formatter.stringFromNumber(numParticles.rawValue * 4)! + " Particles"
  
-        super.init()
+        super.init(frame: CGRect(x: 0, y: 0, width: Int(width), height: Int(height)), device:  MTLCreateSystemDefaultDevice())
         
         framebufferOnly = false
         drawableSize = CGSize(width: CGFloat(imageWidth), height: CGFloat(imageHeight));
-        drawsAsynchronously = true
         
         setUpParticles()
         
         setUpMetal()
-        
-        markerA.strokeColor = UIColor.whiteColor().CGColor
-        markerB.strokeColor = UIColor.whiteColor().CGColor
-        markerC.strokeColor = UIColor.whiteColor().CGColor
-        markerD.strokeColor = UIColor.whiteColor().CGColor
     }
 
-    required init?(coder aDecoder: NSCoder)
+    required init(coder: NSCoder)
     {
         fatalError("init(coder:) has not been implemented")
     }
+
     
     deinit
     {
         free(particlesMemory)
     }
-    
-    var showGravityWellPositions: Bool = false
-    {
-        didSet
-        {
-            if showGravityWellPositions
-            {
-                addSublayer(markerA)
-                addSublayer(markerB)
-                addSublayer(markerC)
-                addSublayer(markerD)
-            }
-            else
-            {
-                markerA.removeFromSuperlayer()
-                markerB.removeFromSuperlayer()
-                markerC.removeFromSuperlayer()
-                markerD.removeFromSuperlayer()
-            }
-        }
-    }
-    
+
     private func setUpParticles()
     {
         posix_memalign(&particlesMemory, alignment, particlesMemoryByteSize)
@@ -272,12 +240,9 @@ class ParticleLab: CAMetalLayer
         imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
 
         blur = MPSImageGaussianBlur(device: device, sigma: 5)
-        
-        timer = CADisplayLink(target: self, selector: Selector("step"))
-        timer.addToRunLoop(NSRunLoop.mainRunLoop(), forMode: NSDefaultRunLoopMode)
     }
     
-    func step()
+    override func drawRect(dirtyRect: CGRect)
     {
         guard let device = device else
         {
@@ -324,18 +289,8 @@ class ParticleLab: CAMetalLayer
         
         let respawnOutOfBoundsParticlesBuffer = device.newBufferWithBytes(&respawnOutOfBoundsParticles, length: sizeof(Bool), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         commandEncoder.setBuffer(respawnOutOfBoundsParticlesBuffer, offset: 0, atIndex: 7)
-        
-        if showGravityWellPositions
-        {
-            let scale = frame.width / CGFloat(imageWidth)
-            
-            markerA.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.A.x) * scale - 5, y: CGFloat(gravityWellParticle.A.y - 5) * scale, width: 10, height: 10), nil)
-            markerB.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.B.x) * scale - 5, y: CGFloat(gravityWellParticle.B.y - 5) * scale, width: 10, height: 10), nil)
-            markerC.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.C.x) * scale - 5, y: CGFloat(gravityWellParticle.C.y - 5) * scale, width: 10, height: 10), nil)
-            markerD.path = CGPathCreateWithEllipseInRect(CGRect(x: CGFloat(gravityWellParticle.D.x) * scale - 5, y: CGFloat(gravityWellParticle.D.y - 5) * scale, width: 10, height: 10), nil)
-        }
-        
-        guard let drawable = nextDrawable() else
+
+        guard let drawable = currentDrawable else
         {
             commandEncoder.endEncoding()
             

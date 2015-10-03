@@ -101,6 +101,8 @@ class ParticleLab: MTKView
         setUpParticles()
         
         setUpMetal()
+        
+        multipleTouchEnabled = true
     }
 
     required init(coder: NSCoder)

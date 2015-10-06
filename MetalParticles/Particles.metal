@@ -7,6 +7,8 @@
 //
 //  Thanks to: http://memkite.com/blog/2014/12/15/data-parallel-programming-with-metal-and-swift-for-iphoneipad-gpu/
 //
+//  Thanks to: Owen Anderson for suggesting removing color lookup aray in favour of ternaries
+//
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or
@@ -49,12 +51,9 @@ kernel void particleRendererShader(texture2d<float, access::write> outTexture [[
     const uint type = id % 3;
     const float typeTweak = 1 + type;
     
-    const float4 colors[] = {
-        float4(particleColor.r, particleColor.g , particleColor.b , 1.0),
-        float4(particleColor.b, particleColor.r, particleColor.g, 1.0),
-        float4(particleColor.g, particleColor.b, particleColor.r, 1.0)};
-    
-    const float4 outColor = colors[type];
+    const float4 outColor = float4(type == 0 ? particleColor.r : type == 1 ? particleColor.g : particleColor.b,
+                                   type == 0 ? particleColor.b : type == 1 ? particleColor.r : particleColor.g,
+                                   type == 0 ? particleColor.g : type == 1 ? particleColor.b : particleColor.r, 1);
 
     // ---
     

@@ -45,9 +45,8 @@ class ViewController: UIViewController, ParticleLabDelegate
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.blackColor()
-        view.multipleTouchEnabled = true
-        
-        let numParticles = ParticleCount.FourMillion
+    
+        let numParticles = ParticleCount.EightMillion
         
         if view.frame.height < view.frame.width
         {

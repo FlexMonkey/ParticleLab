@@ -7,8 +7,6 @@
 //
 //  Thanks to: http://memkite.com/blog/2014/12/15/data-parallel-programming-with-metal-and-swift-for-iphoneipad-gpu/
 //
-//  Thanks to: Owen Anderson for suggesting removing color lookup aray in favour of ternaries
-//
 //  This program is free software: you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
 //  the Free Software Foundation, either version 3 of the License, or

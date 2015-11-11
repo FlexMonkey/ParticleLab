@@ -63,11 +63,12 @@ class ParticleLab: MTKView
 
     weak var particleLabDelegate: ParticleLabDelegate?
     
-    var particleColor = ParticleColor(R: 1, G: 0.5, B: 0.2, A: 1)
+    var particleColor = ParticleColor(R: 1, G: 0.8, B: 0.4, A: 1)
     var dragFactor: Float = 0.97
     var respawnOutOfBoundsParticles = false
     
     var blur: MPSImageGaussianBlur?
+    var erode: MPSImageAreaMin?
     
     var clearOnStep = true
     
@@ -124,7 +125,7 @@ class ParticleLab: MTKView
         particlesParticlePtr = UnsafeMutablePointer<Particle>(particlesVoidPtr)
         particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
         
-        resetParticles()
+        resetParticles(true)
     }
     
     func resetGravityWells()
@@ -241,7 +242,8 @@ class ParticleLab: MTKView
         
         imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
 
-        blur = MPSImageGaussianBlur(device: device, sigma: 5)
+        blur = MPSImageGaussianBlur(device: device, sigma: 3)
+        erode = MPSImageAreaMin(device: device, kernelWidth: 5, kernelHeight: 5)
     }
     
     override func drawRect(dirtyRect: CGRect)
@@ -322,6 +324,10 @@ class ParticleLab: MTKView
             inPlaceTexture.initialize(drawable.texture)
             
             blur?.encodeToCommandBuffer(commandBuffer,
+                inPlaceTexture: inPlaceTexture,
+                fallbackCopyAllocator: nil)
+            
+            erode?.encodeToCommandBuffer(commandBuffer,
                 inPlaceTexture: inPlaceTexture,
                 fallbackCopyAllocator: nil)
         }
@@ -434,6 +440,7 @@ enum ParticleCount: Int
     case TwoMillion =  524_288
     case FourMillion = 1_048_576
     case EightMillion = 2_097_152
+    case SixteenMillion = 4_194_304
 }
 
 //  Paticles are split into three classes. The supplied particle color defines one

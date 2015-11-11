@@ -36,7 +36,7 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     var gravityWellAngle: Float = 0
     
-    var demoMode = DemoModes.cloudChamber
+    var demoMode = DemoModes.orbits
     
     var currentTouches = Set<UITouch>()
     
@@ -46,7 +46,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         view.backgroundColor = UIColor.blackColor()
     
-        let numParticles = ParticleCount.EightMillion
+        let numParticles = ParticleCount.SixteenMillion
         
         if view.frame.height < view.frame.width
         {
@@ -72,7 +72,8 @@ class ViewController: UIViewController, ParticleLabDelegate
         }
         
         particleLab.particleLabDelegate = self
-        particleLab.dragFactor = 0.85
+        particleLab.dragFactor = 0.8
+        particleLab.clearOnStep = false
         
         view.addSubview(particleLab)
         
@@ -88,7 +89,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         view.addSubview(menuButton)
         
         statusLabel.text = "http://flexmonkey.blogspot.co.uk"
-        statusLabel.textColor = UIColor.whiteColor()
+        statusLabel.textColor = UIColor.darkGrayColor()
         
         view.addSubview(statusLabel)
     }
@@ -158,21 +159,25 @@ class ViewController: UIViewController, ParticleLabDelegate
         case .orbits:
             particleLab.dragFactor = 0.82
             particleLab.respawnOutOfBoundsParticles = true
+            particleLab.clearOnStep = false
             particleLab.resetParticles(false)
             
         case .cloudChamber:
-            particleLab.dragFactor = 0.75
+            particleLab.dragFactor = 0.8
             particleLab.respawnOutOfBoundsParticles = false
+            particleLab.clearOnStep = false
             particleLab.resetParticles(true)
             
         case .multiTouch:
             particleLab.dragFactor = 0.95
             particleLab.respawnOutOfBoundsParticles = false
+            particleLab.clearOnStep = true
             particleLab.resetParticles(false)
             
         case .respawn:
             particleLab.dragFactor = 0.98
             particleLab.respawnOutOfBoundsParticles = true
+            particleLab.clearOnStep = true
             particleLab.resetParticles(true)
         }
     }
@@ -250,8 +255,8 @@ class ViewController: UIViewController, ParticleLabDelegate
         gravityWellAngle = gravityWellAngle + 0.0015
         
         particleLab.setGravityWellProperties(gravityWell: .One,
-            normalisedPositionX: 0.5 + 0.002 * sin(gravityWellAngle * 43),
-            normalisedPositionY: 0.5 + 0.002 * cos(gravityWellAngle * 43),
+            normalisedPositionX: 0.5 + 0.006 * cos(gravityWellAngle * 43),
+            normalisedPositionY: 0.5 + 0.006 * sin(gravityWellAngle * 43),
             mass: 10,
             spin: 24)
         
@@ -266,8 +271,8 @@ class ViewController: UIViewController, ParticleLabDelegate
         let particleTwoPosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Two)
         
         particleLab.setGravityWellProperties(gravityWell: .Three,
-            normalisedPositionX: particleTwoPosition.x + 0.1 * sin(gravityWellAngle * 23),
-            normalisedPositionY: particleTwoPosition.y + 0.1 * cos(gravityWellAngle * 23),
+            normalisedPositionX: particleTwoPosition.x + 0.1 * cos(gravityWellAngle * 23),
+            normalisedPositionY: particleTwoPosition.y + 0.1 * sin(gravityWellAngle * 23),
             mass: 6,
             spin: 17)
         
@@ -277,7 +282,7 @@ class ViewController: UIViewController, ParticleLabDelegate
             normalisedPositionX: particleThreePosition.x + 0.03 * sin(gravityWellAngle * 37),
             normalisedPositionY: particleThreePosition.y + 0.03 * cos(gravityWellAngle * 37),
             mass: 8,
-            spin: 15)
+            spin: 25)
     }
     
     func cloudChamberStep()
@@ -325,6 +330,10 @@ class ViewController: UIViewController, ParticleLabDelegate
         // Dispose of any resources that can be recreated.
     }
     
+    override func prefersStatusBarHidden() -> Bool
+    {
+        return true
+    }
 }
 
 

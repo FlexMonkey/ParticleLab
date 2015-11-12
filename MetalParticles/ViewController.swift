@@ -46,7 +46,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         view.backgroundColor = UIColor.blackColor()
     
-        let numParticles = ParticleCount.SixteenMillion
+        let numParticles = ParticleCount.EightMillion
         
         if view.frame.height < view.frame.width
         {
@@ -72,7 +72,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         }
         
         particleLab.particleLabDelegate = self
-        particleLab.dragFactor = 0.25
+        particleLab.dragFactor = 0.5
         particleLab.clearOnStep = false
         particleLab.respawnOutOfBoundsParticles = false
         
@@ -186,7 +186,7 @@ class ViewController: UIViewController, ParticleLabDelegate
             particleLab.resetParticles(true)
             
         case .iPadProDemo:
-            particleLab.dragFactor = 0.15
+            particleLab.dragFactor = 0.5
             particleLab.respawnOutOfBoundsParticles = true
             particleLab.clearOnStep = false
             particleLab.resetParticles(true)
@@ -266,32 +266,34 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     func ipadProDemoStep()
     {
-        gravityWellAngle = gravityWellAngle + 0.002
+        gravityWellAngle = gravityWellAngle + 0.004
         
         particleLab.setGravityWellProperties(gravityWell: .One,
             normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 0.5),
             normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 0.5),
-            mass: 11 * sin(gravityWellAngle / 1.9),
+            mass: 11 * sin(gravityWellAngle / 1.8),
             spin: 23 * cos(gravityWellAngle / 2.1))
         
         particleLab.setGravityWellProperties(gravityWell: .Two,
             normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 1.5),
             normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 1.5),
-            mass: 11 * sin(gravityWellAngle / 1.9),
-            spin: 23 * cos(gravityWellAngle / 2.1))
+            mass: 11 * sin(gravityWellAngle / 0.9),
+            spin: 23 * cos(gravityWellAngle / 1.05))
         
         particleLab.setGravityWellProperties(gravityWell: .Three,
             normalisedPositionX: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * cos(gravityWellAngle / 1.3),
             normalisedPositionY: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * sin(gravityWellAngle / 1.3),
-            mass: 26, spin: -19 * sin(gravityWellAngle * 1.5))
+            mass: 13, spin: 19 * sin(gravityWellAngle * 1.75))
         
+        let particleOnePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .One)
+        let particleTwoPosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Two)
         let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Three)
         
         particleLab.setGravityWellProperties(gravityWell: .Four,
-            normalisedPositionX: particleThreePosition.x + 0.03 * sin(gravityWellAngle * 37),
-            normalisedPositionY: particleThreePosition.y + 0.03 * cos(gravityWellAngle * 37),
-            mass: 8,
-            spin: 25)
+            normalisedPositionX: (particleOnePosition.x + particleTwoPosition.x + particleThreePosition.x) / 3 + 0.03 * sin(gravityWellAngle),
+            normalisedPositionY: (particleOnePosition.y + particleTwoPosition.y + particleThreePosition.y) / 3 + 0.03 * cos(gravityWellAngle),
+            mass: 8 ,
+            spin: 25 * sin(gravityWellAngle / 3 ))
     }
     
     func orbitsStep()

@@ -36,7 +36,7 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     var gravityWellAngle: Float = 0
     
-    var demoMode = DemoModes.orbits
+    var demoMode = DemoModes.iPadProDemo
     
     var currentTouches = Set<UITouch>()
     
@@ -72,8 +72,9 @@ class ViewController: UIViewController, ParticleLabDelegate
         }
         
         particleLab.particleLabDelegate = self
-        particleLab.dragFactor = 0.8
+        particleLab.dragFactor = 0.25
         particleLab.clearOnStep = false
+        particleLab.respawnOutOfBoundsParticles = false
         
         view.addSubview(particleLab)
         
@@ -132,11 +133,13 @@ class ViewController: UIViewController, ParticleLabDelegate
         let orbitsAction = UIAlertAction(title: DemoModes.orbits.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         let multiTouchAction = UIAlertAction(title: DemoModes.multiTouch.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         let respawnAction = UIAlertAction(title: DemoModes.respawn.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
+        let iPadProAction = UIAlertAction(title: DemoModes.iPadProDemo.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
         
         alertController.addAction(cloudChamberAction)
         alertController.addAction(orbitsAction)
         alertController.addAction(multiTouchAction)
         alertController.addAction(respawnAction)
+        alertController.addAction(iPadProAction)
         
         if let popoverPresentationController = alertController.popoverPresentationController
         {
@@ -147,25 +150,27 @@ class ViewController: UIViewController, ParticleLabDelegate
             popoverPresentationController.sourceView = view
         }
         
-        presentViewController(alertController, animated: true, completion: nil)
+        particleLab.paused = true
+        
+        presentViewController(alertController, animated: true, completion: {self.particleLab.paused = false})
     }
  
     func calloutActionHandler(value: UIAlertAction!) -> Void
     {
-        demoMode = DemoModes(rawValue: value.title!) ?? DemoModes.cloudChamber
+        demoMode = DemoModes(rawValue: value.title!) ?? DemoModes.iPadProDemo
         
         switch demoMode
         {
         case .orbits:
             particleLab.dragFactor = 0.82
             particleLab.respawnOutOfBoundsParticles = true
-            particleLab.clearOnStep = false
+            particleLab.clearOnStep = true
             particleLab.resetParticles(false)
             
         case .cloudChamber:
             particleLab.dragFactor = 0.8
             particleLab.respawnOutOfBoundsParticles = false
-            particleLab.clearOnStep = false
+            particleLab.clearOnStep = true
             particleLab.resetParticles(true)
             
         case .multiTouch:
@@ -178,6 +183,12 @@ class ViewController: UIViewController, ParticleLabDelegate
             particleLab.dragFactor = 0.98
             particleLab.respawnOutOfBoundsParticles = true
             particleLab.clearOnStep = true
+            particleLab.resetParticles(true)
+            
+        case .iPadProDemo:
+            particleLab.dragFactor = 0.15
+            particleLab.respawnOutOfBoundsParticles = true
+            particleLab.clearOnStep = false
             particleLab.resetParticles(true)
         }
     }
@@ -201,6 +212,9 @@ class ViewController: UIViewController, ParticleLabDelegate
             
         case .respawn:
             respawnStep()
+            
+        case .iPadProDemo:
+            ipadProDemoStep()
         }
     }
     
@@ -248,6 +262,36 @@ class ViewController: UIViewController, ParticleLabDelegate
                 spin: 0)
         }
         
+    }
+    
+    func ipadProDemoStep()
+    {
+        gravityWellAngle = gravityWellAngle + 0.002
+        
+        particleLab.setGravityWellProperties(gravityWell: .One,
+            normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 0.5),
+            normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 0.5),
+            mass: 11 * sin(gravityWellAngle / 1.9),
+            spin: 23 * cos(gravityWellAngle / 2.1))
+        
+        particleLab.setGravityWellProperties(gravityWell: .Two,
+            normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 1.5),
+            normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 1.5),
+            mass: 11 * sin(gravityWellAngle / 1.9),
+            spin: 23 * cos(gravityWellAngle / 2.1))
+        
+        particleLab.setGravityWellProperties(gravityWell: .Three,
+            normalisedPositionX: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * cos(gravityWellAngle / 1.3),
+            normalisedPositionY: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * sin(gravityWellAngle / 1.3),
+            mass: 26, spin: -19 * sin(gravityWellAngle * 1.5))
+        
+        let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Three)
+        
+        particleLab.setGravityWellProperties(gravityWell: .Four,
+            normalisedPositionX: particleThreePosition.x + 0.03 * sin(gravityWellAngle * 37),
+            normalisedPositionY: particleThreePosition.y + 0.03 * cos(gravityWellAngle * 37),
+            mass: 8,
+            spin: 25)
     }
     
     func orbitsStep()
@@ -339,6 +383,7 @@ class ViewController: UIViewController, ParticleLabDelegate
 
 enum DemoModes: String
 {
+    case iPadProDemo = "iPad Pro Demo"
     case cloudChamber = "Cloud Chamber"
     case orbits = "Orbits"
     case multiTouch = "Multiple Touch"

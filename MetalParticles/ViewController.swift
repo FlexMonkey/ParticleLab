@@ -87,7 +87,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         menuButton.setImage(UIImage(named: "hamburger.png"), forState: UIControlState.Normal)
         menuButton.addTarget(self, action: "displayCallout", forControlEvents: UIControlEvents.TouchDown)
         
-        //view.addSubview(menuButton)
+        view.addSubview(menuButton)
         
         statusLabel.text = "http://flexmonkey.blogspot.co.uk"
         statusLabel.textColor = UIColor.darkGrayColor()

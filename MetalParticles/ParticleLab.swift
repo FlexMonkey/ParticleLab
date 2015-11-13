@@ -67,8 +67,17 @@ class ParticleLab: MTKView
     var dragFactor: Float = 0.97
     var respawnOutOfBoundsParticles = false
     
-    var blur: MPSImageGaussianBlur?
-    var erode: MPSImageAreaMin?
+    lazy var blur: MPSImageGaussianBlur =
+    {
+        [unowned self] in
+        return MPSImageGaussianBlur(device: self.device!, sigma: 3)
+    }()
+    
+    lazy var erode: MPSImageAreaMin =
+    {
+        [unowned self] in
+        return MPSImageAreaMin(device: self.device!, kernelWidth: 5, kernelHeight: 5)
+    }()
     
     var clearOnStep = true
     
@@ -241,9 +250,6 @@ class ParticleLab: MTKView
         imageWidthFloatBuffer =  device.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
         
         imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
-
-        blur = MPSImageGaussianBlur(device: device, sigma: 3)
-        erode = MPSImageAreaMin(device: device, kernelWidth: 5, kernelHeight: 5)
     }
     
     override func drawRect(dirtyRect: CGRect)
@@ -323,11 +329,11 @@ class ParticleLab: MTKView
             let inPlaceTexture = UnsafeMutablePointer<MTLTexture?>.alloc(1)
             inPlaceTexture.initialize(drawable.texture)
             
-            blur?.encodeToCommandBuffer(commandBuffer,
+            blur.encodeToCommandBuffer(commandBuffer,
                 inPlaceTexture: inPlaceTexture,
                 fallbackCopyAllocator: nil)
             
-            erode?.encodeToCommandBuffer(commandBuffer,
+            erode.encodeToCommandBuffer(commandBuffer,
                 inPlaceTexture: inPlaceTexture,
                 fallbackCopyAllocator: nil)
         }

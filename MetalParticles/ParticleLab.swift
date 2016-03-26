@@ -103,8 +103,8 @@ class ParticleLab: MTKView
         
         statusPrefix = formatter.stringFromNumber(numParticles.rawValue * 4)! + " Particles"
  
-        let frameWidth = hiDPI ? width / 2 : width
-        let frameHeight = hiDPI ? height / 2 : height
+        let frameWidth = hiDPI ? width / UInt(UIScreen.mainScreen().scale) : width
+        let frameHeight = hiDPI ? height / UInt(UIScreen.mainScreen().scale) : height
         
         super.init(frame: CGRect(x: 0, y: 0, width: Int(frameWidth), height: Int(frameHeight)), device:  MTLCreateSystemDefaultDevice())
         

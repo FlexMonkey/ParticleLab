@@ -47,13 +47,15 @@ class ViewController: UIViewController, ParticleLabDelegate
         super.viewDidLoad()
         
         view.backgroundColor = UIColor.blackColor()
+        
+        print(UIScreen.mainScreen().scale)
     
         let numParticles = ParticleCount.EightMillion
         
         if hiDPI
         {
-            particleLab = ParticleLab(width: UInt(view.frame.width * 2),
-                height: UInt(view.frame.height * 2),
+            particleLab = ParticleLab(width: UInt(view.frame.width * UIScreen.mainScreen().scale),
+                height: UInt(view.frame.height * UIScreen.mainScreen().scale),
                 numParticles: numParticles,
                 hiDPI: true)
         }

@@ -32,11 +32,13 @@ class ViewController: UIViewController, ParticleLabDelegate
     
     let floatPi = Float(M_PI)
     
+    let hiDPI = false
+    
     var particleLab: ParticleLab!
     
     var gravityWellAngle: Float = 0
     
-    var demoMode = DemoModes.iPadProDemo
+    var demoMode = DemoModes.cloudChamber
     
     var currentTouches = Set<UITouch>()
     
@@ -48,32 +50,29 @@ class ViewController: UIViewController, ParticleLabDelegate
     
         let numParticles = ParticleCount.EightMillion
         
-        if view.frame.height < view.frame.width
+        if hiDPI
         {
-            particleLab = ParticleLab(width: UInt(view.frame.width),
-                height: UInt(view.frame.height),
-                numParticles: numParticles)
-       
-            particleLab.frame = CGRect(x: 0,
-                y: 0,
-                width: view.frame.width,
-                height: view.frame.height)
+            particleLab = ParticleLab(width: UInt(view.frame.width * 2),
+                height: UInt(view.frame.height * 2),
+                numParticles: numParticles,
+                hiDPI: true)
         }
         else
         {
-            particleLab = ParticleLab(width: UInt(view.frame.height),
-                height: UInt(view.frame.width),
-                numParticles: numParticles)
-            
-            particleLab.frame = CGRect(x: 0,
-                y: 0,
-                width: view.frame.height,
-                height: view.frame.width)
+            particleLab = ParticleLab(width: UInt(view.frame.width),
+                height: UInt(view.frame.height),
+                numParticles: numParticles,
+                hiDPI: false)
         }
+        
+        particleLab.frame = CGRect(x: 0,
+                                   y: 0,
+                                   width: view.frame.width,
+                                   height: view.frame.height)
         
         particleLab.particleLabDelegate = self
         particleLab.dragFactor = 0.5
-        particleLab.clearOnStep = false
+        particleLab.clearOnStep = true
         particleLab.respawnOutOfBoundsParticles = false
         
         view.addSubview(particleLab)
@@ -85,7 +84,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         menuButton.showsTouchWhenHighlighted = true
         menuButton.imageView?.contentMode = UIViewContentMode.ScaleAspectFit
         menuButton.setImage(UIImage(named: "hamburger.png"), forState: UIControlState.Normal)
-        menuButton.addTarget(self, action: "displayCallout", forControlEvents: UIControlEvents.TouchDown)
+        menuButton.addTarget(self, action: #selector(ViewController.displayCallout), forControlEvents: UIControlEvents.TouchDown)
         
         view.addSubview(menuButton)
         
@@ -101,9 +100,7 @@ class ViewController: UIViewController, ParticleLabDelegate
             y: view.frame.height - statusLabel.intrinsicContentSize().height,
             width: view.frame.width,
             height: statusLabel.intrinsicContentSize().height)
-        
-        // frame: CGRect(x: 5, y: 5, width: 30, height: 30)
-        
+
         menuButton.frame = CGRect(x: view.frame.width - 35,
             y: view.frame.height - 35,
             width: 30,
@@ -252,8 +249,8 @@ class ViewController: UIViewController, ParticleLabDelegate
                 mass: 40 * touchMultiplier,
                 spin: 20 * touchMultiplier)
         }
-
-        for var i = currentTouchesArray.count; i < 4; i++
+ 
+        for i in currentTouchesArray.count ..< 4
         {
             particleLab.setGravityWellProperties(gravityWellIndex: i,
                 normalisedPositionX: 0.5,

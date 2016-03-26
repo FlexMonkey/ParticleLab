@@ -84,7 +84,7 @@ class ParticleLab: MTKView
     let statusPrefix: String
     var statusPostix: String = ""
     
-    init(width: UInt, height: UInt, numParticles: ParticleCount)
+    init(width: UInt, height: UInt, numParticles: ParticleCount, hiDPI: Bool)
     {
         particleCount = numParticles.rawValue
         
@@ -103,7 +103,10 @@ class ParticleLab: MTKView
         
         statusPrefix = formatter.stringFromNumber(numParticles.rawValue * 4)! + " Particles"
  
-        super.init(frame: CGRect(x: 0, y: 0, width: Int(width), height: Int(height)), device:  MTLCreateSystemDefaultDevice())
+        let frameWidth = hiDPI ? width / 2 : width
+        let frameHeight = hiDPI ? height / 2 : height
+        
+        super.init(frame: CGRect(x: 0, y: 0, width: Int(frameWidth), height: Int(frameHeight)), device:  MTLCreateSystemDefaultDevice())
         
         framebufferOnly = false
         drawableSize = CGSize(width: CGFloat(imageWidth), height: CGFloat(imageHeight));
@@ -261,7 +264,7 @@ class ParticleLab: MTKView
             return
         }
         
-        frameNumber++
+        frameNumber += 1
         
         if frameNumber == 100
         {

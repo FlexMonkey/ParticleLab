@@ -46,16 +46,16 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor.blackColor()
+        view.backgroundColor = UIColor.black
         
-        print(UIScreen.mainScreen().scale)
+        print(UIScreen.main.scale)
     
-        let numParticles = ParticleCount.EightMillion
+        let numParticles = ParticleCount.eightMillion
         
         if hiDPI
         {
-            particleLab = ParticleLab(width: UInt(view.frame.width * UIScreen.mainScreen().scale),
-                height: UInt(view.frame.height * UIScreen.mainScreen().scale),
+            particleLab = ParticleLab(width: UInt(view.frame.width * UIScreen.main.scale),
+                height: UInt(view.frame.height * UIScreen.main.scale),
                 numParticles: numParticles,
                 hiDPI: true)
         }
@@ -79,19 +79,19 @@ class ViewController: UIViewController, ParticleLabDelegate
         
         view.addSubview(particleLab)
         
-        menuButton.layer.borderColor = UIColor.lightGrayColor().CGColor
+        menuButton.layer.borderColor = UIColor.lightGray.cgColor
         menuButton.layer.borderWidth = 1
         menuButton.layer.cornerRadius = 5
-        menuButton.layer.backgroundColor = UIColor.darkGrayColor().CGColor
+        menuButton.layer.backgroundColor = UIColor.darkGray.cgColor
         menuButton.showsTouchWhenHighlighted = true
-        menuButton.imageView?.contentMode = UIViewContentMode.ScaleAspectFit
-        menuButton.setImage(UIImage(named: "hamburger.png"), forState: UIControlState.Normal)
-        menuButton.addTarget(self, action: #selector(ViewController.displayCallout), forControlEvents: UIControlEvents.TouchDown)
+        menuButton.imageView?.contentMode = UIViewContentMode.scaleAspectFit
+        menuButton.setImage(UIImage(named: "hamburger.png"), for: UIControlState())
+        menuButton.addTarget(self, action: #selector(ViewController.displayCallout), for: UIControlEvents.touchDown)
         
         view.addSubview(menuButton)
         
         statusLabel.text = "http://flexmonkey.blogspot.co.uk"
-        statusLabel.textColor = UIColor.darkGrayColor()
+        statusLabel.textColor = UIColor.darkGray
         
         view.addSubview(statusLabel)
     }
@@ -99,9 +99,9 @@ class ViewController: UIViewController, ParticleLabDelegate
     override func viewDidLayoutSubviews()
     {
         statusLabel.frame = CGRect(x: 5,
-            y: view.frame.height - statusLabel.intrinsicContentSize().height,
+            y: view.frame.height - statusLabel.intrinsicContentSize.height,
             width: view.frame.width,
-            height: statusLabel.intrinsicContentSize().height)
+            height: statusLabel.intrinsicContentSize.height)
 
         menuButton.frame = CGRect(x: view.frame.width - 35,
             y: view.frame.height - 35,
@@ -114,25 +114,25 @@ class ViewController: UIViewController, ParticleLabDelegate
         // handle metal unavailable here
     }
 
-    override func touchesBegan(touches: Set<UITouch>, withEvent event: UIEvent?)
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?)
     {
         currentTouches = currentTouches.union(touches)
     }
 
-    override func touchesEnded(touches: Set<UITouch>, withEvent event: UIEvent?)
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?)
     {
-        currentTouches = currentTouches.subtract(touches)
+        currentTouches = currentTouches.subtracting(touches)
     }
     
     func displayCallout()
     {
-        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.ActionSheet)
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: UIAlertControllerStyle.actionSheet)
         
-        let cloudChamberAction = UIAlertAction(title: DemoModes.cloudChamber.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
-        let orbitsAction = UIAlertAction(title: DemoModes.orbits.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
-        let multiTouchAction = UIAlertAction(title: DemoModes.multiTouch.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
-        let respawnAction = UIAlertAction(title: DemoModes.respawn.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
-        let iPadProAction = UIAlertAction(title: DemoModes.iPadProDemo.rawValue, style: UIAlertActionStyle.Default, handler: calloutActionHandler)
+        let cloudChamberAction = UIAlertAction(title: DemoModes.cloudChamber.rawValue, style: UIAlertActionStyle.default, handler: calloutActionHandler)
+        let orbitsAction = UIAlertAction(title: DemoModes.orbits.rawValue, style: UIAlertActionStyle.default, handler: calloutActionHandler)
+        let multiTouchAction = UIAlertAction(title: DemoModes.multiTouch.rawValue, style: UIAlertActionStyle.default, handler: calloutActionHandler)
+        let respawnAction = UIAlertAction(title: DemoModes.respawn.rawValue, style: UIAlertActionStyle.default, handler: calloutActionHandler)
+        let iPadProAction = UIAlertAction(title: DemoModes.iPadProDemo.rawValue, style: UIAlertActionStyle.default, handler: calloutActionHandler)
         
         alertController.addAction(cloudChamberAction)
         alertController.addAction(orbitsAction)
@@ -149,12 +149,12 @@ class ViewController: UIViewController, ParticleLabDelegate
             popoverPresentationController.sourceView = view
         }
         
-        particleLab.paused = true
+        particleLab.isPaused = true
         
-        presentViewController(alertController, animated: true, completion: {self.particleLab.paused = false})
+        present(alertController, animated: true, completion: {self.particleLab.isPaused = false})
     }
  
-    func calloutActionHandler(value: UIAlertAction!) -> Void
+    func calloutActionHandler(_ value: UIAlertAction!) -> Void
     {
         demoMode = DemoModes(rawValue: value.title!) ?? DemoModes.iPadProDemo
         
@@ -192,7 +192,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         }
     }
     
-    func particleLabDidUpdate(status: String)
+    func particleLabDidUpdate(_ status: String)
     {
         statusLabel.text = "http://flexmonkey.blogspot.co.uk  |  " + status
         
@@ -221,13 +221,13 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         gravityWellAngle = gravityWellAngle + 0.02
         
-        particleLab.setGravityWellProperties(gravityWell: .One,
+        particleLab.setGravityWellProperties(gravityWell: .one,
             normalisedPositionX: 0.5 + 0.45 * sin(gravityWellAngle),
             normalisedPositionY: 0.5 + 0.15 * cos(gravityWellAngle),
             mass: 14,
             spin: 16)
         
-        particleLab.setGravityWellProperties(gravityWell: .Two,
+        particleLab.setGravityWellProperties(gravityWell: .two,
             normalisedPositionX: 0.5 + 0.25 * cos(gravityWellAngle * 1.3),
             normalisedPositionY: 0.5 + 0.6 * sin(gravityWellAngle * 1.3),
             mass: 8,
@@ -239,15 +239,15 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         let currentTouchesArray = Array(currentTouches)
         
-        for (i, currentTouch) in currentTouchesArray.enumerate() where i < 4
+        for (i, currentTouch) in currentTouchesArray.enumerated() where i < 4
         {
             let touchMultiplier = currentTouch.force == 0 && currentTouch.maximumPossibleForce == 0
                 ? 1
                 : Float(currentTouch.force / currentTouch.maximumPossibleForce)
             
             particleLab.setGravityWellProperties(gravityWellIndex: i,
-                normalisedPositionX: Float(currentTouch.locationInView(view).x / view.frame.width) ,
-                normalisedPositionY: Float(currentTouch.locationInView(view).y / view.frame.height),
+                normalisedPositionX: Float(currentTouch.location(in: view).x / view.frame.width) ,
+                normalisedPositionY: Float(currentTouch.location(in: view).y / view.frame.height),
                 mass: 40 * touchMultiplier,
                 spin: 20 * touchMultiplier)
         }
@@ -267,28 +267,28 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         gravityWellAngle = gravityWellAngle + 0.004
         
-        particleLab.setGravityWellProperties(gravityWell: .One,
+        particleLab.setGravityWellProperties(gravityWell: .one,
             normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 0.5),
             normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 0.5),
             mass: 11 * sin(gravityWellAngle / 1.8),
             spin: 23 * cos(gravityWellAngle / 2.1))
         
-        particleLab.setGravityWellProperties(gravityWell: .Two,
+        particleLab.setGravityWellProperties(gravityWell: .two,
             normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 1.5),
             normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 1.5),
             mass: 11 * sin(gravityWellAngle / 0.9),
             spin: 23 * cos(gravityWellAngle / 1.05))
         
-        particleLab.setGravityWellProperties(gravityWell: .Three,
+        particleLab.setGravityWellProperties(gravityWell: .three,
             normalisedPositionX: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * cos(gravityWellAngle / 1.3),
             normalisedPositionY: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * sin(gravityWellAngle / 1.3),
             mass: 13, spin: 19 * sin(gravityWellAngle * 1.75))
         
-        let particleOnePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .One)
-        let particleTwoPosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Two)
-        let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Three)
+        let particleOnePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .one)
+        let particleTwoPosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .two)
+        let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .three)
         
-        particleLab.setGravityWellProperties(gravityWell: .Four,
+        particleLab.setGravityWellProperties(gravityWell: .four,
             normalisedPositionX: (particleOnePosition.x + particleTwoPosition.x + particleThreePosition.x) / 3 + 0.03 * sin(gravityWellAngle),
             normalisedPositionY: (particleOnePosition.y + particleTwoPosition.y + particleThreePosition.y) / 3 + 0.03 * cos(gravityWellAngle),
             mass: 8 ,
@@ -299,31 +299,31 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         gravityWellAngle = gravityWellAngle + 0.0015
         
-        particleLab.setGravityWellProperties(gravityWell: .One,
+        particleLab.setGravityWellProperties(gravityWell: .one,
             normalisedPositionX: 0.5 + 0.006 * cos(gravityWellAngle * 43),
             normalisedPositionY: 0.5 + 0.006 * sin(gravityWellAngle * 43),
             mass: 10,
             spin: 24)
         
-        let particleOnePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .One)
+        let particleOnePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .one)
         
-        particleLab.setGravityWellProperties(gravityWell: .Two,
+        particleLab.setGravityWellProperties(gravityWell: .two,
             normalisedPositionX: particleOnePosition.x + 0.3 * sin(gravityWellAngle * 5),
             normalisedPositionY: particleOnePosition.y + 0.3 * cos(gravityWellAngle * 5),
             mass: 4,
             spin: 18)
         
-        let particleTwoPosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Two)
+        let particleTwoPosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .two)
         
-        particleLab.setGravityWellProperties(gravityWell: .Three,
+        particleLab.setGravityWellProperties(gravityWell: .three,
             normalisedPositionX: particleTwoPosition.x + 0.1 * cos(gravityWellAngle * 23),
             normalisedPositionY: particleTwoPosition.y + 0.1 * sin(gravityWellAngle * 23),
             mass: 6,
             spin: 17)
         
-        let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .Three)
+        let particleThreePosition = particleLab.getGravityWellNormalisedPosition(gravityWell: .three)
         
-        particleLab.setGravityWellProperties(gravityWell: .Four,
+        particleLab.setGravityWellProperties(gravityWell: .four,
             normalisedPositionX: particleThreePosition.x + 0.03 * sin(gravityWellAngle * 37),
             normalisedPositionY: particleThreePosition.y + 0.03 * cos(gravityWellAngle * 37),
             mass: 8,
@@ -334,39 +334,39 @@ class ViewController: UIViewController, ParticleLabDelegate
     {
         gravityWellAngle = gravityWellAngle + 0.02
         
-        particleLab.setGravityWellProperties(gravityWell: .One,
+        particleLab.setGravityWellProperties(gravityWell: .one,
             normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 0.5),
             normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 0.5),
             mass: 11 * sin(gravityWellAngle / 1.9),
             spin: 23 * cos(gravityWellAngle / 2.1))
         
-        particleLab.setGravityWellProperties(gravityWell: .Four,
+        particleLab.setGravityWellProperties(gravityWell: .four,
             normalisedPositionX: 0.5 + 0.1 * sin(gravityWellAngle + floatPi * 1.5),
             normalisedPositionY: 0.5 + 0.1 * cos(gravityWellAngle + floatPi * 1.5),
             mass: 11 * sin(gravityWellAngle / 1.9),
             spin: 23 * cos(gravityWellAngle / 2.1))
         
-        particleLab.setGravityWellProperties(gravityWell: .Two,
+        particleLab.setGravityWellProperties(gravityWell: .two,
             normalisedPositionX: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * cos(gravityWellAngle / 1.3),
             normalisedPositionY: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * sin(gravityWellAngle / 1.3),
             mass: 26, spin: -19 * sin(gravityWellAngle * 1.5))
         
-        particleLab.setGravityWellProperties(gravityWell: .Three,
+        particleLab.setGravityWellProperties(gravityWell: .three,
             normalisedPositionX: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * cos(gravityWellAngle / 1.3 + floatPi),
             normalisedPositionY: 0.5 + (0.35 + sin(gravityWellAngle * 2.7)) * sin(gravityWellAngle / 1.3 + floatPi),
             mass: 26, spin: -19 * sin(gravityWellAngle * 1.5))
     }
     
     
-    override func supportedInterfaceOrientations() -> UIInterfaceOrientationMask
+    override var supportedInterfaceOrientations : UIInterfaceOrientationMask
     {
-        return UIInterfaceOrientationMask.Landscape
+        return UIInterfaceOrientationMask.landscape
     }
     
     
-    override func preferredStatusBarStyle() -> UIStatusBarStyle
+    override var preferredStatusBarStyle : UIStatusBarStyle
     {
-        return UIStatusBarStyle.LightContent
+        return UIStatusBarStyle.lightContent
     }
     
     override func didReceiveMemoryWarning()
@@ -375,7 +375,7 @@ class ViewController: UIViewController, ParticleLabDelegate
         // Dispose of any resources that can be recreated.
     }
     
-    override func prefersStatusBarHidden() -> Bool
+    override var prefersStatusBarHidden : Bool
     {
         return true
     }

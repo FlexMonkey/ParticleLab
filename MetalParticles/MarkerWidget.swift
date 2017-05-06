@@ -24,11 +24,11 @@ class Circle: CAShapeLayer
 {
     func draw()
     {
-        fillColor = UIColor.lightGrayColor().CGColor
+        fillColor = UIColor.lightGray.cgColor
         
         let ballRect = CGRect(x: -10, y: -10, width: 20, height: 20)
-        let ballPath = UIBezierPath(ovalInRect: ballRect)
+        let ballPath = UIBezierPath(ovalIn: ballRect)
         
-        path = ballPath.CGPath
+        path = ballPath.cgPath
     }
 }

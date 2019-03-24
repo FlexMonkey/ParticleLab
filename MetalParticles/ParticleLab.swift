@@ -47,8 +47,8 @@ class ParticleLab: MTKView
     let alignment:Int = 0x4000
     let particlesMemoryByteSize:Int
     
-    private var particlesMemory:UnsafeMutablePointer<Void> = nil
-    private var particlesVoidPtr: COpaquePointer!
+    private var particlesMemory:UnsafeMutableRawPointer? = nil
+    private var particlesVoidPtr: OpaquePointer!
     private var particlesParticlePtr: UnsafeMutablePointer<Particle>!
     private var particlesParticleBufferPtr: UnsafeMutableBufferPointer<Particle>!
     
@@ -59,7 +59,7 @@ class ParticleLab: MTKView
     
     private var frameStartTime: CFAbsoluteTime!
     private var frameNumber = 0
-    let particleSize = sizeof(Particle)
+    let particleSize = MemoryLayout<Particle>.size
 
     weak var particleLabDelegate: ParticleLabDelegate?
     
@@ -94,17 +94,17 @@ class ParticleLab: MTKView
         bytesPerRow = 4 * imageWidth
         
         region = MTLRegionMake2D(0, 0, Int(imageWidth), Int(imageHeight))
-        blankBitmapRawData = [UInt8](count: Int(imageWidth * imageHeight * 4), repeatedValue: 0)
-        particlesMemoryByteSize = particleCount * sizeof(Particle)
+        blankBitmapRawData = [UInt8](repeating: 0, count: Int(imageWidth * imageHeight * 4))
+        particlesMemoryByteSize = particleCount * MemoryLayout<Particle>.size
     
-        let formatter = NSNumberFormatter()
+        let formatter = NumberFormatter()
         formatter.usesGroupingSeparator = true
-        formatter.numberStyle = NSNumberFormatterStyle.DecimalStyle
+        formatter.numberStyle = .decimal
         
-        statusPrefix = formatter.stringFromNumber(numParticles.rawValue * 4)! + " Particles"
+        statusPrefix = "\(numParticles.rawValue * 4) Particles"
  
-        let frameWidth = hiDPI ? width / UInt(UIScreen.mainScreen().scale) : width
-        let frameHeight = hiDPI ? height / UInt(UIScreen.mainScreen().scale) : height
+        let frameWidth = hiDPI ? width / UInt(UIScreen.main.scale) : width
+        let frameHeight = hiDPI ? height / UInt(UIScreen.main.scale) : height
         
         super.init(frame: CGRect(x: 0, y: 0, width: Int(frameWidth), height: Int(frameHeight)), device:  MTLCreateSystemDefaultDevice())
         
@@ -115,7 +115,7 @@ class ParticleLab: MTKView
         
         setUpMetal()
         
-        multipleTouchEnabled = true
+        isMultipleTouchEnabled = true
     }
 
     required init(coder: NSCoder)
@@ -133,11 +133,11 @@ class ParticleLab: MTKView
     {
         posix_memalign(&particlesMemory, alignment, particlesMemoryByteSize)
         
-        particlesVoidPtr = COpaquePointer(particlesMemory)
+        particlesVoidPtr = OpaquePointer(particlesMemory)
         particlesParticlePtr = UnsafeMutablePointer<Particle>(particlesVoidPtr)
         particlesParticleBufferPtr = UnsafeMutableBufferPointer(start: particlesParticlePtr, count: particleCount)
         
-        resetParticles(true)
+        resetParticles(edgesOnly: true)
     }
     
     func resetGravityWells()
@@ -226,14 +226,14 @@ class ParticleLab: MTKView
             return
         }
         
-        defaultLibrary = device.newDefaultLibrary()
-        commandQueue = device.newCommandQueue()
+        defaultLibrary = device.makeDefaultLibrary()
+        commandQueue = device.makeCommandQueue()
         
-        kernelFunction = defaultLibrary.newFunctionWithName("particleRendererShader")
+        kernelFunction = defaultLibrary.makeFunction(name: "particleRendererShader")
         
         do
         {
-            try pipelineState = device.newComputePipelineStateWithFunction(kernelFunction!)
+            try pipelineState = device.makeComputePipelineState(function: kernelFunction!)
         }
         catch
         {
@@ -250,12 +250,12 @@ class ParticleLab: MTKView
         var imageWidthFloat = Float(imageWidth)
         var imageHeightFloat = Float(imageHeight)
         
-        imageWidthFloatBuffer =  device.newBufferWithBytes(&imageWidthFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+        imageWidthFloatBuffer =  device.makeBuffer(bytes: &imageWidthFloat, length: MemoryLayout<Float>.size, options: [])
         
-        imageHeightFloatBuffer = device.newBufferWithBytes(&imageHeightFloat, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
+        imageHeightFloatBuffer = device.makeBuffer(bytes: &imageHeightFloat, length: MemoryLayout<Float>.size, options: [])
     }
     
-    override func drawRect(dirtyRect: CGRect)
+    override func draw(_ dirtyRect: CGRect)
     {
         guard let device = device else
         {
@@ -277,31 +277,31 @@ class ParticleLab: MTKView
             frameNumber = 0
         }
         
-        let commandBuffer = commandQueue.commandBuffer()
-        let commandEncoder = commandBuffer.computeCommandEncoder()
+        guard let commandBuffer = commandQueue.makeCommandBuffer(),
+            let commandEncoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
         commandEncoder.setComputePipelineState(pipelineState)
         
-        let particlesBufferNoCopy = device.newBufferWithBytesNoCopy(particlesMemory, length: Int(particlesMemoryByteSize),
-            options: MTLResourceOptions.CPUCacheModeDefaultCache, deallocator: nil)
+        let particlesBufferNoCopy = device.makeBuffer(bytesNoCopy: particlesMemory!, length: Int(particlesMemoryByteSize),
+            options: [], deallocator: nil)
         
-        commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 0)
-        commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, atIndex: 1)
+        commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, index: 0)
+        commandEncoder.setBuffer(particlesBufferNoCopy, offset: 0, index: 1)
         
-        let inGravityWell = device.newBufferWithBytes(&gravityWellParticle, length: particleSize, options: MTLResourceOptions.CPUCacheModeDefaultCache)
-        commandEncoder.setBuffer(inGravityWell, offset: 0, atIndex: 2)
+        let inGravityWell = device.makeBuffer(bytes: &gravityWellParticle, length: particleSize, options: [])
+        commandEncoder.setBuffer(inGravityWell, offset: 0, index: 2)
         
-        let colorBuffer = device.newBufferWithBytes(&particleColor, length: sizeof(ParticleColor), options: MTLResourceOptions.CPUCacheModeDefaultCache)
-        commandEncoder.setBuffer(colorBuffer, offset: 0, atIndex: 3)
+        let colorBuffer = device.makeBuffer(bytes: &particleColor, length: MemoryLayout<ParticleColor>.size, options: [])
+        commandEncoder.setBuffer(colorBuffer, offset: 0, index: 3)
         
-        commandEncoder.setBuffer(imageWidthFloatBuffer, offset: 0, atIndex: 4)
-        commandEncoder.setBuffer(imageHeightFloatBuffer, offset: 0, atIndex: 5)
+        commandEncoder.setBuffer(imageWidthFloatBuffer, offset: 0, index: 4)
+        commandEncoder.setBuffer(imageHeightFloatBuffer, offset: 0, index: 5)
         
-        let dragFactorBuffer = device.newBufferWithBytes(&dragFactor, length: sizeof(Float), options: MTLResourceOptions.CPUCacheModeDefaultCache)
-        commandEncoder.setBuffer(dragFactorBuffer, offset: 0, atIndex: 6)
+        let dragFactorBuffer = device.makeBuffer(bytes: &dragFactor, length: MemoryLayout<Float>.size, options: [])
+        commandEncoder.setBuffer(dragFactorBuffer, offset: 0, index: 6)
         
-        let respawnOutOfBoundsParticlesBuffer = device.newBufferWithBytes(&respawnOutOfBoundsParticles, length: sizeof(Bool), options: MTLResourceOptions.CPUCacheModeDefaultCache)
-        commandEncoder.setBuffer(respawnOutOfBoundsParticlesBuffer, offset: 0, atIndex: 7)
+        let respawnOutOfBoundsParticlesBuffer = device.makeBuffer(bytes: &respawnOutOfBoundsParticles, length: MemoryLayout<Bool>.size, options: [])
+        commandEncoder.setBuffer(respawnOutOfBoundsParticlesBuffer, offset: 0, index: 7)
 
         guard let drawable = currentDrawable else
         {
@@ -314,14 +314,13 @@ class ParticleLab: MTKView
 
         if clearOnStep
         {
-            drawable.texture.replaceRegion(self.region,
+            drawable.texture.replace(region: self.region,
                 mipmapLevel: 0,
                 withBytes: blankBitmapRawData,
                 bytesPerRow: Int(bytesPerRow))
         }
-        
             
-        commandEncoder.setTexture(drawable.texture, atIndex: 0)
+        commandEncoder.setTexture(drawable.texture, index: 0)
         
         commandEncoder.dispatchThreadgroups(threadgroupsPerGrid, threadsPerThreadgroup: threadsPerThreadgroup)
         
@@ -329,26 +328,21 @@ class ParticleLab: MTKView
         
         if !clearOnStep
         {
-            let inPlaceTexture = UnsafeMutablePointer<MTLTexture?>.alloc(1)
-            inPlaceTexture.initialize(drawable.texture)
+            let inPlaceTexture = UnsafeMutablePointer<MTLTexture>.allocate(capacity: 1)
+            inPlaceTexture.initialize(to: drawable.texture)
             
-            blur.encodeToCommandBuffer(commandBuffer,
-                inPlaceTexture: inPlaceTexture,
-                fallbackCopyAllocator: nil)
-            
-            erode.encodeToCommandBuffer(commandBuffer,
-                inPlaceTexture: inPlaceTexture,
-                fallbackCopyAllocator: nil)
+            blur.encode(commandBuffer: commandBuffer, inPlaceTexture: inPlaceTexture, fallbackCopyAllocator: nil)
+            erode.encode(commandBuffer: commandBuffer, inPlaceTexture: inPlaceTexture, fallbackCopyAllocator: nil)
         }
         
         commandBuffer.commit()
         
         drawable.present()
 
-        particleLabDelegate?.particleLabDidUpdate(statusPrefix + statusPostix)
+        particleLabDelegate?.particleLabDidUpdate(status: statusPrefix + statusPostix)
     }
     
-    final func getGravityWellNormalisedPosition(gravityWell gravityWell: GravityWell) -> (x: Float, y: Float)
+    final func getGravityWellNormalisedPosition(gravityWell: GravityWell) -> (x: Float, y: Float)
     {
         let returnPoint: (x: Float, y: Float)
         
@@ -373,7 +367,7 @@ class ParticleLab: MTKView
         return returnPoint
     }
     
-    final func setGravityWellProperties(gravityWellIndex gravityWellIndex: Int, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
+    final func setGravityWellProperties(gravityWellIndex: Int, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
     {
         switch gravityWellIndex
         {
@@ -391,7 +385,7 @@ class ParticleLab: MTKView
         }
     }
     
-    final func setGravityWellProperties(gravityWell gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
+    final func setGravityWellProperties(gravityWell: GravityWell, normalisedPositionX: Float, normalisedPositionY: Float, mass: Float, spin: Float)
     {
         let imageWidthFloat = Float(imageWidth)
         let imageHeightFloat = Float(imageHeight)
